@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{get_ids}
 \alias{get_ids}
-\title{Title}
+\title{Get ids from data frame}
 \usage{
 get_ids(df, id_col)
 }
@@ -15,5 +15,5 @@ get_ids(df, id_col)
 Vector of Airtable IDs
 }
 \description{
-Title
+Get ids from data frame
 }

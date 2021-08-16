@@ -35,10 +35,7 @@ new_airtable <- function(table = character(), base = character(), view = charact
 
 }
 
-#' Validate a new airtable object
-#'
-#' @param airtable_obj An object of class `airtable`
-#'
+# validate a new airtable object
 
 validate_airtable <- function(airtable_obj){
 
@@ -60,7 +57,7 @@ validate_airtable <- function(airtable_obj){
   }
 
   if (length(base) > 1){
-    stop("Tables appear in a single Aitable base. `base` should be a single character value", .call = FALSE)
+    stop("Tables appear in a single Airtable base. `base` should be a single character value", .call = FALSE)
   }
 
   if (length(base) < 1){
@@ -105,10 +102,7 @@ str.airtable = function(object, ...) {
 
 }
 
-#' Retrieve API Key
-#'
-#' @return API Key
-#'
+# Retrieve API Key
 
 get_airtable_api_key <- function(){
 
@@ -121,13 +115,7 @@ get_airtable_api_key <- function(){
   key
 }
 
-#' Split a dataframe by row
-#'
-#' @param df A data frame
-#' @param chunk_size Size of splits
-#'
-#' @return List
-#'
+# Split a dataframe by row
 
 split_rows <- function(df, chunk_size){
   n_rows <- nrow(df)
@@ -191,7 +179,7 @@ batch_encode_patch <- function(df, id_col = NULL){
   encode
 }
 
-#' Title
+#' Get ids from data frame
 #'
 #' @param df A dataframe
 #' @param id_col Optional name of a column containing Airtable record IDs
@@ -222,13 +210,7 @@ get_ids <- function(df, id_col){
 
 }
 
-#' Split list or vector into equal size pieces
-#'
-#' @param lst A list or vector
-#' @param chunk_size Maximum length of the pieces
-#'
-#' @return A list of with each element having length chunk_size or less
-#'
+# Split list or vector into equal size pieces
 
 split_list <- function(lst, chunk_size = 10){
   mapply(
@@ -239,24 +221,12 @@ split_list <- function(lst, chunk_size = 10){
   )
 }
 
-#' Exit function without error
-#'
-#' @param ... Any number of objects to be concetenated into a message
-#'
-
 stop_quietly <- function(...) {
   opt <- options(show.error.messages = FALSE)
   on.exit(options(opt))
   cat(paste(..., collapse = " "))
   stop()
 }
-
-#' Return an informative error response
-#'
-#' @param response_status httr response status
-#'
-#' @return An informative error message
-#'
 
 process_error <- function(response_status){
 
@@ -303,6 +273,8 @@ delete <- function(ids, airtable_obj){
   Sys.sleep(.2)
 }
 
+vdelete <- Vectorize(delete, vectorize.args = "ids")
+
 #' Send batch post request
 #'
 #' @param records JSON records to post
@@ -327,11 +299,9 @@ post <- function(records, airtable_obj){
 
 }
 
-#' Get a subset of records via the API
-#'
-#' @param airtable  An object of class `airtable`
-#' @param max_records Maximum number of records to return
-#'
+vpost <- Vectorize(post, vectorize.args = "records")
+
+# Get a subset of records via the API
 
 api_get <- function(airtable, max_records){
   response <- httr::GET(paste0(attr(airtable, "request_url"), "?"),
@@ -353,12 +323,7 @@ api_get <- function(airtable, max_records){
 
 }
 
-#' Compare the names of two data frames and stop execution if they do not match
-#'
-#' @param df1 A dataframe
-#' @param df2 A dataframe
-#'
-#'
+# Compare the names of two data frames and stop execution if they do not match
 
 compare_names <- function(df1, df2){
 
@@ -396,17 +361,11 @@ compare_names <- function(df1, df2){
 
 }
 
-#' If the user chooses to execute safely, confirm action before proceeding
-#'
-#' @param safely A boolean
-#' @param cancel_message A message to send if cancellation is chosen
-#' @param ... One or morse expressions to print in the menu
-#' @importFrom crayon red
-#' @importFrom crayon green
-#' @importFrom cli symbol
-#'
+# If the user chooses to execute safely, confirm action before proceeding
 
 safety_check <- function(safely, cancel_message,  ...){
+
+  stopifnot(is.logical(safely))
 
   if (safely){
 

@@ -10,7 +10,6 @@
 #' @importFrom httr add_headers
 #' @importFrom httr status_code
 #' @importFrom dplyr `%>%`
-#' @importFrom purrr walk
 #'
 
 insert_records <- function(data, airtable, batch_size = 10){
@@ -19,7 +18,6 @@ insert_records <- function(data, airtable, batch_size = 10){
   stopifnot(is.data.frame(data))
   stopifnot(batch_size <= 10)
 
-
   current_table <-  api_get(airtable, 15)
 
   compare_names(data, current_table)
@@ -27,6 +25,8 @@ insert_records <- function(data, airtable, batch_size = 10){
   batch_json_requests <- split_rows(data, batch_size) %>%
     lapply(batch_encode_post)
 
-  purrr::walk(batch_json_requests, ~post(.x, airtable_obj = airtable))
+  # purrr::walk(batch_json_requests, ~post(.x, airtable_obj = airtable))
+
+  vpost(records = batch_json_requests, airtable_obj = airtable)
 
 }

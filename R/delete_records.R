@@ -10,7 +10,6 @@
 #'
 #' @export
 #'
-#' @importFrom purrr walk
 #' @importFrom utils menu
 #' @importFrom crayon green
 #' @importFrom crayon red
@@ -34,7 +33,9 @@ delete_records <- function(data, airtable, airtable_id_col = NULL, safely = TRUE
 
   id_batches <- lapply(split_list(ids, batch_size), function(x) paste0("records[]=", x, collapse = "&"))
 
-  purrr::walk(id_batches, ~delete(.x, airtable_obj = airtable))
+  # purrr::walk(id_batches, ~delete(.x, airtable_obj = airtable))
+
+  vdelete(ids = id_batches, airtable_obj = airtable)
 
   cat(crayon::green(cli::symbol$tick), paste0("Deleted ", length(ids), " records."))
 
