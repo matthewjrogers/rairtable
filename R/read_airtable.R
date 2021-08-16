@@ -53,7 +53,7 @@ read_airtable <- function(airtable, id_to_col = FALSE, base_max_rows = 50000){
 
   }
 
-  table_data <- data.table::rbindlist(dta, use.names = TRUE)
+  table_data <- data.table::rbindlist(dta, use.names = TRUE, fill = TRUE)
 
   if(!id_to_col){
     table_data <- tibble::column_to_rownames(table_data, 'airtable_id')

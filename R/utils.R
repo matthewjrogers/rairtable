@@ -335,9 +335,10 @@ compare_names <- function(df1, df2){
   if(!same_length){
     stop(
       sprintf(
-        "The provided data and the data on the Airtable base have an inconsistent number of columns.\n\nThe provided data has %s columns, while the Airtable base has %s columns"),
+        "The provided data and the data on the Airtable base have an inconsistent number of columns.\n\nThe provided data has %s columns, while the Airtable base has %s columns",
       length(names1),
       length(names2)
+      )
     )
   }
 
