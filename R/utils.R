@@ -121,29 +121,84 @@ split_rows <- function(df, chunk_size){
   n_rows <- nrow(df)
   split_vec  <- rep(1:ceiling(n_rows / chunk_size), each = chunk_size)[1:n_rows]
   res <- split(df, split_vec)
+
+  res
+}
+
+encode_batch <- function(list_of_lists){
+  names(list_of_lists) <- rep('fields', length(list_of_lists))
+
+  fields <- list(records = list(list_of_lists))
+
+  jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
+                              # pretty = TRUE,
+                              na = "null")
+
+  cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
+  cln
 }
 
 #' JSON encode a dataframe for POST
 #'
 #' @param df Dataframe
+#' @param batch_size Size of json batches to create. Max 10.
 #'
 #' @return JSON object
 #' @importFrom jsonlite toJSON
 #' @importFrom jsonlite unbox
 #' @importFrom dplyr `%>%`
+#' @importFrom dplyr group_by
+#' @importFrom dplyr group_split
+#' @importFrom dplyr mutate
+#' @importFrom dplyr row_number
+#' @importFrom parallel detectCores
+#' @importFrom snow makeCluster
+#' @importFrom snow clusterApply
+#' @importFrom snow stopCluster
+#' @importFrom rlang .data
 #'
 
-batch_encode_post <- function(df){
+batch_encode_post <- function(df, batch_size = 10){
 
-  split <- lapply(split_rows(df, 1),
-                  function(x) jsonlite::toJSON(list(fields = jsonlite::unbox(x)))
-  ) %>%
-    unlist()
+  records <- df %>%
+    dplyr::mutate(rowid = row_number()) %>%
+    dplyr::group_by(.data$rowid) %>%
+    dplyr::group_split(.keep = FALSE)
 
-  names(split) <- NULL
+  records_lst <- lapply(records, as.list)
 
-  encode <- sprintf('{"records":[%s]}', paste(split, collapse = ","))
-  encode
+  batches <- split_list(records_lst, batch_size)
+
+  cl <- snow::makeCluster(parallel::detectCores(), type = 'SOCK')
+
+  encoded_batches <- snow::clusterApply(cl, x = batches, fun = encode_batch
+  #                                       function(x){
+  #
+  #   names(x) <- rep('fields', length(x))
+  #
+  #   fields <- list(records = list(x))
+  #
+  #   jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
+  #                               # pretty = TRUE,
+  #                               na = "null")
+  #
+  #   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
+  # }
+  )
+
+  snow::stopCluster(cl)
+
+  encoded_batches
+
+  # split <- lapply(split_rows(df, 1),
+  #                 function(x) jsonlite::toJSON(list(fields = jsonlite::unbox(x)))
+  # ) %>%
+  #   unlist()
+  #
+  # names(split) <- NULL
+  #
+  # encode <- sprintf('{"records":[%s]}', paste(split, collapse = ","))
+  # encode
 }
 
 #' JSON encode a dataframe for PATCH
@@ -291,7 +346,7 @@ post <- function(records, airtable_obj){
                          body = records
   )
 
-  if (!httr::status_code(response) %in% c(200, 201)){
+  if (!httr::status_code(response) %in% c(200)){
     stop(paste0("Error in POST. ", process_error(httr::status_code(response))), .call = FALSE)
   }
 
@@ -336,8 +391,8 @@ compare_names <- function(df1, df2){
     stop(
       sprintf(
         "The provided data and the data on the Airtable base have an inconsistent number of columns.\n\nThe provided data has %s columns, while the Airtable base has %s columns",
-      length(names1),
-      length(names2)
+        length(names1),
+        length(names2)
       )
     )
   }

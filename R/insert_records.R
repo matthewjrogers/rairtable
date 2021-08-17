@@ -18,14 +18,15 @@ insert_records <- function(data, airtable, batch_size = 10){
   stopifnot(is.data.frame(data))
   stopifnot(batch_size <= 10)
 
-  current_table <-  api_get(airtable, 15)
+  # current_table <-  api_get(airtable, 15)
 
-  compare_names(data, current_table)
+  # compare_names(data, current_table)
 
-  batch_json_requests <- split_rows(data, batch_size) %>%
-    lapply(batch_encode_post)
+  batch_json_requests <- batch_encode_post(data, batch_size)
+  # batch_json_requests <- split_rows(data, batch_size) %>%
+  #   lapply(batch_encode_post)
 
-  # purrr::walk(batch_json_requests, ~post(.x, airtable_obj = airtable))
+
 
   vpost(records = batch_json_requests, airtable_obj = airtable)
 

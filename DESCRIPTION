@@ -16,7 +16,7 @@ Imports:
     data.table,
     tibble,
     dplyr,
-    purrr,
     cli,
     crayon,
-    rlang
+    rlang,
+    snow
