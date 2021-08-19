@@ -4,12 +4,14 @@
 \alias{batch_encode_post}
 \title{JSON encode a dataframe for POST}
 \usage{
-batch_encode_post(df, batch_size = 10)
+batch_encode_post(df, batch_size = 10, parallel = TRUE)
 }
 \arguments{
 \item{df}{Dataframe}
 
 \item{batch_size}{Size of json batches to create. Max 10.}
+
+\item{parallel}{Use parallel processing for encoding large tables}
 }
 \value{
 JSON object

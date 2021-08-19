@@ -4,12 +4,14 @@
 \alias{post}
 \title{Send batch post request}
 \usage{
-post(records, airtable_obj)
+post(records, airtable_obj, pb)
 }
 \arguments{
 \item{records}{JSON records to post}
 
 \item{airtable_obj}{An object of class `airtable`}
+
+\item{pb}{A progress_bar object}
 }
 \description{
 Send batch post request

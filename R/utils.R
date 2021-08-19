@@ -125,7 +125,8 @@ split_rows <- function(df, chunk_size){
   res
 }
 
-encode_batch <- function(list_of_lists){
+encode_batch <- function(list_of_lists, pb){
+
   names(list_of_lists) <- rep('fields', length(list_of_lists))
 
   fields <- list(records = list(list_of_lists))
@@ -135,6 +136,7 @@ encode_batch <- function(list_of_lists){
                               na = "null")
 
   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
+  pb$tick()
   cln
 }
 
@@ -142,6 +144,7 @@ encode_batch <- function(list_of_lists){
 #'
 #' @param df Dataframe
 #' @param batch_size Size of json batches to create. Max 10.
+#' @param parallel Use parallel processing for encoding large tables
 #'
 #' @return JSON object
 #' @importFrom jsonlite toJSON
@@ -156,9 +159,10 @@ encode_batch <- function(list_of_lists){
 #' @importFrom snow clusterApply
 #' @importFrom snow stopCluster
 #' @importFrom rlang .data
+#' @importFrom progress progress_bar
 #'
 
-batch_encode_post <- function(df, batch_size = 10){
+batch_encode_post <- function(df, batch_size = 10, parallel = TRUE){
 
   records <- df %>%
     dplyr::mutate(rowid = row_number()) %>%
@@ -169,25 +173,33 @@ batch_encode_post <- function(df, batch_size = 10){
 
   batches <- split_list(records_lst, batch_size)
 
-  cl <- snow::makeCluster(parallel::detectCores(), type = 'SOCK')
+  pb <- progress::progress_bar$new(total = length(batches),
+                                   format = "  JSON Encoding Data for POST [:bar] :percent eta: :eta"
+                                   )
+  pb$tick(0)
 
-  encoded_batches <- snow::clusterApply(cl, x = batches, fun = encode_batch
-  #                                       function(x){
-  #
-  #   names(x) <- rep('fields', length(x))
-  #
-  #   fields <- list(records = list(x))
-  #
-  #   jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
-  #                               # pretty = TRUE,
-  #                               na = "null")
-  #
-  #   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
-  # }
-  )
+  if (parallel){
+    cl <- snow::makeCluster(parallel::detectCores(), type = 'SOCK')
 
-  snow::stopCluster(cl)
+    encoded_batches <- snow::clusterApply(cl, x = batches, fun = function(x) encode_batch(x, pb)
+                                          #                                       function(x){
+                                          #
+                                          #   names(x) <- rep('fields', length(x))
+                                          #
+                                          #   fields <- list(records = list(x))
+                                          #
+                                          #   jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
+                                          #                               # pretty = TRUE,
+                                          #                               na = "null")
+                                          #
+                                          #   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
+                                          # }
+    )
 
+    snow::stopCluster(cl)
+  } else {
+    encoded_batches <- lapply(batches, function(x) encode_batch(x, pb))
+  }
   encoded_batches
 
   # split <- lapply(split_rows(df, 1),
@@ -334,9 +346,10 @@ vdelete <- Vectorize(delete, vectorize.args = "ids")
 #'
 #' @param records JSON records to post
 #' @param airtable_obj An object of class `airtable`
+#' @param pb A progress_bar object
 #'
 
-post <- function(records, airtable_obj){
+post <- function(records, airtable_obj, pb){
 
   response <- httr::POST(attr(airtable_obj, 'request_url'),
                          config = httr::add_headers(
@@ -352,6 +365,7 @@ post <- function(records, airtable_obj){
 
   Sys.sleep(.2)
 
+  pb$tick()
 }
 
 vpost <- Vectorize(post, vectorize.args = "records")

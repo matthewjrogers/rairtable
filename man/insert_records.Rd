@@ -4,12 +4,14 @@
 \alias{insert_records}
 \title{Insert records into an Airtable table}
 \usage{
-insert_records(data, airtable, batch_size = 10)
+insert_records(data, airtable, parallel = TRUE, batch_size = 10)
 }
 \arguments{
 \item{data}{A dataframe containing records to insert}
 
 \item{airtable}{An airtable object}
+
+\item{parallel}{Use parallel processing for encoding large tables}
 
 \item{batch_size}{Number of records per request to insert. Maximum of 10}
 }

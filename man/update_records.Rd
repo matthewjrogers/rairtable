@@ -10,6 +10,7 @@ update_records(
   columns = dplyr::everything(),
   airtable_id_col = NULL,
   safely = TRUE,
+  parallel = TRUE,
   batch_size = 10
 )
 }
@@ -23,6 +24,8 @@ update_records(
 \item{airtable_id_col}{Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from `read_airtable`}
 
 \item{safely}{If `TRUE`, confirm number and names of columns to update and number of rows befor executing update.}
+
+\item{parallel}{If `TRUE` use parallel processing for encoding large tables}
 
 \item{batch_size}{Number of records to update per request. Maximum of 10}
 }
