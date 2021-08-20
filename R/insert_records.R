@@ -28,15 +28,15 @@ insert_records <- function(data, airtable, parallel = TRUE, batch_size = 10){
 
 
   batch_json_requests <- batch_encode_post(data, batch_size = batch_size, parallel = parallel)
-  cat(crayon::green(cli::symbol$tick), " Data JSON Encoded")
+  # cat(crayon::green(cli::symbol$tick), " Data JSON Encoded\n\n")
   # batch_json_requests <- split_rows(data, batch_size) %>%
   #   lapply(batch_encode_post)
 
   pb <- progress::progress_bar$new(total = length(batch_json_requests),
                                    format = "  Sending POST requests [:bar] :percent eta: :eta"
                                    )
-  pb$tick(0)
+  # pb$tick(0)
 
-  vpost(records = batch_json_requests, airtable_obj = airtable)
+  vpost(records = batch_json_requests, airtable_obj = airtable, pb = pb)
 
 }

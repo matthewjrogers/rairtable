@@ -49,31 +49,31 @@ validate_airtable <- function(airtable_obj){
   }
 
   if (length(table) > 1){
-    stop("You can only connect to one Airtable table at a time. `table` should be a single character value", .call = FALSE)
+    stop("You can only connect to one Airtable table at a time. `table` should be a single character value", call. = FALSE)
   }
 
   if (length(table) < 1){
-    stop("You muist provide an Airtable table name. `table` should be a single character value", .call = FALSE)
+    stop("You muist provide an Airtable table name. `table` should be a single character value", call. = FALSE)
   }
 
   if (length(base) > 1){
-    stop("Tables appear in a single Airtable base. `base` should be a single character value", .call = FALSE)
+    stop("Tables appear in a single Airtable base. `base` should be a single character value", call. = FALSE)
   }
 
   if (length(base) < 1){
-    stop("You muist provide an Airtable base name. `base` should be a single character value", .call = FALSE)
+    stop("You muist provide an Airtable base name. `base` should be a single character value", call. = FALSE)
   }
 
   if (length(view) > 1){
-    stop("You can only connect to one Airtable view at a time. `view` must be either NULL or a single character value", .call = FALSE)
+    stop("You can only connect to one Airtable view at a time. `view` must be either NULL or a single character value", call. = FALSE)
   }
 
   if (length(view) < 1 & !is.null(view)){
-    stop("`view` must be either NULL or a single character value", .call = FALSE)
+    stop("`view` must be either NULL or a single character value", call. = FALSE)
   }
 
   if (grepl("\\s", request_url)){
-    stop("`request_url` cannot contain any spaces", .call = FALSE)
+    stop("`request_url` cannot contain any spaces", call. = FALSE)
   }
 
 }
@@ -127,16 +127,21 @@ split_rows <- function(df, chunk_size){
 
 encode_batch <- function(list_of_lists, pb){
 
-  names(list_of_lists) <- rep('fields', length(list_of_lists))
+  lol <- vector(mode = 'list', length = length(list_of_lists))
 
-  fields <- list(records = list(list_of_lists))
+  for (idx in 1:length(lol)){
+    lol[[idx]] <- list(fields = list_of_lists[[idx]])
+  }
+
+  fields <- list(records = lol)
 
   jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
                               # pretty = TRUE,
                               na = "null")
 
   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
-  pb$tick()
+  if(!is.null(pb)){  pb$tick() }
+
   cln
 }
 
@@ -173,31 +178,34 @@ batch_encode_post <- function(df, batch_size = 10, parallel = TRUE){
 
   batches <- split_list(records_lst, batch_size)
 
-  pb <- progress::progress_bar$new(total = length(batches),
-                                   format = "  JSON Encoding Data for POST [:bar] :percent eta: :eta"
-                                   )
-  pb$tick(0)
 
   if (parallel){
+    cat("JSON encoding data for POST")
     cl <- snow::makeCluster(parallel::detectCores(), type = 'SOCK')
-
-    encoded_batches <- snow::clusterApply(cl, x = batches, fun = function(x) encode_batch(x, pb)
-                                          #                                       function(x){
-                                          #
-                                          #   names(x) <- rep('fields', length(x))
-                                          #
-                                          #   fields <- list(records = list(x))
-                                          #
-                                          #   jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
-                                          #                               # pretty = TRUE,
-                                          #                               na = "null")
-                                          #
-                                          #   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
-                                          # }
+    snow::clusterExport(cl, "encode_batch")
+    encoded_batches <- snow::parLapply(cl, x = batches, fun = function(x){ encode_batch(x, pb = NULL)}
+                                       #                                       function(x){
+                                       #
+                                       #   names(x) <- rep('fields', length(x))
+                                       #
+                                       #   fields <- list(records = list(x))
+                                       #
+                                       #   jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
+                                       #                               # pretty = TRUE,
+                                       #                               na = "null")
+                                       #
+                                       #   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
+                                       # }
     )
 
     snow::stopCluster(cl)
+    cat(adorn_text("Data JSON Encoded. Beginning POST requests."))
   } else {
+    pb <- progress::progress_bar$new(total = length(batches),
+                                     format = "  JSON Encoding Data for POST [:bar] :percent eta: :eta"
+    )
+    pb$tick(0)
+
     encoded_batches <- lapply(batches, function(x) encode_batch(x, pb))
   }
   encoded_batches
@@ -211,6 +219,19 @@ batch_encode_post <- function(df, batch_size = 10, parallel = TRUE){
   #
   # encode <- sprintf('{"records":[%s]}', paste(split, collapse = ","))
   # encode
+}
+
+
+adorn_text <- function(text, mode = 'success'){
+  md <- match.arg(mode, c('success', 'failure'))
+
+  if (md == 'success'){
+    res <- paste(crayon::green(cli::symbol$tick), text, sep = " ")
+  } else {
+    res <- paste(crayon::red(cli::symbol$cross), text, sep = " ")
+  }
+
+  res
 }
 
 #' JSON encode a dataframe for PATCH
@@ -262,7 +283,7 @@ get_ids <- function(df, id_col){
   if (is.null(id_col)){
 
     if (!tibble::has_rownames(df)){
-      stop("Data must either have Airtable IDs in row names or a provided ID column", .call = FALSE)
+      stop("Data must either have Airtable IDs in row names or a provided ID column", call. = FALSE)
     }
 
     ids <- row.names(df)
@@ -298,14 +319,15 @@ stop_quietly <- function(...) {
 process_error <- function(response_status){
 
   statuses <- data.frame(
-    code = c(400,  401, 403,  404, 408, 413, 422),
+    code = c(400,  401, 403,  404, 408, 413, 422, 503),
     description = c("The server could not understand the request due to invalid syntax",
                     "Unauthorized: Invalid authentication",
                     "Forbidden: Invalid authentication",
                     "Resource not found",
                     "Request timeout",
                     "Payload too large",
-                    "Unprocessable entity. The request was well-formed but was unable to be followed due to semantic errors."
+                    "Unprocessable entity. The request was well-formed but was unable to be followed due to semantic errors.\n\nEnsure that the column types in R are compatible with the column types of your Airtable table.",
+                    "The server is currently unable to handle the request due to temporary overloading or maintenance of the server."
 
     )
   )
@@ -334,7 +356,7 @@ delete <- function(ids, airtable_obj){
   )
 
   if (!httr::status_code(response) %in% c(200)){
-    stop(paste0("Error in DELETE ", process_error(httr::status_code(response))), .call = FALSE)
+    stop(paste0("Error in DELETE ", process_error(httr::status_code(response))), call. = FALSE)
   }
 
   Sys.sleep(.2)
@@ -360,7 +382,7 @@ post <- function(records, airtable_obj, pb){
   )
 
   if (!httr::status_code(response) %in% c(200)){
-    stop(paste0("Error in POST. ", process_error(httr::status_code(response))), .call = FALSE)
+    stop(paste0("Error in POST. ", process_error(httr::status_code(response))), call. = FALSE)
   }
 
   Sys.sleep(.2)
@@ -383,7 +405,7 @@ api_get <- function(airtable, max_records){
   parsed_json_response <- jsonlite::fromJSON(httr::content(response, as = "text"))
 
   if (!is.null(parsed_json_response$error)){
-    stop(paste0('Error in JSON Response: ', parsed_json_response$error, collapse = " "), .call = FALSE)
+    stop(paste0('Error in JSON Response: ', parsed_json_response$error, collapse = " "), call. = FALSE)
   }
 
   dta <-  parsed_json_response$records$fields

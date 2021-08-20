@@ -26,7 +26,7 @@ update_records <- function(data, airtable, columns = dplyr::everything(), airtab
   stopifnot(is.logical(safely))
 
   if (!tibble::has_rownames(data) & is.null(rlang::enexpr(airtable_id_col))){
-    stop("Data must either have Airtable IDs in row names or a provided ID column", .call = FALSE)
+    stop("Data must either have Airtable IDs in row names or a provided ID column", call. = FALSE)
   }
 
   if (is.null(rlang::enexpr(airtable_id_col))){
