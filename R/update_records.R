@@ -24,6 +24,7 @@ update_records <- function(data, airtable, columns = dplyr::everything(), airtab
   stopifnot(is.data.frame(data))
   stopifnot(batch_size <= 10)
   stopifnot(is.logical(safely))
+  stopifnot(is.logical(parallel))
 
   if (!tibble::has_rownames(data) & is.null(rlang::enexpr(airtable_id_col))){
     stop("Data must either have Airtable IDs in row names or a provided ID column", call. = FALSE)
@@ -41,17 +42,13 @@ update_records <- function(data, airtable, columns = dplyr::everything(), airtab
                )
 
 
-  batch_json_requests <- split_rows(update_data, batch_size) %>%
-    lapply(function(x) batch_encode_patch(x, id_col = rlang::enexpr(airtable_id_col)))
+  batch_json_requests <- batch_encode_patch(data, id_col = rlang::enexpr(airtable_id_col))
 
-  for (request in batch_json_requests){
-    httr::PATCH(attr(airtable, 'request_url'),
-                config = httr::add_headers(
-                  Authorization = paste("Bearer", get_airtable_api_key()),
-                  `Content-type` = "application/json"
-                ),
-                body = request
-    )
-  }
+
+  pb <- progress::progress_bar$new(total = length(batch_json_requests),
+                                   format = "  Sending PATCH requests [:bar] :percent eta: :eta"
+  )
+
+  vpatch(batch_json_requests, airtable, pb)
 
 }

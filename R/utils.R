@@ -125,7 +125,7 @@ split_rows <- function(df, chunk_size){
   res
 }
 
-encode_batch <- function(list_of_lists, pb){
+encode_batch_post <- function(list_of_lists, pb){
 
   lol <- vector(mode = 'list', length = length(list_of_lists))
 
@@ -181,44 +181,26 @@ batch_encode_post <- function(df, batch_size = 10, parallel = TRUE){
 
   if (parallel){
     cat("JSON encoding data for POST")
+
     cl <- snow::makeCluster(parallel::detectCores(), type = 'SOCK')
-    snow::clusterExport(cl, "encode_batch")
-    encoded_batches <- snow::parLapply(cl, x = batches, fun = function(x){ encode_batch(x, pb = NULL)}
-                                       #                                       function(x){
-                                       #
-                                       #   names(x) <- rep('fields', length(x))
-                                       #
-                                       #   fields <- list(records = list(x))
-                                       #
-                                       #   jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
-                                       #                               # pretty = TRUE,
-                                       #                               na = "null")
-                                       #
-                                       #   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
-                                       # }
-    )
+    snow::clusterExport(cl, "encode_batch_post")
+
+    encoded_batches <- snow::parLapply(cl, x = batches, fun = function(x){ encode_batch_post(x, pb = NULL)})
 
     snow::stopCluster(cl)
     cat(adorn_text("Data JSON Encoded. Beginning POST requests."))
+
   } else {
     pb <- progress::progress_bar$new(total = length(batches),
                                      format = "  JSON Encoding Data for POST [:bar] :percent eta: :eta"
     )
     pb$tick(0)
 
-    encoded_batches <- lapply(batches, function(x) encode_batch(x, pb))
+    encoded_batches <- lapply(batches, function(x) encode_batch_post(x, pb))
   }
+
   encoded_batches
 
-  # split <- lapply(split_rows(df, 1),
-  #                 function(x) jsonlite::toJSON(list(fields = jsonlite::unbox(x)))
-  # ) %>%
-  #   unlist()
-  #
-  # names(split) <- NULL
-  #
-  # encode <- sprintf('{"records":[%s]}', paste(split, collapse = ","))
-  # encode
 }
 
 
@@ -234,37 +216,67 @@ adorn_text <- function(text, mode = 'success'){
   res
 }
 
-#' JSON encode a dataframe for PATCH
-#'
-#' @param df A data frame
-#' @param id_col Optional column name containing IDs as a string
-#'
-#' @return JSON object
-#'
-#' @importFrom tibble has_rownames
-#' @importFrom jsonlite toJSON
-#' @importFrom jsonlite unbox
-#'
+encode_batch_patch <- function(record_batch, id_batch, pb = NULL){
+  stopifnot(length(record_batch) == length(id_batch))
+  lol <- vector(mode = 'list', length = length(record_batch))
 
-batch_encode_patch <- function(df, id_col = NULL){
+  for (idx in 1:length(lol)){
+    lol[[idx]] <- list(id = id_batch[[idx]], fields = record_batch[[idx]])
+  }
+
+  fields <- list(records = lol)
+
+  jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
+                              pretty = TRUE,
+                              na = "null")
+
+  cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
+  if(!is.null(pb)){  pb$tick() }
+
+  cln
+}
+
+vencode_batch_patch <- Vectorize(encode_batch_patch, vectorize.args = c('record_batch', 'id_batch'))
+
+batch_encode_patch <- function(df, id_col = NULL, batch_size = 10, pb = NULL){
+  # get ids
 
   ids <- get_ids(df = df, id_col = id_col)
 
+  # remove id col if present
   if (!is.null(id_col)){
     df <- select(df, -{{ id_col }})
   }
 
-  split <- lapply(split_rows(df, 1),
-                  function(x) jsonlite::toJSON(list(fields = jsonlite::unbox(x)))
-  ) %>%
-    unlist()
 
-  names(split) <- NULL
+  # split data into single rows
+  records <- df %>%
+    dplyr::mutate(rowid = row_number()) %>%
+    dplyr::group_by(.data$rowid) %>%
+    dplyr::group_split(.keep = FALSE)
 
-  records <- sprintf('{"id":"%s",%s', ids, gsub("^\\{", "", split))
 
-  encode <- sprintf('{"records":[%s]}', paste(records, collapse = ","))
+  # convert to list of lists
+  records <- lapply(records, as.list)
+
+  record_batches <- split_list(records, batch_size)
+  id_batches     <- split_list(ids, batch_size)
+
+  encode <- vencode_batch_patch(record_batches, id_batches, pb)
+
   encode
+  # split <- lapply(split_rows(df, 1),
+  #                 function(x) jsonlite::toJSON(list(fields = jsonlite::unbox(x)))
+  # ) %>%
+  #   unlist()
+  #
+  # names(split) <- NULL
+  #
+  # records <- sprintf('{"id":"%s",%s', ids, gsub("^\\{", "", split))
+  #
+  # encode <- sprintf('{"records":[%s]}', paste(records, collapse = ","))
+  # encode
+
 }
 
 #' Get ids from data frame
@@ -392,6 +404,28 @@ post <- function(records, airtable_obj, pb){
 
 vpost <- Vectorize(post, vectorize.args = "records")
 
+
+patch <- function(records, airtable_obj, pb){
+
+  response <- httr::PATCH(attr(airtable_obj, 'request_url'),
+                          config = httr::add_headers(
+                            Authorization = paste("Bearer", get_airtable_api_key()),
+                            `Content-type` = "application/json"
+                          ),
+                          body = request
+  )
+
+  if (!httr::status_code(response) %in% c(200)){
+    stop(paste0("Error in POST. ", process_error(httr::status_code(response))), call. = FALSE)
+  }
+
+  Sys.sleep(.2)
+
+  pb$tick()
+
+}
+
+vpatch <- Vectorize(patch, vectorize.args = 'records')
 # Get a subset of records via the API
 
 api_get <- function(airtable, max_records){

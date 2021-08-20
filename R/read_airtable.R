@@ -49,7 +49,7 @@ read_airtable <- function(airtable, id_to_col = FALSE, base_max_rows = 50000){
 
     query_body['offset'] <- parsed_json_response$offset
 
-    Sys.sleep(.2)
+    # Sys.sleep(.2)
 
   }
 
