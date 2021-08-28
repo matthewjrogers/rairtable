@@ -2,19 +2,20 @@
 #'
 #' @param airtable An airtable object
 #' @param id_to_col If TRUE, store airtable ID as a column rather than as row names
-#' @param base_max_rows Record cap for the base,
+#' @param max_rows Optional maximum number of rows to read
 #'
 #' @export
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
 #' @importFrom httr content
+#' @importFrom httr stop_for_status
 #' @importFrom jsonlite fromJSON
 #' @importFrom data.table rbindlist
 #' @importFrom tibble column_to_rownames
 #'
 
-read_airtable <- function(airtable, id_to_col = FALSE, base_max_rows = 50000){
+read_airtable <- function(airtable, id_to_col = FALSE, max_rows = 50000){
 
   validate_airtable(airtable)
   stopifnot(is.logical(id_to_col))
@@ -35,11 +36,13 @@ read_airtable <- function(airtable, id_to_col = FALSE, base_max_rows = 50000){
                           query = query_body
     )
 
+    httr::stop_for_status(response, "Fetch Airtable records")
+
     parsed_json_response <- jsonlite::fromJSON(httr::content(response, as = "text"))
 
-    if (!is.null(parsed_json_response$error)){
-      stop(paste0('Error in JSON Response: ', parsed_json_response$error, collapse = " "))
-    }
+    # if (!is.null(parsed_json_response$error)){
+    #   stop(paste0('Error in JSON Response: ', parsed_json_response$error, collapse = " "))
+    # }
 
     dta[[idx]] <- cbind(airtable_id = parsed_json_response$records$id, parsed_json_response$records$fields)
 

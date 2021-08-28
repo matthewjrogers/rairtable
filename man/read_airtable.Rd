@@ -4,14 +4,14 @@
 \alias{read_airtable}
 \title{Read records from an Airtable object}
 \usage{
-read_airtable(airtable, id_to_col = FALSE, base_max_rows = 50000)
+read_airtable(airtable, id_to_col = FALSE, max_rows = 50000)
 }
 \arguments{
 \item{airtable}{An airtable object}
 
 \item{id_to_col}{If TRUE, store airtable ID as a column rather than as row names}
 
-\item{base_max_rows}{Record cap for the base,}
+\item{max_rows}{Optional maximum number of rows to read}
 }
 \description{
 Read records from an Airtable object

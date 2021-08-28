@@ -45,6 +45,7 @@ update_records <- function(data, airtable, columns = dplyr::everything(), airtab
   batch_json_requests <- batch_encode_patch(data, id_col = rlang::enexpr(airtable_id_col))
 
 
+
   pb <- progress::progress_bar$new(total = length(batch_json_requests),
                                    format = "  Sending PATCH requests [:bar] :percent eta: :eta"
   )
