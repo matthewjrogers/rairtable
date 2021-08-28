@@ -26,4 +26,35 @@ table <- airtable('TABLE_NAME', 'BASE_ID')
 view <- airtable('TABLE_NAME', 'BASE_ID', view = 'VIEW_NAME')
 
 ```
-`rairtable::airtable()` creates an `airtable` object that is used in a similar fashion to a database connection. 
+`rairtable::airtable()` creates an `airtable` object that is used in a similar fashion to a database connection. The resulting object is then passed to other `rairtable` functions.
+
+## Read a table
+
+```
+airtable_data <- read_airtable(airtable_object, id_to_col = FALSE, max_rows = 50000)
+```
+
+By default, `read_airtable()` will read all rows in the chosen table and store Airtable records IDs as row names. 
+
+Row names are bad practice in most cases. For this application, they offer the advantage of being sticky through most subset and transform operations which allows us to retain the record ID by default. This is largely a matter of convenience. In recognition of best practices and to facilitate some operations that will destroy row names (e.g. the use of `dplyr::arrange()`) setting `id_to_col = TRUE` will return Airtable record IDs as a column named `airtable_id`. Airtable record IDs are necessary for update and delete operations, but otherwise can be ignored.
+
+## Workflow
+
+`rairtable` is intended to slot into existing data processing workflows.
+
+```
+table <- airtable('mtcars', 'appXXXXXXXXXXXXXX')
+
+cars_airtable <- read_airtable(table)
+
+# change units of qsec to minutes
+cars_airtable %>%
+  mutate(qsec = qsec/60) %>%
+  update_records(table, columns = qsec)
+
+# remove records where mpg is less than 12
+cars_airtable %>%
+  filter(mpg < 12) %>%
+  delete_records(table)
+
+```
