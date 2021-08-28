@@ -16,7 +16,7 @@
 #' @importFrom progress progress_bar
 #'
 
-insert_records <- function(data, airtable, parallel = TRUE, batch_size = 10){
+insert_records <- function(data, airtable, parallel = FALSE, batch_size = 10){
 
   validate_airtable(airtable)
   stopifnot(is.data.frame(data))
