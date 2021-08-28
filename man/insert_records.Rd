@@ -4,7 +4,7 @@
 \alias{insert_records}
 \title{Insert records into an Airtable table}
 \usage{
-insert_records(data, airtable, parallel = TRUE, batch_size = 10)
+insert_records(data, airtable, parallel = FALSE, batch_size = 10)
 }
 \arguments{
 \item{data}{A dataframe containing records to insert}

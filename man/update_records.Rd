@@ -10,7 +10,7 @@ update_records(
   columns = dplyr::everything(),
   airtable_id_col = NULL,
   safely = TRUE,
-  parallel = TRUE,
+  parallel = FALSE,
   batch_size = 10
 )
 }

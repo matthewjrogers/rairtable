@@ -15,7 +15,10 @@
 #' @importFrom dplyr `%>%`
 #' @importFrom dplyr select
 #' @importFrom dplyr everything
+#' @importFrom dplyr row_number
 #' @importFrom rlang enexpr
+#' @importFrom rlang .data
+#' @importFrom dplyr pull
 #'
 
 update_records <- function(data, airtable, columns = dplyr::everything(), airtable_id_col = NULL, safely = TRUE, parallel = FALSE, batch_size = 10){

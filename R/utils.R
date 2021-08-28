@@ -1,15 +1,4 @@
-#' Airtable constructor
-#'
-#' @param table Table name
-#' @param base base name
-#' @param view view name
-#' @param api_url api url
-#' @param api_version api version
-#'
-#' @return Airtable object
-#'
-#' @importFrom utils URLencode
-#'
+
 
 new_airtable <- function(table = character(), base = character(), view = character(), api_url = character(), api_version = integer()) {
 
@@ -141,19 +130,6 @@ adorn_text <- function(text, mode = 'success'){
 }
 
 
-
-#' Get ids from data frame
-#'
-#' @param df A dataframe
-#' @param id_col Optional name of a column containing Airtable record IDs
-#'
-#' @return Vector of Airtable IDs
-#'
-#' @importFrom tibble has_rownames
-#' @importFrom dplyr select
-#' @importFrom dplyr pull
-#'
-
 get_ids <- function(df, id_col){
   if (is.null(id_col)){
 
@@ -165,7 +141,7 @@ get_ids <- function(df, id_col){
 
   } else {
 
-    ids <- df %>% select(!!id_col) %>% pull()
+    ids <- df %>% select(!!id_col) %>% dplyr::pull()
 
   }
 

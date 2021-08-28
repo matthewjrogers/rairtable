@@ -1,11 +1,3 @@
-#' Send batch delete request
-#'
-#' @param ids Vector of IDs
-#' @param airtable_obj Object of class `airtable`
-#'
-#' @importFrom httr DELETE
-#' @importFrom httr add_headers
-#'
 
 delete <- function(ids, airtable_obj){
   response <- httr::DELETE(sprintf("%s?%s", attr(airtable_obj, 'request_url'), ids),

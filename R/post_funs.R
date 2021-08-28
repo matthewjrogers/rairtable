@@ -1,25 +1,3 @@
-#' JSON encode a dataframe for POST
-#'
-#' @param df Dataframe
-#' @param batch_size Size of json batches to create. Max 10.
-#' @param parallel Use parallel processing for encoding large tables
-#'
-#' @return JSON object
-#' @importFrom jsonlite toJSON
-#' @importFrom jsonlite unbox
-#' @importFrom dplyr `%>%`
-#' @importFrom dplyr group_by
-#' @importFrom dplyr group_split
-#' @importFrom dplyr mutate
-#' @importFrom dplyr row_number
-#' @importFrom parallel detectCores
-#' @importFrom snow makeCluster
-#' @importFrom snow parLapply
-#' @importFrom snow stopCluster
-#' @importFrom rlang .data
-#' @importFrom progress progress_bar
-#'
-
 batch_encode_post <- function(df, batch_size = 10, parallel = TRUE){
 
   records <- df %>%
@@ -77,12 +55,6 @@ encode_batch_post <- function(list_of_lists, pb){
   cln
 }
 
-#' Send batch post request
-#'
-#' @param records JSON records to post
-#' @param airtable_obj An object of class `airtable`
-#' @param pb A progress_bar object
-#'
 
 post <- function(records, airtable_obj, pb){
 
