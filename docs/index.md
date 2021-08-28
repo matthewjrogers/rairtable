@@ -1,37 +1,60 @@
-## Welcome to GitHub Pages
+# rairtable
+[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
-You can use the [editor on GitHub](https://github.com/matthewjrogers/rairtable/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+`rairtable` is an efficient, Tidyverse-friendly interface to Airtable API intended to simplify the integration of Airtable into data science workflows. Other R packages exist for this purpose, but `rairtable` offers the following advantages:
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+- Create, update, and delete Airtable records in batches of up to 10 at a time
+- Optional parallelization for large tables
+- Tidyverse conscious development, facilitating Airtable as an endpoint for `dplyr` pipelines
+- Support for Airtable views
+- Convenient interface for setting and updating Airtable API keys
 
-### Markdown
+# Installation
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Install using `remotes::install_github('matthewjrogers/rairtable')`.
 
-```markdown
-Syntax highlighted code block
+# Usage
 
-# Header 1
-## Header 2
-### Header 3
+## Get and set your API key
+Generate an Airtable API key from your [Airtable account](http://airtable.com/account) page and pass the result to `set_airtable_api_key('MY_KEY_HERE')`. If you would like to store the key in your `.Renviron` file for use in the future, set `set_airtable_api_key('MY_KEY_HERE', install = TRUE)`.
 
-- Bulleted
-- List
+## Connect to a table
 
-1. Numbered
-2. List
+```
+table <- airtable('TABLE_NAME', 'BASE_ID')
 
-**Bold** and _Italic_ and `Code` text
+view <- airtable('TABLE_NAME', 'BASE_ID', view = 'VIEW_NAME')
 
-[Link](url) and ![Image](src)
+```
+`rairtable::airtable()` creates an `airtable` object that is used in a similar fashion to a database connection. The resulting object is then passed to other `rairtable` functions.
+
+## Read a table
+
+```
+airtable_data <- read_airtable(airtable_object, id_to_col = FALSE, max_rows = 50000)
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+By default, `read_airtable()` will read all rows in the chosen table and store Airtable records IDs as row names. 
 
-### Jekyll Themes
+Row names are bad practice in most cases. For this application, they offer the advantage of being sticky through most subset and transform operations which allows us to retain the record ID by default. This is largely a matter of convenience. In recognition of best practices and to facilitate some operations that will destroy row names (e.g. the use of `dplyr::arrange()`) setting `id_to_col = TRUE` will return Airtable record IDs as a column named `airtable_id`. Airtable record IDs are necessary for update and delete operations, but otherwise can be ignored.
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/matthewjrogers/rairtable/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## Workflow
 
-### Support or Contact
+`rairtable` is intended to slot into existing data processing workflows.
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+```
+table <- airtable('mtcars', 'appXXXXXXXXXXXXXX')
+
+cars_airtable <- read_airtable(table)
+
+# change units of qsec to minutes
+cars_airtable %>%
+  mutate(qsec = qsec/60) %>%
+  update_records(table, columns = qsec)
+
+# remove records where mpg is less than 12
+cars_airtable %>%
+  filter(mpg < 12) %>%
+  delete_records(table)
+
+```
