@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_airtable.R
 \name{read_airtable}
 \alias{read_airtable}
-\title{Read records from an Airtable object}
+\title{Read table from Airtable}
 \usage{
 read_airtable(airtable, id_to_col = FALSE, max_rows = 50000)
 }
@@ -14,5 +14,5 @@ read_airtable(airtable, id_to_col = FALSE, max_rows = 50000)
 \item{max_rows}{Optional maximum number of rows to read}
 }
 \description{
-Read records from an Airtable object
+Connect to and read values from an Airtable table.
 }

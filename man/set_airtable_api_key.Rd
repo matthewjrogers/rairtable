@@ -2,7 +2,7 @@
 % Please edit documentation in R/set_airtable_api_key.R
 \name{set_airtable_api_key}
 \alias{set_airtable_api_key}
-\title{Set or install Airtable API key, and optionally store in .Renviron file}
+\title{Set or install Airtable API key}
 \usage{
 set_airtable_api_key(key, install = FALSE)
 }
@@ -12,10 +12,9 @@ set_airtable_api_key(key, install = FALSE)
 \item{install}{Add your API key to .Renviron for future sessions. Optionally overwrite an existing Airtable API key.}
 }
 \description{
-Set or install Airtable API key, and optionally store in .Renviron file
+Set Airtable API key as an environment variable, and optionally install the API key to your .Renviron file for future use.
 }
 \examples{
-
 \dontrun{
 airtable_api_key("XXXXXXXXXX", install = TRUE)
 }

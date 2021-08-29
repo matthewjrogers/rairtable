@@ -12,8 +12,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -38,6 +38,8 @@
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  
 
 <meta property="og:title" content="Function reference" />
 
@@ -84,11 +86,16 @@
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/matthewjrogers/rairtable">
+    <span class="fas fa-github"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -116,8 +123,8 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-setup-and-access" class="hasAnchor"><a href="#section-setup-and-access" class="anchor"></a>Setup and Access</h2>
+          <p class="section-desc"><p>Functions for setting up a connection to airtable</p></p>
         </th>
       </tr>
       
@@ -128,15 +135,34 @@
       <tr>
         
         <td>
-          <p><code><a href="airtable.html">airtable()</a></code> </p>
+          <p><code><a href="set_airtable_api_key.html">set_airtable_api_key()</a></code> </p>
         </td>
-        <td><p>Create a new airtable object</p></td>
+        <td><p>Set or install Airtable API key</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="delete_records.html">delete_records()</a></code> </p>
+          <p><code><a href="airtable.html">airtable()</a></code> </p>
         </td>
-        <td><p>Delete airtable records</p></td>
+        <td><p>Create a new airtable object</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-crud-functions" class="hasAnchor"><a href="#section-crud-functions" class="anchor"></a>CRUD Functions</h2>
+          <p class="section-desc"><p>Functions for create-read-update-delete (CRUD) functionality in Airtable</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="read_airtable.html">read_airtable()</a></code> </p>
+        </td>
+        <td><p>Read table from Airtable</p></td>
       </tr><tr>
         
         <td>
@@ -146,21 +172,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="read_airtable.html">read_airtable()</a></code> </p>
-        </td>
-        <td><p>Read records from an Airtable object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="set_airtable_api_key.html">set_airtable_api_key()</a></code> </p>
-        </td>
-        <td><p>Set or install Airtable API key, and optionally store in .Renviron file</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="update_records.html">update_records()</a></code> </p>
         </td>
-        <td><p>Update airtable records</p></td>
+        <td><p>Update Airtable records</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="delete_records.html">delete_records()</a></code> </p>
+        </td>
+        <td><p>Delete airtable records</p></td>
       </tr>
     </tbody>
     </table>

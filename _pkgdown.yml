@@ -1,0 +1,50 @@
+url: https://matthewjrogers.github.io/rairtable
+
+destination: "./docs"
+
+template:
+  params:
+    bootswatch: cosmo
+  # package: preferably
+  # params:
+  #   package: preferably
+
+navbar:
+  title: "rairtable"
+  left:
+    - icon: fa-home fa-lg
+      href: index.html
+    - text: "Functions"
+      href: reference/index.html
+  right:
+   - icon: fa-github
+     href: https://github.com/matthewjrogers/rairtable
+
+
+# articles:
+#   - title: "Getting Started"
+#     desc: >
+#       These vignettes provide an introduction to visualizing MCMC draws and
+#       diagnostics and performing graphical posterior predictive checks using
+#       the **bayesplot** package.
+#     contents:
+#       - plotting-mcmc-draws
+#       - visual-mcmc-diagnostics
+#       - graphical-ppcs
+
+reference:
+  - title: "Setup and Access"
+    desc: >
+      Functions for setting up a connection to airtable
+    contents:
+      - set_airtable_api_key
+      - airtable
+  - title: "CRUD Functions"
+    desc: >
+      Functions for create-read-update-delete (CRUD) functionality in Airtable
+    contents:
+      - read_airtable
+      - insert_records
+      - update_records
+      - delete_records
+

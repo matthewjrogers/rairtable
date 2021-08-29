@@ -13,21 +13,21 @@ airtable(
 )
 }
 \arguments{
-\item{table}{Table name}
+\item{table}{Table name in Airtable}
 
-\item{base}{Airtable base containing table}
+\item{base}{Airtable base containing table. A base functions like a schema in a traditional database. You can retrieve the base ID from the API documentation.}
 
 \item{view}{Optional view of data to read}
 
-\item{api_url}{API endpoint to connect to. Can be changed for integrations that require custom endpoint}
+\item{api_url}{API endpoint to connect to. Can be changed for API integrations that require custom endpoint}
 
-\item{api_version}{Version of API to use}
+\item{api_version}{Version of API to use. Defaults to 0 (the current version as of Fall 2021)}
 }
 \value{
 An airtable object
 }
 \description{
-Create a new airtable object
+Creates an S3 airtable object, which serves as a pointer for rairtable functions
 }
 \examples{
 \dontrun{

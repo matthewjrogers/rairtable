@@ -12,8 +12,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -38,9 +38,11 @@
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  
 
 <meta property="og:title" content="Delete airtable records — delete_records" />
-<meta property="og:description" content="Delete airtable records" />
+<meta property="og:description" content="Delete records in an Airtable table based on their Airtable record ID." />
 
 
 
@@ -85,11 +87,16 @@
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/matthewjrogers/rairtable">
+    <span class="fas fa-github"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -109,7 +116,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Delete airtable records</p>
+    <p>Delete records in an Airtable table based on their Airtable record ID.</p>
     </div>
 
     <pre class="usage"><span class='fu'>delete_records</span><span class='op'>(</span>
@@ -133,11 +140,11 @@
     </tr>
     <tr>
       <th>airtable_id_col</th>
-      <td><p>Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from `read_airtable`</p></td>
+      <td><p>Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from <code>read_airtable</code>.</p></td>
     </tr>
     <tr>
       <th>safely</th>
-      <td><p>Optionally ask for confirmation before executing DELETE request</p></td>
+      <td><p>If <code>TRUE</code>, ask for confirmation before executing DELETE request</p></td>
     </tr>
     <tr>
       <th>batch_size</th>

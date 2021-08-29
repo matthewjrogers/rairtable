@@ -1,4 +1,9 @@
-# rairtable
+
+# __rairtable__ 
+
+### Efficient CRUD interface to the Airtable API
+
+
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
 `rairtable` is an efficient, Tidyverse-friendly interface to Airtable API intended to simplify the integration of Airtable into data science workflows. Other R packages exist for this purpose, but `rairtable` offers the following advantages:
@@ -9,11 +14,15 @@
 - Support for Airtable views
 - Convenient interface for setting and updating Airtable API keys
 
-# Installation
+*****
+
+## __INSTALLATION__
 
 Install using `remotes::install_github('matthewjrogers/rairtable')`.
 
-# Usage
+*****
+
+## __USAGE__
 
 ## Get and set your API key
 Generate an Airtable API key from your [Airtable account](http://airtable.com/account) page and pass the result to `set_airtable_api_key('MY_KEY_HERE')`. If you would like to store the key in your `.Renviron` file for use in the future, set `set_airtable_api_key('MY_KEY_HERE', install = TRUE)`.
@@ -58,3 +67,5 @@ cars_airtable %>%
   delete_records(table)
 
 ```
+
+*****

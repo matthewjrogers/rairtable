@@ -6,14 +6,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Read records from an Airtable object — read_airtable • rairtable</title>
+<title>Read table from Airtable — read_airtable • rairtable</title>
 
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -38,9 +38,11 @@
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  
 
-<meta property="og:title" content="Read records from an Airtable object — read_airtable" />
-<meta property="og:description" content="Read records from an Airtable object" />
+<meta property="og:title" content="Read table from Airtable — read_airtable" />
+<meta property="og:description" content="Connect to and read values from an Airtable table." />
 
 
 
@@ -85,11 +87,16 @@
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/matthewjrogers/rairtable">
+    <span class="fas fa-github"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -103,13 +110,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Read records from an Airtable object</h1>
+    <h1>Read table from Airtable</h1>
     
     <div class="hidden name"><code>read_airtable.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Read records from an Airtable object</p>
+    <p>Connect to and read values from an Airtable table.</p>
     </div>
 
     <pre class="usage"><span class='fu'>read_airtable</span><span class='op'>(</span><span class='va'>airtable</span>, id_to_col <span class='op'>=</span> <span class='cn'>FALSE</span>, max_rows <span class='op'>=</span> <span class='fl'>50000</span><span class='op'>)</span></pre>

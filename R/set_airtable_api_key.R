@@ -1,11 +1,12 @@
-#' Set or install Airtable API key, and optionally store in .Renviron file
+#' Set or install Airtable API key
 #'
+#' Set Airtable API key as an environment variable, and optionally install the API key to your .Renviron file for future use.
+#'
+#' @name set_airtable_api_key
 #' @param key A valid Airtable API key
 #' @param install Add your API key to .Renviron for future sessions. Optionally overwrite an existing Airtable API key.
 #'
 #' @export
-#'
-#' @examples
 #'
 #' @importFrom utils URLencode
 #' @importFrom utils menu

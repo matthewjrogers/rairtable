@@ -2,7 +2,7 @@
 % Please edit documentation in R/update_records.R
 \name{update_records}
 \alias{update_records}
-\title{Update airtable records}
+\title{Update Airtable records}
 \usage{
 update_records(
   data,
@@ -19,16 +19,16 @@ update_records(
 
 \item{airtable}{An airtable object}
 
-\item{columns}{Columns in the data to update on Airtable. Defaults to `dplyr::everything()`}
+\item{columns}{Columns in the data to update on Airtable. Can be a vector of character strings, unquoted column names, or a \code{dplyr} tidyselect helper like \code{starts_with()}, \code{ends_with()} or \code{everything()}. Defaults to \code{dplyr::everything()}}
 
-\item{airtable_id_col}{Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from `read_airtable`}
+\item{airtable_id_col}{Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from \code{read_airtable}}
 
-\item{safely}{If `TRUE`, confirm number and names of columns to update and number of rows befor executing update.}
+\item{safely}{If \code{TRUE}, confirm number and names of columns to update and number of rows before executing update.}
 
-\item{parallel}{If `TRUE` use parallel processing for encoding large tables}
+\item{parallel}{If \code{TRUE} use parallel processing for encoding large tables}
 
 \item{batch_size}{Number of records to update per request. Maximum of 10}
 }
 \description{
-Update airtable records
+Update one or more columns of data in an Airtable table. Supports batch updates and parallel JSON encoding (recommended for large tables).
 }

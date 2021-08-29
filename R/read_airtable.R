@@ -1,4 +1,6 @@
-#' Read records from an Airtable object
+#' Read table from Airtable
+#'
+#' Connect to and read values from an Airtable table.
 #'
 #' @param airtable An airtable object
 #' @param id_to_col If TRUE, store airtable ID as a column rather than as row names

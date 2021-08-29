@@ -1,11 +1,13 @@
-#' Update airtable records
+#' Update Airtable records
+#'
+#' Update one or more columns of data in an Airtable table. Supports batch updates and parallel JSON encoding (recommended for large tables).
 #'
 #' @param data A dataframe containing the records and fields to update
 #' @param airtable An airtable object
-#' @param columns Columns in the data to update on Airtable. Defaults to `dplyr::everything()`
-#' @param airtable_id_col Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from `read_airtable`
-#' @param safely If `TRUE`, confirm number and names of columns to update and number of rows befor executing update.
-#' @param parallel If `TRUE` use parallel processing for encoding large tables
+#' @param columns Columns in the data to update on Airtable. Can be a vector of character strings, unquoted column names, or a \code{dplyr} tidyselect helper like \code{starts_with()}, \code{ends_with()} or \code{everything()}. Defaults to \code{dplyr::everything()}
+#' @param airtable_id_col Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from \code{read_airtable}
+#' @param safely If \code{TRUE}, confirm number and names of columns to update and number of rows before executing update.
+#' @param parallel If \code{TRUE} use parallel processing for encoding large tables
 #' @param batch_size Number of records to update per request. Maximum of 10
 #'
 #' @export

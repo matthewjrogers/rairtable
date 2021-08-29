@@ -11,10 +11,10 @@ insert_records(data, airtable, parallel = FALSE, batch_size = 10)
 
 \item{airtable}{An airtable object}
 
-\item{parallel}{Use parallel processing for encoding large tables}
+\item{parallel}{If  \code{TRUE}, use parallel processing for encoding large tables}
 
 \item{batch_size}{Number of records per request to insert. Maximum of 10}
 }
 \description{
-Insert records into an Airtable table
+Insert rows into an Airtable table. Requires that data names and types exactly match column names and types in Airtable. Violating this assumption will return a 422 Unprocessable Entity error. Supports batch insert and parallel JSON encoding (recommended for large tables).
 }

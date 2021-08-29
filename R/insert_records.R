@@ -1,8 +1,10 @@
 #' Insert records into an Airtable table
 #'
+#' Insert rows into an Airtable table. Requires that data names and types exactly match column names and types in Airtable. Violating this assumption will return a 422 Unprocessable Entity error. Supports batch insert and parallel JSON encoding (recommended for large tables).
+#'
 #' @param data A dataframe containing records to insert
 #' @param airtable An airtable object
-#' @param parallel Use parallel processing for encoding large tables
+#' @param parallel If  \code{TRUE}, use parallel processing for encoding large tables
 #' @param batch_size Number of records per request to insert. Maximum of 10
 #'
 #' @export

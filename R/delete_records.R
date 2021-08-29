@@ -1,9 +1,11 @@
 #' Delete airtable records
 #'
+#' Delete records in an Airtable table based on their Airtable record ID.
+#'
 #' @param data A data frame containing records to delete
 #' @param airtable An airtable object
-#' @param airtable_id_col Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from `read_airtable`
-#' @param safely Optionally ask for confirmation before executing DELETE request
+#' @param airtable_id_col Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from \code{read_airtable}.
+#' @param safely If \code{TRUE}, ask for confirmation before executing DELETE request
 #' @param batch_size Number of requests to send at a time. Maximum of 10.
 #'
 #' @return A vector of IDs deleted

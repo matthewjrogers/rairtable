@@ -6,14 +6,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Update airtable records — update_records • rairtable</title>
+<title>Update Airtable records — update_records • rairtable</title>
 
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -38,9 +38,11 @@
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  
 
-<meta property="og:title" content="Update airtable records — update_records" />
-<meta property="og:description" content="Update airtable records" />
+<meta property="og:title" content="Update Airtable records — update_records" />
+<meta property="og:description" content="Update one or more columns of data in an Airtable table. Supports batch updates and parallel JSON encoding (recommended for large tables)." />
 
 
 
@@ -85,11 +87,16 @@
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/matthewjrogers/rairtable">
+    <span class="fas fa-github"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -103,13 +110,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Update airtable records</h1>
+    <h1>Update Airtable records</h1>
     
     <div class="hidden name"><code>update_records.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Update airtable records</p>
+    <p>Update one or more columns of data in an Airtable table. Supports batch updates and parallel JSON encoding (recommended for large tables).</p>
     </div>
 
     <pre class="usage"><span class='fu'>update_records</span><span class='op'>(</span>
@@ -135,19 +142,19 @@
     </tr>
     <tr>
       <th>columns</th>
-      <td><p>Columns in the data to update on Airtable. Defaults to `dplyr::everything()`</p></td>
+      <td><p>Columns in the data to update on Airtable. Can be a vector of character strings, unquoted column names, or a <code>dplyr</code> tidyselect helper like <code>starts_with()</code>, <code>ends_with()</code> or <code>everything()</code>. Defaults to <code><a href='https://tidyselect.r-lib.org/reference/everything.html'>dplyr::everything()</a></code></p></td>
     </tr>
     <tr>
       <th>airtable_id_col</th>
-      <td><p>Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from `read_airtable`</p></td>
+      <td><p>Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from <code>read_airtable</code></p></td>
     </tr>
     <tr>
       <th>safely</th>
-      <td><p>If `TRUE`, confirm number and names of columns to update and number of rows befor executing update.</p></td>
+      <td><p>If <code>TRUE</code>, confirm number and names of columns to update and number of rows before executing update.</p></td>
     </tr>
     <tr>
       <th>parallel</th>
-      <td><p>If `TRUE` use parallel processing for encoding large tables</p></td>
+      <td><p>If <code>TRUE</code> use parallel processing for encoding large tables</p></td>
     </tr>
     <tr>
       <th>batch_size</th>

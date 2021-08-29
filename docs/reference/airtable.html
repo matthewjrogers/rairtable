@@ -12,8 +12,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -38,9 +38,11 @@
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  
 
 <meta property="og:title" content="Create a new airtable object — airtable" />
-<meta property="og:description" content="Create a new airtable object" />
+<meta property="og:description" content="Creates an S3 airtable object, which serves as a pointer for rairtable functions" />
 
 
 
@@ -85,11 +87,16 @@
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/matthewjrogers/rairtable">
+    <span class="fas fa-github"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -109,7 +116,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Create a new airtable object</p>
+    <p>Creates an S3 airtable object, which serves as a pointer for rairtable functions</p>
     </div>
 
     <pre class="usage"><span class='fu'>airtable</span><span class='op'>(</span>
@@ -125,11 +132,11 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>table</th>
-      <td><p>Table name</p></td>
+      <td><p>Table name in Airtable</p></td>
     </tr>
     <tr>
       <th>base</th>
-      <td><p>Airtable base containing table</p></td>
+      <td><p>Airtable base containing table. A base functions like a schema in a traditional database. You can retrieve the base ID from the API documentation.</p></td>
     </tr>
     <tr>
       <th>view</th>
@@ -137,11 +144,11 @@
     </tr>
     <tr>
       <th>api_url</th>
-      <td><p>API endpoint to connect to. Can be changed for integrations that require custom endpoint</p></td>
+      <td><p>API endpoint to connect to. Can be changed for API integrations that require custom endpoint</p></td>
     </tr>
     <tr>
       <th>api_version</th>
-      <td><p>Version of API to use</p></td>
+      <td><p>Version of API to use. Defaults to 0 (the current version as of Fall 2021)</p></td>
     </tr>
     </table>
 

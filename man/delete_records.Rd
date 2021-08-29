@@ -17,9 +17,9 @@ delete_records(
 
 \item{airtable}{An airtable object}
 
-\item{airtable_id_col}{Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from `read_airtable`}
+\item{airtable_id_col}{Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from \code{read_airtable}.}
 
-\item{safely}{Optionally ask for confirmation before executing DELETE request}
+\item{safely}{If \code{TRUE}, ask for confirmation before executing DELETE request}
 
 \item{batch_size}{Number of requests to send at a time. Maximum of 10.}
 }
@@ -27,5 +27,5 @@ delete_records(
 A vector of IDs deleted
 }
 \description{
-Delete airtable records
+Delete records in an Airtable table based on their Airtable record ID.
 }
