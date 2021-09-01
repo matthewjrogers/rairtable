@@ -17,8 +17,8 @@ navbar:
     - text: "Functions"
       href: reference/index.html
   right:
-   - icon: fa-github
-     href: https://github.com/matthewjrogers/rairtable
+    - icon: fab fa-github
+      href: https://github.com/matthewjrogers/rairtable
 
 
 # articles:
