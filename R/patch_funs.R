@@ -43,9 +43,9 @@ batch_encode_patch <- function(df, id_col = NULL, batch_size = 10, parallel = TR
     pb <- progress::progress_bar$new(total = length(batches),
                                      format = "  JSON Encoding Data for PATCH [:bar] :percent eta: :eta"
     )
-    pb$tick(0)
+    # pb$tick(0)
 
-    encoded_batches <- vencode_batch_patch(batches, pb = pb)
+    encoded_batches <- vencode_batch_patch(batches, prog_bar = pb)
 
   }
 
@@ -53,7 +53,7 @@ batch_encode_patch <- function(df, id_col = NULL, batch_size = 10, parallel = TR
 
 }
 
-encode_batch_patch <- function(record_batch, pb = NULL){
+encode_batch_patch <- function(record_batch, prog_bar = NULL){
   # browser()
   stopifnot(length(record_batch[['records']]) == length(record_batch[['ids']]))
 
@@ -71,14 +71,14 @@ encode_batch_patch <- function(record_batch, pb = NULL){
 
   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
 
-  if(!is.null(pb)){  pb$tick() }
+  if(!is.null(prog_bar)){  prog_bar$tick() }
 
   cln
 }
 
 vencode_batch_patch <- Vectorize(encode_batch_patch, vectorize.args = c('record_batch'))
 
-patch <- function(records, airtable_obj, pb){
+patch <- function(records, airtable_obj, prog_bar){
 
   response <- httr::PATCH(attr(airtable_obj, 'request_url'),
                           config = httr::add_headers(
@@ -89,12 +89,12 @@ patch <- function(records, airtable_obj, pb){
   )
 
   if (!httr::status_code(response) %in% c(200)){
-    stop(paste0("Error in POST. ", process_error(httr::status_code(response))), call. = FALSE)
+    stop(paste0("Error in PATCH ", process_error(httr::status_code(response))), call. = FALSE)
   }
 
-  Sys.sleep(.2)
+  Sys.sleep(.21)
 
-  pb$tick()
+  prog_bar$tick()
 
 }
 

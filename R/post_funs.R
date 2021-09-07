@@ -25,9 +25,9 @@ batch_encode_post <- function(df, batch_size = 10, parallel = TRUE){
     pb <- progress::progress_bar$new(total = length(batches),
                                      format = "  JSON Encoding Data for POST [:bar] :percent eta: :eta"
     )
-    pb$tick(0)
+    # pb$tick(0)
 
-    encoded_batches <- lapply(batches, function(x) encode_batch_post(x, pb))
+    encoded_batches <- lapply(batches, function(x) encode_batch_post(x, prog_bar))
   }
 
   encoded_batches
@@ -35,7 +35,7 @@ batch_encode_post <- function(df, batch_size = 10, parallel = TRUE){
 }
 
 
-encode_batch_post <- function(list_of_lists, pb){
+encode_batch_post <- function(list_of_lists, prog_bar){
 
   lol <- vector(mode = 'list', length = length(list_of_lists))
 
@@ -50,13 +50,13 @@ encode_batch_post <- function(list_of_lists, pb){
                               na = "null")
 
   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
-  if(!is.null(pb)){  pb$tick() }
+  if(!is.null(prog_bar)){  prog_bar$tick() }
 
   cln
 }
 
 
-post <- function(records, airtable_obj, pb){
+post <- function(records, airtable_obj, prog_bar){
 
   response <- httr::POST(attr(airtable_obj, 'request_url'),
                          config = httr::add_headers(
@@ -70,9 +70,9 @@ post <- function(records, airtable_obj, pb){
     stop(paste0("Error in POST. ", process_error(httr::status_code(response))), call. = FALSE)
   }
 
-  Sys.sleep(.2)
+  Sys.sleep(.21)
 
-  pb$tick()
+  prog_bar$tick()
 }
 
 vpost <- Vectorize(post, vectorize.args = "records")
