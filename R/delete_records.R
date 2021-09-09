@@ -41,11 +41,7 @@ delete_records <- function(data, airtable, airtable_id_col = NULL, safely = TRUE
 
   cat(adorn_text(paste0("Deleted ", length(ids), " records.")))
 
-  if (!is.null(airtable_id_col)){
-    return(invisible(dplyr::filter(data, !{ airtable_id_col } %in% ids)))
-  }
-
-  return(invisible(dplyr::filter(data, !rownames(data) %in% ids)))
+  return(invisible(ids))
 
 }
 
