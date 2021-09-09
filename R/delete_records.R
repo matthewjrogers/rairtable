@@ -17,6 +17,7 @@
 #' @importFrom crayon red
 #' @importFrom cli symbol
 #' @importFrom rlang enexpr
+#' @importFrom dplyr filter
 #'
 
 delete_records <- function(data, airtable, airtable_id_col = NULL, safely = TRUE, batch_size = 10){
@@ -40,7 +41,11 @@ delete_records <- function(data, airtable, airtable_id_col = NULL, safely = TRUE
 
   cat(adorn_text(paste0("Deleted ", length(ids), " records.")))
 
-  return(invisible(ids))
+  if (!is.null(airtable_id_col)){
+    return(invisible(dplyr::filter(data, !{ airtable_id_col } %in% ids)))
+  }
+
+  return(invisible(dplyr::filter(data, !rownames(data) %in% ids)))
 
 }
 
