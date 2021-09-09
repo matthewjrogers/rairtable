@@ -17,7 +17,7 @@
 #' @importFrom tibble column_to_rownames
 #'
 
-read_airtable <- function(airtable, id_to_col = FALSE, max_rows = 50000){
+read_airtable <- function(airtable, id_to_col = TRUE, max_rows = 50000){
 
   validate_airtable(airtable)
   stopifnot(is.logical(id_to_col))
@@ -50,7 +50,7 @@ read_airtable <- function(airtable, id_to_col = FALSE, max_rows = 50000){
     parsed_json_response <- jsonlite::fromJSON(httr::content(response, as = "text"))
 
     # bind record IDs and fields into a dataframe
-    dta[[idx]] <- cbind(airtable_id = parsed_json_response$records$id, parsed_json_response$records$fields)
+    dta[[idx]] <- cbind(airtable_record_id = parsed_json_response$records$id, parsed_json_response$records$fields)
 
     if (is.null(parsed_json_response$offset)){
       # end loop if no offset returned
@@ -68,7 +68,7 @@ read_airtable <- function(airtable, id_to_col = FALSE, max_rows = 50000){
 
   if(!id_to_col){
     # set ids to rownames if not instructed to do otherwise
-    table_data <- tibble::column_to_rownames(table_data, 'airtable_id')
+    table_data <- tibble::column_to_rownames(table_data, 'airtable_record_id')
   }
 
   return(table_data)
