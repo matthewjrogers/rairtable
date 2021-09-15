@@ -57,4 +57,5 @@ update_records <- function(data, airtable, columns = dplyr::everything(), airtab
 
   vpatch(batch_json_requests, airtable, pb)
 
+  return(invisible(data))
 }

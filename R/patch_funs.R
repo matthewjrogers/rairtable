@@ -71,7 +71,7 @@ encode_batch_patch <- function(record_batch, prog_bar = NULL){
 
   cln <- gsub("fields\\.\\d?\\d", "fields", jsonout)
 
-  if(!is.null(prog_bar)){  prog_bar$tick() }
+  if(!is.null(prog_bar)){  invisible(prog_bar$tick()) }
 
   cln
 }
@@ -94,7 +94,7 @@ patch <- function(records, airtable_obj, prog_bar){
 
   Sys.sleep(.21)
 
-  prog_bar$tick()
+  invisible(prog_bar$tick())
 
 }
 

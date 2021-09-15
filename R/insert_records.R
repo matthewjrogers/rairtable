@@ -33,4 +33,5 @@ insert_records <- function(data, airtable, parallel = FALSE, batch_size = 10){
 
   vpost(records = batch_json_requests, airtable_obj = airtable, pb = pb)
 
+  return(invisible(data))
 }
