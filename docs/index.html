@@ -77,7 +77,7 @@
 <p><code>rairtable</code> is an efficient, Tidyverse-friendly interface to Airtable API intended to simplify the integration of Airtable into data science workflows. Other R packages exist for this purpose, but <code>rairtable</code> offers the following advantages:</p>
 <ul>
 <li>Create, update, and delete Airtable records in batches of up to 10 at a time</li>
-<li>Optional parallelization for large tables</li>
+<li>Optional parallelization of JSON encoding for large tables</li>
 <li>Tidyverse conscious development, facilitating Airtable as an endpoint for <code>dplyr</code> pipelines</li>
 <li>Support for Airtable views</li>
 <li>Convenient interface for setting and updating Airtable API keys</li>
@@ -113,9 +113,9 @@ view &lt;- airtable('TABLE_NAME', 'BASE_ID', view = 'VIEW_NAME')
 <div id="read-a-table" class="section level2">
 <h2 class="hasAnchor">
 <a href="#read-a-table" class="anchor"></a>Read a table</h2>
-<pre><code>airtable_data &lt;- read_airtable(airtable_object, id_to_col = FALSE, max_rows = 50000)</code></pre>
-<p>By default, <code><a href="reference/read_airtable.html">read_airtable()</a></code> will read all rows in the chosen table and store Airtable records IDs as row names.</p>
-<p>Row names are bad practice in most cases. For this application, they offer the advantage of being sticky through most subset and transform operations which allows us to retain the record ID by default. This is largely a matter of convenience. In recognition of best practices and to facilitate some operations that will destroy row names (e.g. the use of <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">dplyr::arrange()</a></code>) setting <code>id_to_col = TRUE</code> will return Airtable record IDs as a column named <code>airtable_id</code>. Airtable record IDs are necessary for update and delete operations, but otherwise can be ignored.</p>
+<pre><code>airtable_data &lt;- read_airtable(airtable_object, id_to_col = TRUE, max_rows = 50000)</code></pre>
+<p>By default, <code><a href="reference/read_airtable.html">read_airtable()</a></code> will read all rows in the chosen table and store Airtable records IDs in a column named <code>airtable_record_id</code>. Optionally, airtable record IDs can be stored as row names for convenience.</p>
+<p>Row names are bad practice in most cases. For this application, they offer the advantage of being sticky through most subset and transform operations which allows us to retain the record ID by default. Some operations will destroy row names (e.g. the use of <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">dplyr::arrange()</a></code>). For these reasons, the default behavior is to store the record IDs in a column. Airtable record IDs are necessary for update and delete operations, but otherwise can be ignored.</p>
 </div>
 <div id="workflow" class="section level2">
 <h2 class="hasAnchor">
