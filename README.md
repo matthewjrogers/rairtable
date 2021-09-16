@@ -40,7 +40,7 @@ view <- airtable('TABLE_NAME', 'BASE_ID', view = 'VIEW_NAME')
 ## Read a table
 
 ```
-airtable_data <- read_airtable(airtable_object, id_to_col = FALSE, max_rows = 50000)
+airtable_data <- read_airtable(airtable_object, id_to_col = TRUE, max_rows = 50000)
 ```
 
 By default, `read_airtable()` will read all rows in the chosen table and store Airtable records IDs in a column named `airtable_record_id`. Optionally, airtable record IDs can be stored as row names for convenience.
