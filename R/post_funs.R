@@ -14,7 +14,7 @@ batch_encode_post <- function(df, batch_size = 10, parallel = TRUE){
     cat("JSON encoding data for POST")
 
     cl <- snow::makeCluster(parallel::detectCores(), type = 'SOCK')
-    snow::clusterExport(cl, "encode_batch_post")
+    # snow::clusterExport(cl, "encode_batch_post")
 
     encoded_batches <- snow::parLapply(cl, x = batches, fun = function(x){ encode_batch_post(x, pb = NULL) })
 
