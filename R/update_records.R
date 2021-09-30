@@ -37,13 +37,18 @@ update_records <- function(data, airtable, columns = dplyr::everything(), airtab
 
   if (is.null(rlang::enexpr(airtable_id_col))){
     update_data <- dplyr::select(data, {{ columns }})
+
+    update_col_names <- names(update_data)
+
   } else {
     update_data <- dplyr::select(data, c({{ airtable_id_col }}, {{ columns }}))
+
+    update_col_names <- names(dplyr::select(update_data, -{{ airtable_id_col }}))
   }
 
   safety_check(safely,
                cancel_message = "PATCH request cancelled.",
-               paste0("You are about to update ", nrow(update_data), " records of the following variables:\n    ", paste0(names(update_data), collapse = ", "), "\nDo you wish to proceed?")
+               paste0("You are about to update ", nrow(update_data), " records of the following variables:\n    ", paste0(update_col_names, collapse = ", "), "\nDo you wish to proceed?")
                )
 
 
