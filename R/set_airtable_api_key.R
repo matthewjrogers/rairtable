@@ -52,7 +52,7 @@ set_airtable_api_key <- function(key, install = FALSE){
           cat("Your original .Renviron will be backed up and stored in your R HOME directory if needed.")
 
           oldenv <- utils::read.table(renv, stringsAsFactors = FALSE)
-          newenv <- oldenv[-grep("AIRTABLE_API_KEY", oldenv),]
+          newenv <- oldenv[-grep("AIRTABLE_API_KEY", oldenv$V1),]
 
           utils::write.table(newenv, renv, quote = FALSE, sep = "\n",
                              col.names = FALSE, row.names = FALSE
