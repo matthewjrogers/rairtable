@@ -32,7 +32,7 @@ batch_encode_patch <- function(df, id_col = NULL, batch_size = 10, parallel = TR
 
     # snow::clusterExport(cl, "encode_batch_patch")
 
-    encoded_batches <- snow::parLapply(cl, x = batches, fun = function(x){ encode_batch_patch(x, pb = NULL) })
+    encoded_batches <- snow::parLapply(cl, x = batches, fun = function(x){ encode_batch_patch(x, prog_bar = NULL) })
 
     snow::stopCluster(cl)
 
