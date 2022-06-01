@@ -57,14 +57,17 @@ table <- airtable('mtcars', 'appXXXXXXXXXXXXXX')
 cars_airtable <- read_airtable(table)
 
 # change units of qsec to minutes
-cars_airtable %>%
+cars_airtable <- cars_airtable %>%
   mutate(qsec = qsec/60) %>%
   update_records(table, columns = qsec)
 
 # remove records where mpg is less than 12
-cars_airtable %>%
+removed_ids <- cars_airtable %>%
   filter(mpg < 12) %>%
   delete_records(table)
+
+cars_airtable %>%
+  filter(!airtable_id %in% removed_ids)
 
 ```
 
