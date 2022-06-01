@@ -31,7 +31,7 @@ insert_records <- function(data, airtable, parallel = FALSE, batch_size = 10){
                                    format = "  Creating records: [:bar] :percent eta: :eta"
                                    )
 
-  vpost(records = batch_json_requests, airtable_obj = airtable, pb = pb)
+  vpost(records = batch_json_requests, airtable_obj = airtable, prog_bar = pb)
 
   return(invisible(data))
 }
