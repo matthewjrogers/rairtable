@@ -3,8 +3,13 @@
 
 ### Efficient CRUD interface to the Airtable API
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/matthewjrogers/rairtable/workflows/R-CMD-check/badge.svg)](https://github.com/matthewjrogers/rairtable/actions)
+<!-- badges: end -->
+
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://www.tidyverse.org/lifecycle/#stable)
+
 
 `rairtable` is an efficient, Tidyverse-friendly interface to Airtable API intended to simplify the integration of Airtable into data science workflows. Other R packages exist for this purpose, but `rairtable` offers the following advantages:
 
