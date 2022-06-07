@@ -23,7 +23,7 @@
 
 ## __INSTALLATION__
 
-Install using `remotes::install_github('matthewjrogers/rairtable')`.
+Install using `install.packages('rairtable'))`.
 
 *****
 

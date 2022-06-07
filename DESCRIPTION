@@ -1,7 +1,7 @@
 Package: rairtable
 Type: Package
 Title: Efficient Wrapper for the Airtable API
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person(given = "Matthew",
            family = "Rogers",
