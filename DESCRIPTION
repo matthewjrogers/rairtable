@@ -2,8 +2,12 @@ Package: rairtable
 Type: Package
 Title: Efficient Wrapper for the Airtable API
 Version: 0.1.0
-Author: Matt Rogers
-Maintainer: Matt Rogers <matthew.rogers09@gmail.com>
+Authors@R: 
+    person(given = "Matthew",
+           family = "Rogers",
+           role = c("aut", "cre"),
+           email = "matthew.rogers09@gmail.com")
+Maintainer: Matthew Rogers <matthew.rogers09@gmail.com>
 Description: Efficient CRUD interface for the Airtable API, supporting batch requests and parallel encoding of large data sets.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -20,3 +24,4 @@ Imports:
     rlang,
     snow,
     progress
+URL: https://matthewjrogers.github.io/rairtable/

@@ -16,6 +16,7 @@
 #' @importFrom crayon green
 #' @importFrom cli symbol
 #' @importFrom progress progress_bar
+#' @importFrom jsonlite toJson
 #'
 
 insert_records <- function(data, airtable, parallel = FALSE, batch_size = 10){
