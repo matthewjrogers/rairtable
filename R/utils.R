@@ -33,7 +33,7 @@ validate_airtable <- function(airtable_obj){
   view <- attr(airtable_obj, "view")
   request_url <- attr(airtable_obj, "request_url")
 
-  if (class(airtable_obj) != 'airtable'){
+  if (!inherits(airtable_obj, 'airtable')){
     stop("The provided airtable object is not of class `airtable`")
   }
 

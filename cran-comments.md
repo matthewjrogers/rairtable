@@ -1,4 +1,34 @@
-## R CMD check results
-There were no ERRORs, WARNINGs, or NOTES. 
+## Test Environments
 
-This is my first CRAN submission
+- Local Windows 10 install, R 4.0.4
+- Mac OS (on R-hub)
+- Ubuntu Linux 20.04.1 LTS (on R-hub), R 4.1.2
+- Fedora Linux (on R-hub) R-devel
+- Windows (on R-hub, devel and release)
+
+## R CMD check results
+There were no ERRORs, WARNINGs. 
+
+
+### NOTES
+
+There is one NOTE that is only found on Windows (Server 2022, R-devel 64-bit):
+
+First NOTE:
+
+```
+* checking for detritus in the temp directory ... NOTE
+Found the following files/directories:
+  'lastMiKTeXException'
+```
+As noted in [R-hub issue #503](https://github.com/r-hub/rhub/issues/503), this is likely due to a bug in MiKTeX and can be ignored.
+
+There is an additional NOTE that occurs across several platforms.
+
+```
+Possibly misspelled words in DESCRIPTION:
+  Airtable (3:34, 11:47)
+```
+"Airtable" is the correct spelling, but is not a dictionary word. For this reason, I believe this note can be safely ignored.
+
+In addition, note that this is my first CRAN submission which may yield an additional NOTE
