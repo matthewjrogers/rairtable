@@ -1,7 +1,7 @@
 ## Test Environments
 
 - Local Windows 10 install, R 4.0.4
-- Mac OS (on R-hub)
+- Mac OS (vie GitHub actions, R-devel)
 - Ubuntu Linux 20.04.1 LTS (on R-hub), R 4.1.2
 - Fedora Linux (on R-hub) R-devel
 - Windows (on R-hub, devel and release)
@@ -23,7 +23,7 @@ Found the following files/directories:
 ```
 As noted in [R-hub issue #503](https://github.com/r-hub/rhub/issues/503), this is likely due to a bug in MiKTeX and can be ignored.
 
-There is an additional NOTE that occurs across several platforms.
+There is an additional NOTE that occurs across multiple platforms.
 
 ```
 Possibly misspelled words in DESCRIPTION:
