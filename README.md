@@ -5,7 +5,6 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/matthewjrogers/rairtable/workflows/R-CMD-check/badge.svg)](https://github.com/matthewjrogers/rairtable/actions)
-[![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://www.tidyverse.org/lifecycle/#stable)
 <!-- badges: end --> 
 
 
@@ -28,7 +27,7 @@ Install using `install.packages('rairtable'))`.
 ## __USAGE__
 
 ## Get and set your API key
-Generate an Airtable API key from your [Airtable account](http://airtable.com/account) page and pass the result to `set_airtable_api_key('MY_KEY_HERE')`. If you would like to store the key in your `.Renviron` file for use in the future, set `set_airtable_api_key('MY_KEY_HERE', install = TRUE)`.
+Generate an Airtable API key from your [Airtable account](https://airtable.com/account) page and pass the result to `set_airtable_api_key('MY_KEY_HERE')`. If you would like to store the key in your `.Renviron` file for use in the future, set `set_airtable_api_key('MY_KEY_HERE', install = TRUE)`.
 
 ## Connect to a table
 
