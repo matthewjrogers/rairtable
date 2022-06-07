@@ -1,6 +1,6 @@
 Package: rairtable
 Type: Package
-Title: Efficient wrapper for the Airtable API
+Title: Efficient Wrapper for the Airtable API
 Version: 0.1.0
 Author: Matt Rogers
 Maintainer: Matt Rogers <matthew.rogers09@gmail.com>
