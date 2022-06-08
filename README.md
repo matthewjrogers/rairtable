@@ -20,7 +20,7 @@
 
 ## __INSTALLATION__
 
-Install using `install.packages('rairtable'))`.
+Install using `install.packages('rairtable')`.
 
 *****
 
