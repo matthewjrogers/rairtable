@@ -5,7 +5,9 @@
 #' @name set_airtable_api_key
 #' @param key A valid Airtable API key
 #' @param install Add your API key to .Renviron for future sessions. Optionally overwrite an existing Airtable API key.
-#'
+#' 
+#' @return No return value, called for side effects
+#' 
 #' @export
 #'
 #' @importFrom utils URLencode

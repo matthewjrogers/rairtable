@@ -13,6 +13,9 @@ read_airtable(airtable, id_to_col = TRUE, max_rows = 50000)
 
 \item{max_rows}{Optional maximum number of rows to read}
 }
+\value{
+A dataframe containing the data read from the 'Airtable' table
+}
 \description{
 Connect to and read values from an Airtable table.
 }

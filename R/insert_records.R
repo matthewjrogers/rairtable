@@ -6,7 +6,9 @@
 #' @param airtable An airtable object
 #' @param parallel If  \code{TRUE}, use parallel processing for encoding large tables
 #' @param batch_size Number of records per request to insert. Maximum of 10
-#'
+#' 
+#' @return A dataframe (invisibly) of the input data, to be stored as an object or piped into further `dplyr` functions
+#' 
 #' @export
 #'
 #' @importFrom httr POST

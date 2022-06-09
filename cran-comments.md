@@ -1,3 +1,9 @@
+## Resubmission
+This is a resubmission. In this version I have:
+- Removed one invalid link from my README
+- Fixed a second invalid link in my README (converted http -> https)
+
+
 ## Test Environments
 
 - Local Windows 10 install, R 4.0.4

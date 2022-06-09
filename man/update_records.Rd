@@ -29,6 +29,9 @@ update_records(
 
 \item{batch_size}{Number of records to update per request. Maximum of 10}
 }
+\value{
+A dataframe (invisibly) of the input data, to be stored as an object or piped into further `dplyr` functions
+}
 \description{
 Update one or more columns of data in an Airtable table. Supports batch updates and parallel JSON encoding (recommended for large tables).
 }

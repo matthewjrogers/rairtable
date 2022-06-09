@@ -11,6 +11,9 @@ set_airtable_api_key(key, install = FALSE)
 
 \item{install}{Add your API key to .Renviron for future sessions. Optionally overwrite an existing Airtable API key.}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Set Airtable API key as an environment variable, and optionally install the API key to your .Renviron file for future use.
 }

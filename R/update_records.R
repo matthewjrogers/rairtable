@@ -9,7 +9,9 @@
 #' @param safely If \code{TRUE}, confirm number and names of columns to update and number of rows before executing update.
 #' @param parallel If \code{TRUE} use parallel processing for encoding large tables
 #' @param batch_size Number of records to update per request. Maximum of 10
-#'
+#' 
+#' @return A dataframe (invisibly) of the input data, to be stored as an object or piped into further `dplyr` functions
+#' 
 #' @export
 #'
 #' @importFrom httr PATCH

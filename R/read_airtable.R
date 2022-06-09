@@ -5,7 +5,9 @@
 #' @param airtable An airtable object
 #' @param id_to_col If TRUE, store airtable ID as a column rather than as row names
 #' @param max_rows Optional maximum number of rows to read
-#'
+#' 
+#' @return A dataframe containing the data read from the specified 'Airtable' table
+#' 
 #' @export
 #'
 #' @importFrom httr GET

@@ -15,6 +15,9 @@ insert_records(data, airtable, parallel = FALSE, batch_size = 10)
 
 \item{batch_size}{Number of records per request to insert. Maximum of 10}
 }
+\value{
+A dataframe (invisibly) of the input data, to be stored as an object or piped into further `dplyr` functions
+}
 \description{
 Insert rows into an Airtable table. Requires that data names and types exactly match column names and types in Airtable. Violating this assumption will return a 422 Unprocessable Entity error. Supports batch insert and parallel JSON encoding (recommended for large tables).
 }

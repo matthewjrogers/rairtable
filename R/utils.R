@@ -193,7 +193,7 @@ process_error <- function(response_status){
 
 # If the user chooses to execute safely, confirm action before proceeding
 
-safety_check <- function(safely, cancel_message,  ...){
+safety_check <- function(safely, cancel_message, ...){
 
   stopifnot(is.logical(safely))
 
