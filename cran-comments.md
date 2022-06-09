@@ -1,7 +1,12 @@
 ## Resubmission
 This is a resubmission. In this version I have:
-- Removed one invalid link from my README
-- Fixed a second invalid link in my README (converted http -> https)
+- Added single quotes around the name 'Airtable' in the DESCRIPTION file
+- Added a link to the Airtable API in the Description field of the DESCRIPTION file, per request
+- Added `\value` tags to `insert_records.Rd`
+- Added `\value` tags to `read_airtable.Rd`
+- Added `\value` tags to `set_airtable_api_key.Rd`
+- Added `\value` tags to `update_records.Rd`
+- Changed calls to `cat` to calls to `message` such that they can be suppressed if desired. Because these processes can be long-running, I have received feedback from users that these messages are helpful and so I opt to retain the verbose behavior by default.
 
 
 ## Test Environments
