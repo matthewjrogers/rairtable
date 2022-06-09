@@ -51,7 +51,7 @@ set_airtable_api_key <- function(key, install = FALSE){
 
         if (ans == 1){
 
-          cat("Your original .Renviron will be backed up and stored in your R HOME directory if needed.")
+          message("Your original .Renviron will be backed up and stored in your R HOME directory if needed.")
 
           oldenv <- utils::read.table(renv, stringsAsFactors = FALSE)
           newenv <- oldenv[-grep("AIRTABLE_API_KEY", oldenv$V1),]
@@ -74,13 +74,13 @@ set_airtable_api_key <- function(key, install = FALSE){
     # Append API key to .Renviron file
     write(keyconcat, renv, sep = "\n", append = TRUE)
 
-    cat(crayon::green(cli::symbol$tick), 'Your API key has been stored in your .Renviron and can be accessed by Sys.getenv("AIRTABLE_API_KEY"). \nTo use now, restart R or run `readRenviron("~/.Renviron")`')
+    message(crayon::green(cli::symbol$tick), ' Your API key has been stored in your .Renviron and can be accessed by Sys.getenv("AIRTABLE_API_KEY"). \n  To use now, restart R or run `readRenviron("~/.Renviron")`')
     return(invisible(key))
 
   } else {
 
     Sys.setenv(AIRTABLE_API_KEY = key)
-    cat(crayon::green(cli::symbol$tick), "AIRTABLE_API_KEY set for current session. To install your API key for use in future sessions, run this function with `install = TRUE`.")
+    message(crayon::green(cli::symbol$tick), " AIRTABLE_API_KEY set for current session. To install your API key for use in future sessions, run this function with `install = TRUE`.")
   }
 
 }

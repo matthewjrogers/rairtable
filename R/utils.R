@@ -163,7 +163,7 @@ split_list <- function(lst, chunk_size = 10){
 stop_quietly <- function(...) {
   opt <- options(show.error.messages = FALSE)
   on.exit(options(opt))
-  cat(paste(..., collapse = " "))
+  message(paste(..., collapse = " "))
   stop()
 }
 

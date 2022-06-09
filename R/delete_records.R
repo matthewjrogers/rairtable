@@ -39,7 +39,7 @@ delete_records <- function(data, airtable, airtable_id_col = NULL, safely = TRUE
   vdelete(ids = id_batches, airtable_obj = airtable)
 
 
-  cat(adorn_text(paste0("Deleted ", length(ids), " records.")))
+  message(adorn_text(paste0("Deleted ", length(ids), " records.")))
 
   return(invisible(ids))
 

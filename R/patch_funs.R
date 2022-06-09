@@ -26,7 +26,7 @@ batch_encode_patch <- function(df, id_col = NULL, batch_size = 10, parallel = TR
   )
 
   if (parallel){
-    cat("JSON encoding data for PATCH\n")
+    message("JSON encoding data for PATCH\n")
 
     cl <- snow::makeCluster(parallel::detectCores(), type = 'SOCK')
 
@@ -36,7 +36,7 @@ batch_encode_patch <- function(df, id_col = NULL, batch_size = 10, parallel = TR
 
     snow::stopCluster(cl)
 
-    cat(adorn_text("Data JSON Encoded. Beginning PATCH requests.\n"))
+    message(adorn_text("Data JSON Encoded. Beginning PATCH requests.\n"))
 
   } else {
 
