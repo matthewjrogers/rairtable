@@ -5,6 +5,9 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/matthewjrogers/rairtable/workflows/R-CMD-check/badge.svg)](https://github.com/matthewjrogers/rairtable/actions)
+[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/rairtable)](https://cran.r-project.org/package=rairtable)
+[![metacran
+downloads](https://cranlogs.r-pkg.org/badges/rairtable)](https://cran.r-project.org/package=rairtable)
 <!-- badges: end --> 
 
 
