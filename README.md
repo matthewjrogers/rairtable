@@ -23,7 +23,7 @@ downloads](https://cranlogs.r-pkg.org/badges/rairtable)](https://cran.r-project.
 
 ## __INSTALLATION__
 
-For the stable CRAN releastr, install using `install.packages('rairtable')`. For the development version of the package, use `remotes::install_giuthub('matthewjrogers/rairtable')`
+For the stable CRAN release, install using `install.packages('rairtable')`. For the development version of the package, use `remotes::install_giuthub('matthewjrogers/rairtable')`
 
 *****
 
