@@ -11,7 +11,7 @@ downloads](https://cranlogs.r-pkg.org/badges/rairtable)](https://cran.r-project.
 <!-- badges: end --> 
 
 
-`rairtable` is an efficient, Tidyverse-friendly interface to Airtable API intended to simplify the integration of Airtable into data science workflows. Other R packages exist for this purpose, but `rairtable` offers the following advantages:
+`rairtable` is an efficient, Tidyverse-friendly interface to the Airtable API intended to simplify the integration of Airtable into data science workflows. Other R packages exist for this purpose, but `rairtable` offers the following advantages:
 
 - Create, update, and delete Airtable records in batches of up to 10 at a time
 - Optional parallelization of JSON encoding for large tables
