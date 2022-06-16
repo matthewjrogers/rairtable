@@ -54,7 +54,7 @@ update_records <- function(data, airtable, columns = dplyr::everything(), airtab
                )
 
 
-  batch_json_requests <- batch_encode_patch(data, id_col = rlang::enexpr(airtable_id_col), batch_size = batch_size, parallel = parallel)
+  batch_json_requests <- batch_encode_patch(update_data, id_col = rlang::enexpr(airtable_id_col), batch_size = batch_size, parallel = parallel)
 
 
 
