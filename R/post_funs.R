@@ -40,7 +40,7 @@ encode_batch_post <- function(list_of_lists, prog_bar){
   lol <- vector(mode = 'list', length = length(list_of_lists))
 
   for (idx in 1:length(lol)){
-    lol[[idx]] <- list(fields = list_of_lists[[idx]])
+    lol[[idx]] <- list(fields = lapply(list_of_lists[[idx]], function(r) if (is.list(r) & length(r[[1]]) > 1) unlist(r) else r))
   }
 
   fields <- list(records = lol)
