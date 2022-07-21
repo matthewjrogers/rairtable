@@ -65,8 +65,13 @@ read_airtable <- function(airtable, id_to_col = TRUE, max_rows = 50000){
 
   }
 
+  
+  if (any(unlist(lapply(dta[[1]], class)) == "data.frame")){
+    warning("This data may contain 'user' field types. This type is currently unsupported in `insert_records` and `update_records`", call. = FALSE)
+  }
+  
   # collapse list to dataframe
-  table_data <- data.table::rbindlist(dta, use.names = TRUE, fill = TRUE)
+  table_data <- dplyr::bind_rows(dta)
 
   if(!id_to_col){
     # set ids to rownames if not instructed to do otherwise
