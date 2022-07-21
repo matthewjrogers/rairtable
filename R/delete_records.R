@@ -20,7 +20,7 @@
 #' @importFrom dplyr filter
 #'
 
-delete_records <- function(data, airtable, airtable_id_col = NULL, safely = TRUE, batch_size = 10){
+delete_records <- function(data, airtable, airtable_id_col = 'airtable_record_id', safely = TRUE, batch_size = 10){
 
   validate_airtable(airtable)
   stopifnot(is.data.frame(data))

@@ -60,7 +60,7 @@ encode_batch_patch <- function(record_batch, prog_bar = NULL){
   lol <- vector(mode = 'list', length = length(record_batch[['records']]))
 
   for (idx in 1:length(lol)){
-    lol[[idx]] <- list(id = record_batch[['ids']][[idx]], fields = record_batch[['records']][[idx]])
+    lol[[idx]] <- list(id = record_batch[['ids']][[idx]], fields = lapply(record_batch[['records']][[idx]], function(r) if (is.list(r) & length(r[[1]]) > 1) unlist(r) else r))
   }
 
   fields <- list(records = lol)

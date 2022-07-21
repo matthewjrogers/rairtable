@@ -7,7 +7,7 @@
 delete_records(
   data,
   airtable,
-  airtable_id_col = NULL,
+  airtable_id_col = "airtable_record_id",
   safely = TRUE,
   batch_size = 10
 )

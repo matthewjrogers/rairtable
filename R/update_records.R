@@ -25,7 +25,7 @@
 #' @importFrom dplyr pull
 #'
 
-update_records <- function(data, airtable, columns = dplyr::everything(), airtable_id_col = NULL, safely = TRUE, parallel = FALSE, batch_size = 10){
+update_records <- function(data, airtable, columns = dplyr::everything(), airtable_id_col = 'airtable_record_id', safely = TRUE, parallel = FALSE, batch_size = 10){
 
   validate_airtable(airtable)
   stopifnot(is.data.frame(data))
