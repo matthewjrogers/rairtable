@@ -15,7 +15,7 @@
 #' @importFrom httr content
 #' @importFrom httr stop_for_status
 #' @importFrom jsonlite fromJSON
-#' @importFrom data.table rbindlist
+#' @importFrom dplyr bind_rows
 #' @importFrom tibble column_to_rownames
 #'
 
