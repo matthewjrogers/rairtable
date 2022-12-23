@@ -4,10 +4,12 @@
 \alias{read_airtable}
 \title{Read table from Airtable}
 \usage{
-read_airtable(airtable, id_to_col = TRUE, max_rows = 50000)
+read_airtable(airtable, fields = NULL, id_to_col = TRUE, max_rows = 50000)
 }
 \arguments{
 \item{airtable}{An airtable object}
+
+\item{fields}{An optional list of fields to select.}
 
 \item{id_to_col}{If TRUE, store airtable ID as a column rather than as row names}
 
