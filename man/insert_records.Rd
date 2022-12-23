@@ -4,14 +4,22 @@
 \alias{insert_records}
 \title{Insert records into an Airtable table}
 \usage{
-insert_records(data, airtable, parallel = FALSE, batch_size = 10)
+insert_records(
+  data,
+  airtable,
+  typecast = FALSE,
+  parallel = FALSE,
+  batch_size = 10
+)
 }
 \arguments{
 \item{data}{A dataframe containing records to insert}
 
 \item{airtable}{An airtable object}
 
-\item{parallel}{If  \code{TRUE}, use parallel processing for encoding large tables}
+\item{typecast}{If \code{TRUE}, values will be converted to match the base if possible. Set to \code{TRUE} to add new values to a multi select field.}
+
+\item{parallel}{If \code{TRUE}, use parallel processing for encoding large tables}
 
 \item{batch_size}{Number of records per request to insert. Maximum of 10}
 }
