@@ -4,7 +4,8 @@
 #'
 #' @param data A dataframe containing records to insert
 #' @param airtable An airtable object
-#' @param parallel If  \code{TRUE}, use parallel processing for encoding large tables
+#' @param typecast If \code{TRUE}, values will be converted to match the base if possible. Set to \code{TRUE} to add new values to a multi select field.
+#' @param parallel If \code{TRUE}, use parallel processing for encoding large tables
 #' @param batch_size Number of records per request to insert. Maximum of 10
 #' 
 #' @return A dataframe (invisibly) of the input data, to be stored as an object or piped into further `dplyr` functions
@@ -21,13 +22,13 @@
 #' @importFrom jsonlite toJSON
 #'
 
-insert_records <- function(data, airtable, parallel = FALSE, batch_size = 10){
+insert_records <- function(data, airtable, typecast = FALSE, parallel = FALSE, batch_size = 10){
 
   validate_airtable(airtable)
   stopifnot(is.data.frame(data))
   stopifnot(batch_size <= 10)
 
-  batch_json_requests <- batch_encode_post(data, batch_size = batch_size, parallel = parallel)
+  batch_json_requests <- batch_encode_post(data, batch_size = batch_size, parallel = parallel, typecast = typecast)
 
 
   pb <- progress::progress_bar$new(total = length(batch_json_requests),
