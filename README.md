@@ -30,7 +30,7 @@ For the stable CRAN release, install using `install.packages('rairtable')`. For 
 ## __USAGE__
 
 ## Get and set your API key
-Generate an Airtable API key from your [Airtable account](https://airtable.com/account) page and pass the result to `set_airtable_api_key('MY_KEY_HERE')`. If you would like to store the key in your `.Renviron` file for use in the future, use `set_airtable_api_key('MY_KEY_HERE', install = TRUE)`.
+Generate an Airtable API key from your [Airtable account](https://airtable.com/account) page and pass the result to `set_airtable_api_key('MY_KEY_HERE')`. If you would like to store the key in your `.Renviron` file for use in the future, use `set_airtable_api_key('MY_KEY_HERE', install = TRUE)`. This will also work work with Personal Access Tokens
 
 ## Connect to a table
 
