@@ -13,12 +13,11 @@ batch_encode_post <- function(df, batch_size = 10, parallel = FALSE, typecast = 
   if (parallel){
     message("JSON encoding data for POST")
     
-    cl <- snow::makeCluster(parallel::detectCores(), type = 'SOCK')
-    # snow::clusterExport(cl, "encode_batch_post")
+    cl <- parallel::makeCluster(parallel::detectCores(), type = 'SOCK')
     
-    encoded_batches <- snow::parLapply(cl, x = batches, fun = function(x){ encode_batch_post(x, typecast, prog_bar = NULL) })
+    encoded_batches <- parallel::parLapply(cl, x = batches, fun = function(x){ encode_batch_post(x, typecast, prog_bar = NULL) })
     
-    snow::stopCluster(cl)
+    parallel::stopCluster(cl)
     message(adorn_text("Data JSON Encoded. Beginning POST requests."))
     
   } else {

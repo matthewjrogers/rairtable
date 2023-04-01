@@ -20,7 +20,7 @@ Imports:
     cli,
     crayon,
     rlang,
-    snow,
+    parallel,
     progress
 URL: https://matthewjrogers.github.io/rairtable/
 BugReports: https://github.com/matthewjrogers/rairtable/issues

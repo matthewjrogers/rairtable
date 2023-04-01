@@ -28,13 +28,11 @@ batch_encode_patch <- function(df, id_col = NULL, batch_size = 10, parallel = TR
   if (parallel){
     message("JSON encoding data for PATCH\n")
 
-    cl <- snow::makeCluster(parallel::detectCores(), type = 'SOCK')
+    cl <- parallel::makeCluster(parallel::detectCores(), type = 'SOCK')
 
-    # snow::clusterExport(cl, "encode_batch_patch")
+    encoded_batches <- parallel::parLapply(cl, x = batches, fun = function(x){ encode_batch_patch(x, prog_bar = NULL) })
 
-    encoded_batches <- snow::parLapply(cl, x = batches, fun = function(x){ encode_batch_patch(x, prog_bar = NULL) })
-
-    snow::stopCluster(cl)
+    parallel::stopCluster(cl)
 
     message(adorn_text("Data JSON Encoded. Beginning PATCH requests.\n"))
 
