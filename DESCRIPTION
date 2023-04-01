@@ -1,21 +1,20 @@
 Package: rairtable
 Type: Package
 Title: Efficient Wrapper for the 'Airtable' API
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person(given = "Matthew",
            family = "Rogers",
            role = c("aut", "cre"),
            email = "matthew.rogers09@gmail.com")
 Maintainer: Matthew Rogers <matthew.rogers09@gmail.com>
-Description: Efficient CRUD interface for the 'Airtable' API <https://airtable.com/api>, supporting batch requests and parallel encoding of large data sets.
+Description: Efficient CRUD interface for the 'Airtable' API <https://airtable.com/developers/web/api>, supporting batch requests and parallel encoding of large data sets.
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 Imports:
     httr,
     jsonlite,
-    data.table,
     tibble,
     dplyr,
     cli,
