@@ -1,3 +1,24 @@
+
+new_airtable_fields_schema <- function(schema = list()){
+  stopifnot(is.list(schema))
+  class(schema) <- 'airtable_fields_schema'
+  validate_airtable_fields_schema(schema)
+  return(schema)
+}
+
+
+validate_airtable_fields_schema <- function(schema){
+  
+  if (!all(sapply(schema, length) >= 3)){
+    stop("One or more of the provided fields is of length 2, and at least 3 items are expected. 
+         All fields should contain at least a name, Field ID, and data type.")
+  }
+  
+  if (!all(sapply(schema, function(x) all(names(x) %in% c('type', 'id', 'name', 'options'))))){
+    stop("One or more of the provided fields contains a value name other than 'type', 'id', 'name', or 'options'.")
+  }
+}
+
 #' @keywords internal
 #' @export
 #'

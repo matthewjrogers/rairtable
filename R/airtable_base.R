@@ -6,6 +6,11 @@
 #' @return an `airtable_base_schema` object
 #' @export
 #'
+#' @importFrom httr GET
+#' @importFrom httr add_headers
+#' @importFrom httr stop_for_status
+#' @importFrom jsonlite fromJSON
+#'
 #' @examples
 #' \dontrun{
 #' base <- airtable_base("appXXXXXXXXXXXXX")
