@@ -104,6 +104,17 @@ get_airtable_api_key <- function(){
   key
 }
 
+get_airtable_pat <- function(){
+  
+  key <- Sys.getenv("AIRTABLE_PAT")
+  
+  if (key == ""){
+    stop("No Airtable personal access tokens set. Use `set_airtable_pat()` to set your API key.")
+  }
+  
+  key
+}
+
 # Split a dataframe by row
 
 split_rows <- function(df, chunk_size){

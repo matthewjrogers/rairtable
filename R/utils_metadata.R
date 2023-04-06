@@ -1,3 +1,7 @@
+#' @keywords internal
+#' @export
+#'
+
 print.airtable_fields_schema <- function(x, ...){
   prefix <- "  "
   for(i in seq_along(x)){
@@ -14,8 +18,13 @@ print.airtable_fields_schema <- function(x, ...){
       }
     }
   }
-  return(invisible(NULL))
+  return(invisible(x))
 }
+
+#' @keywords internal
+#' @export
+#'
+
 print.airtable_table_schema <- function(x, ...){
   cat(sprintf("Table Name: %s\n", x$name))
   cat(sprintf(". Table ID: %s\n", x$id))
@@ -24,8 +33,14 @@ print.airtable_table_schema <- function(x, ...){
   r <- print(x$fields)
   cat("\n\n")
 }
+
+#' @keywords internal
+#' @export
+#'
+
 print.airtable_base_schema <- function(x, ...){
   for (table in x){
     r <- print(table)
   }
 }
+
