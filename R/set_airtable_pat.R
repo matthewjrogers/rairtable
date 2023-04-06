@@ -1,3 +1,27 @@
+#' Set or install Airtable personal access token
+#'
+#' Set Airtable personal access token as an environment variable, and optionally install the personal access token to your .Renviron file for future use.
+#'
+#' @param pat A valid Airtable personal access token
+#' @param install Add your personal access token to your .Renviron for future sessions. Optionally overwrite an existing Airtable personal access token.
+#' 
+#' @return No return value, called for side effects
+#' 
+#' @export
+#'
+#' @importFrom utils URLencode
+#' @importFrom utils menu
+#' @importFrom utils read.table
+#' @importFrom utils write.table
+#' @importFrom crayon green
+#' @importFrom crayon red
+#' @importFrom cli symbol
+#'
+#' @examples
+#' \dontrun{
+#' set_airtable_pat("XXXXXXXXXX", install = TRUE)
+#' }
+#'
 set_airtable_pat <- function(pat, install = FALSE){
   
   stopifnot(is.logical(install))
