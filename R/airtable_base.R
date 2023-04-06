@@ -1,3 +1,22 @@
+#' Title
+#'
+#' @param base_id A valid Airtable base ID
+#' @param metadata_api_url_pattern URL for GET request. By default 'https://api.airtable.com/v0/meta/bases/%s/tables'
+#'
+#' @return an `airtable_base_schema` object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' base <- airtable_base("appXXXXXXXXXXXXX")
+#' 
+#' # read 'table1' from the base
+#' tbl_data <- read_airtable(base$table1)
+#' 
+#' # view base schema
+#' print(base$schema)
+#' }
+
 airtable_base <- function(base_id, metadata_api_url_pattern = 'https://api.airtable.com/v0/meta/bases/%s/tables'){
   url <- sprintf(metadata_api_url_pattern, base_id)
   result <- httr::GET(url,
