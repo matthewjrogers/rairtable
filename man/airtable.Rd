@@ -8,6 +8,7 @@ airtable(
   table,
   base,
   view = NULL,
+  fields = list(),
   api_url = "https://api.airtable.com",
   api_version = 0
 )
@@ -18,6 +19,8 @@ airtable(
 \item{base}{Airtable base containing table. A base functions like a schema in a traditional database. You can retrieve the base ID from the API documentation.}
 
 \item{view}{Optional view of data to read}
+
+\item{fields}{An optional `airtable_fields_schema` object. Automatically populated in tables created by `airtable_base()`}
 
 \item{api_url}{API endpoint to connect to. Can be changed for API integrations that require custom endpoint}
 
