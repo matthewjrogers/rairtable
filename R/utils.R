@@ -1,17 +1,19 @@
 
 
-new_airtable <- function(table = character(), base = character(), view = character(), api_url = character(), api_version = integer()) {
-
+new_airtable <- function(table = character(), base = character(), view = character(), fields = list(), api_url = character(), api_version = integer()) {
+  
   stopifnot(is.character(table))
   stopifnot(is.character(base))
   stopifnot(is.character(view) | is.null(view))
   stopifnot(is.character(api_url))
   stopifnot(is.integer(api_version))
   stopifnot(length(api_version) == 1)
+  stopifnot(is.list(fields))
 
   atbl <- new.env()
   atbl$table <- table
-
+  atbl$fields <- fields
+  
   class(atbl) <- "airtable"
 
   attr(atbl, "base") <- base
@@ -32,7 +34,17 @@ validate_airtable <- function(airtable_obj){
   base <- attr(airtable_obj, "base")
   view <- attr(airtable_obj, "view")
   request_url <- attr(airtable_obj, "request_url")
-
+  fields <- airtable_obj$fields
+  
+  
+  if (!is.list(fields)){
+    stop("The fields of the provided Airtable object is not a list")
+  }
+  
+  if (!inherits(fields, 'airtable_fields_schema')){
+    stop("The fields of the provided Airtable object must be of class `airtable_fields_schema`")
+  }
+  
   if (!inherits(airtable_obj, 'airtable')){
     stop("The provided airtable object is not of class `airtable`")
   }
@@ -50,7 +62,7 @@ validate_airtable <- function(airtable_obj){
   }
 
   if (length(base) < 1){
-    stop("You muist provide an Airtable base name. `base` should be a single character value", call. = FALSE)
+    stop("You must provide an Airtable base name. `base` should be a single character value", call. = FALSE)
   }
 
   if (length(view) > 1){
