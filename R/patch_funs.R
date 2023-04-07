@@ -65,7 +65,8 @@ encode_batch_patch <- function(record_batch, prog_bar = NULL){
 
   fields <- list(records = lol)
 
-  jsonout <- jsonlite::toJSON(fields, auto_unbox = TRUE,
+  jsonout <- jsonlite::toJSON(fields, 
+                              auto_unbox = TRUE,
                               # pretty = TRUE,
                               na = "null")
 
@@ -82,7 +83,7 @@ patch <- function(records, airtable_obj, prog_bar){
 
   response <- httr::PATCH(attr(airtable_obj, 'request_url'),
                           config = httr::add_headers(
-                            Authorization = paste("Bearer", get_airtable_api_key()),
+                            Authorization = paste("Bearer", get_airtable_pat_or_key()),
                             `Content-type` = "application/json"
                           ),
                           body = records

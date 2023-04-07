@@ -48,7 +48,7 @@ read_airtable <- function(airtable, fields = NULL, id_to_col = TRUE, max_rows = 
 
     response <- httr::GET(url,
                           config = httr::add_headers(
-                            Authorization = paste("Bearer", get_airtable_api_key())
+                            Authorization = paste("Bearer", get_airtable_pat_or_key())
                           ),
                           query = query_body
     )

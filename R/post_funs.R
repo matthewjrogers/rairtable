@@ -69,7 +69,7 @@ post <- function(records, airtable_obj, prog_bar){
   
   response <- httr::POST(attr(airtable_obj, 'request_url'),
                          config = httr::add_headers(
-                           Authorization = paste("Bearer", get_airtable_api_key()),
+                           Authorization = paste("Bearer", get_airtable_pat_or_key()),
                            `Content-type` = "application/json"
                          ),
                          body = records

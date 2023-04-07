@@ -110,7 +110,7 @@ get_airtable_api_key <- function(){
   key <- Sys.getenv("AIRTABLE_API_KEY")
 
   if (key == ""){
-    stop("No Airtable API key set. Use `airtable_api_key()` to set your API key.")
+    stop("No Airtable personal access tokens or API keys set. API keys will be deprecated in 2024. Use `set_airtable_pat()` to set a personal access token")
   }
 
   key
@@ -121,12 +121,21 @@ get_airtable_pat <- function(){
   key <- Sys.getenv("AIRTABLE_PAT")
   
   if (key == ""){
-    stop("No Airtable personal access tokens set. Use `set_airtable_pat()` to set your API key.")
+    stop("No Airtable personal access tokens set. Use `set_airtable_pat()` to set your personal access token.")
   }
   
   key
 }
 
+# while both PATs and keys are supported, this function will let us get 
+get_airtable_pat_or_key <- function(){
+  tryCatch(
+    get_airtable_pat(),
+    error = function(e){
+      get_airtable_api_key()
+    }
+  )
+}
 # Split a dataframe by row
 
 split_rows <- function(df, chunk_size){

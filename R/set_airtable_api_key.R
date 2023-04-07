@@ -17,6 +17,7 @@
 #' @importFrom crayon green
 #' @importFrom crayon red
 #' @importFrom cli symbol
+#' @importFrom rlang warn
 #'
 #' @examples
 #' \dontrun{
@@ -25,6 +26,11 @@
 #'
 
 set_airtable_api_key <- function(key, install = FALSE){
+  
+  rlang::warn("Airtable API keys will no longer be supported starting in early 2024. 
+Moving forward, using`set_airtable_pat()` with a personal access token is strongly recommended.", 
+              .frequency = 'once',
+              .frequency_id = 'api_deprecate')
 
   stopifnot(is.logical(install))
 
