@@ -8,7 +8,7 @@ skip_if_no_pat <- function(pat = NULL, default = "AIRTABLE_PAT") {
 
 set_rairtable_test_args <- function(base,
                                     table,
-                                    view = NULL) {
+                                    view = "") {
   Sys.setenv("rairtable.test_base" = base)
   Sys.setenv("rairtable.test_table" = table)
   Sys.setenv("rairtable.test_view" = view)
