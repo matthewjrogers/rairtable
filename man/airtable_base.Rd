@@ -4,11 +4,7 @@
 \alias{airtable_base}
 \title{Get metadata for an Airtable base}
 \usage{
-airtable_base(
-  base,
-  metadata_api_url_pattern = "meta/bases/{base}/tables",
-  token = NULL
-)
+airtable_base(base, metadata_api_url_pattern = deprecated(), token = NULL)
 }
 \arguments{
 \item{base}{A valid Airtable base ID}

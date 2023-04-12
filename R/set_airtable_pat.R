@@ -60,7 +60,7 @@ set_airtable_token <- function(token,
     file.create(renv)
   }
 
-  write(glue("{default}='{token}'"), renv, sep = "\n", append = TRUE)
+  write(glue('{default}="{token}"'), renv, sep = "\n", append = TRUE)
 
   cli::cli_bullets(
     c(
@@ -75,7 +75,7 @@ set_airtable_token <- function(token,
 
 #' Retrieve a environmental variable for use as a token
 #'
-#' @noRd
+#' @keywords internal
 get_airtable_token <- function(token = NULL,
                                default = "AIRTABLE_PAT",
                                call = caller_env(),
@@ -84,7 +84,7 @@ get_airtable_token <- function(token = NULL,
   token <- token %||% Sys.getenv(default)
 
   if (!is.null(token) && token != "") {
-    return(invisible(token))
+    return(token)
   }
 
   cli_abort(

@@ -22,26 +22,31 @@
 #' \dontrun{
 #' table <- airtable("Table 1", "appXXXXXXXXXXXXX")
 #' }
-
-airtable <- function(table,
+airtable <- function(table = NULL,
                      base,
                      view = NULL,
                      fields = list(),
                      api_url = NULL,
-                     api_version = NULL) {
-  check_required(table)
+                     api_version = NULL,
+                     require_url = TRUE,
+                     require_fields = FALSE) {
   check_required(base)
+  check_required(table)
 
-  atbl <- new_airtable(
-    table,
-    base,
-    view,
-    fields,
+  atbl <- build_airtable_obj(
+    table = table,
+    base = base,
+    view = view,
+    fields = fields,
     api_url = api_url,
     api_version = api_version
   )
 
-  validate_airtable(atbl)
+  check_airtable_obj(
+    atbl,
+    require_url = require_url,
+    require_fields = require_fields
+  )
 
   atbl
 }
@@ -49,13 +54,12 @@ airtable <- function(table,
 #' Create a new airtable object
 #'
 #' @noRd
-new_airtable <- function(table,
-                         base,
-                         view = NULL,
-                         fields = list(),
-                         api_url = NULL,
-                         api_version = NULL) {
-
+build_airtable_obj <- function(table,
+                             base,
+                             view = NULL,
+                             fields = list(),
+                             api_url = NULL,
+                             api_version = NULL) {
   check_string(table)
   check_string(base)
   check_string(view, allow_null = TRUE)
@@ -70,27 +74,58 @@ new_airtable <- function(table,
   attr(atbl, "view") <- view %||% character()
 
   attr(atbl, "request_url") <-
-    req_airtable_url(
+    airtable_request(
       api_url = api_url,
       api_version = api_version,
       base = base,
       table = table
-      )[["url"]]
-
-  validate_airtable(atbl)
+    )[["url"]]
 
   atbl
+}
+
+#' Does x inherit the airtable class?
+#'
+#' @noRd
+is_airtable_obj <- function(x) {
+  inherits(x, "airtable")
 }
 
 #' Validate a new airtable object
 #'
 #' @noRd
-validate_airtable <- function(airtable_obj,
-                              check_fields = FALSE,
-                              call = caller_env()) {
+check_airtable_obj <- function(x,
+                               require_url = TRUE,
+                               require_table = TRUE,
+                               require_view = FALSE,
+                               require_fields = FALSE,
+                               call = caller_env()) {
+  if (!is_airtable_obj(x)) {
+    cli_abort("The provided airtable object is not of class `airtable`")
+  }
 
-  if (check_fields) {
-    fields <- airtable_obj$fields
+  check_string(attr(x, "base"), call = call)
+
+  if (require_table) {
+    check_string(x$table, call = call)
+  }
+
+  if (require_url) {
+    url <- attr(x, "request_url")
+
+    check_airtable_url(
+      url,
+      require_table = require_table,
+      require_view = require_view
+    )
+  }
+
+  if (require_view) {
+    check_string(attr(x, "view"), call = call)
+  }
+
+  if (require_fields) {
+    fields <- x$fields
 
     if (!is.list(fields)) {
       cli_abort("The fields of the provided Airtable object is not a list")
@@ -100,23 +135,6 @@ validate_airtable <- function(airtable_obj,
       cli_abort("The fields of the provided Airtable object must be of class `airtable_fields_schema`")
     }
   }
-
-  if (!inherits(airtable_obj, "airtable")) {
-    cli_abort("The provided airtable object is not of class `airtable`")
-  }
-
-  check_string(attr(airtable_obj, "base"), call = call)
-  check_string(airtable_obj$table, call = call)
-  view <- attr(airtable_obj, "view")
-
-  if (!is_empty(view)) {
-    check_string(view, allow_null = TRUE, call = call)
-  }
-
-  if (!is_url(attr(airtable_obj, "request_url"))) {
-    cli_abort("`request_url` cannot contain any spaces", call = call)
-  }
-
 }
 
 #' print method for an airtable object
@@ -124,12 +142,11 @@ validate_airtable <- function(airtable_obj,
 #' @keywords internal
 #' @export
 print.airtable <- function(x, ...) {
-
   cat("Table: ", x$table, "\n", sep = "")
-  if (!is.null(attr(x, 'view'))) {
-    cat("   View: ", attr(x, 'view'), "\n", sep = "")
+  if (!is.null(attr(x, "view"))) {
+    cat("   View: ", attr(x, "view"), "\n", sep = "")
   }
-  cat("   Base: ", attr(x, 'base'), "\n", sep = "")
+  cat("   Base: ", attr(x, "base"), "\n", sep = "")
 }
 
 
@@ -137,10 +154,7 @@ print.airtable <- function(x, ...) {
 #'
 #' @keywords internal
 #' @export
-str.airtable = function(object, ...) {
-
+str.airtable <- function(object, ...) {
   view <- ifelse(is.null(attr(object, "view")), "", paste0('."', attr(object, "view"), '"'))
   cat(" Airtable: ", object$table, view, " @ ", attr(object, "base"), "\n", sep = "")
-
 }
-

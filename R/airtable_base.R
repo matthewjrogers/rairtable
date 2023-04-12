@@ -23,13 +23,13 @@
 #' print(base$schema)
 #' }
 airtable_base <- function(base,
-                          metadata_api_url_pattern = "meta/bases/{base}/tables",
+                          metadata_api_url_pattern = deprecated(),
                           token = NULL) {
   check_string(base)
 
   req <-
     req_airtable_query(
-      template = metadata_api_url_pattern,
+      template =  "meta/bases/{base}/tables",
       base = base,
       token = token
       )
@@ -51,7 +51,8 @@ airtable_base <- function(base,
     base_meta[[table$name]] <- airtable(
       table = table$name,
       base = base,
-      fields = table$fields
+      fields = table$fields,
+      require_url = FALSE
     )
   }
 

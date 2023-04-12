@@ -13,12 +13,18 @@
 #' @keywords internal
 #' @export
 #' @importFrom httr2 request req_url_path_append
-req_airtable_url <- function(url = NULL,
+airtable_request <- function(url = NULL,
                              api_url = NULL,
                              api_version = NULL,
                              base = NULL,
-                             table = NULL) {
+                             table = NULL,
+                             airtable = NULL) {
+  if (!is_null(airtable) && is_airtable_obj(airtable)) {
+    url <- url %||% attr(airtable, "request_url")
+  }
+
   if (is_url(url)) {
+    check_airtable_url(url)
     return(httr2::request(url))
   }
 
@@ -47,7 +53,7 @@ req_airtable_url <- function(url = NULL,
   req
 }
 
-#' @rdname req_airtable_url
+#' @rdname airtable_request
 #' @name req_airtable_query
 #' @param template Template for query parameters passed to
 #'   [httr2::req_template()], Default: `NULL`.
@@ -58,12 +64,19 @@ req_airtable_url <- function(url = NULL,
 req_airtable_query <- function(.req = NULL,
                                ...,
                                template = NULL,
+                               method = NULL,
                                url = NULL,
                                api_url = NULL,
                                api_version = NULL,
+                               airtable = NULL,
                                token = NULL,
                                string = NULL) {
-  .req <- .req %||% req_airtable_url(url, api_url, api_version)
+  .req <- .req %||% airtable_request(
+    url = url,
+    api_url = api_url,
+    api_version = api_version,
+    airtable = airtable
+  )
 
   if (!is.null(template)) {
     .req <-
@@ -80,18 +93,22 @@ req_airtable_query <- function(.req = NULL,
       )
   }
 
+  if (!is.null(method)) {
+    .req <- httr2::req_method(.req, method)
+  }
+
   req_auth_airtable(
-    .req,
+    req = .req,
     token = token,
     string = string
   )
 }
 
 
-#' @rdname req_airtable_url
+#' @rdname airtable_request
 #' @name req_auth_airtable
 #' @param token Airtable personal access token, Default: `NULL` (set to output
-#'   from `get_airtable_pat()`)
+#'   from `get_airtable_pat_or_key()`)
 #' @param default Default name for environmental variable for token.
 #' @param string Passed to [httr2::req_user_agent()], Default: `NULL` (set to
 #'   `getOption("rairtable.useragent", default = "rairtable
@@ -106,6 +123,11 @@ req_auth_airtable <- function(req,
                               string = NULL,
                               rate = 5 / 1,
                               realm = NULL) {
+  token <- token %||% get_airtable_pat(token, default = default)
+  # FIXME: Sys.getenv() had some odd issues with the period in pat so escaping
+  # the token then removing escaping characters may be necessary in some cases
+  token <- sub("\\\\", "", token)
+
   req <-
     httr2::req_auth_bearer_token(
       req = req,
@@ -128,7 +150,7 @@ req_auth_airtable <- function(req,
   )
 }
 
-#' @rdname req_airtable_url
+#' @rdname airtable_request
 #' @name req_airtable_records
 #' @param base Airtable base identifier. Required. If base is an Airtable URL,
 #'   the base, table, and view identifiers are extracted from the URL and
@@ -173,7 +195,7 @@ req_airtable_records <- function(req = NULL,
                                  cell_format = NULL,
                                  token = NULL,
                                  default = "AIRTABLE_PAT") {
-  req <- req %||% req_airtable_url(url, api_url, api_version, base, table)
+  req <- req %||% airtable_request(url, api_url, api_version, base, table)
 
   if (!is.null(record)) {
     req <- httr2::req_url_path_append(req, record)

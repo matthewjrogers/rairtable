@@ -5,12 +5,14 @@
 \title{Create a new airtable object}
 \usage{
 airtable(
-  table,
+  table = NULL,
   base,
   view = NULL,
   fields = list(),
   api_url = NULL,
-  api_version = NULL
+  api_version = NULL,
+  require_url = TRUE,
+  require_fields = FALSE
 )
 }
 \arguments{

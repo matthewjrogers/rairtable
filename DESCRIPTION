@@ -19,6 +19,7 @@ Imports:
     httr,
     httr2,
     jsonlite,
+    lifecycle,
     parallel,
     progress,
     rlang (>= 1.1.0),

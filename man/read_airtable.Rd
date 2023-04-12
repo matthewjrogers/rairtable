@@ -8,7 +8,7 @@ read_airtable(
   airtable,
   fields = NULL,
   id_to_col = TRUE,
-  max_rows = 50000,
+  max_rows = NULL,
   ...,
   call = caller_env()
 )

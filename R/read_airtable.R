@@ -21,14 +21,15 @@
 read_airtable <- function(airtable,
                           fields = NULL,
                           id_to_col = TRUE,
-                          max_rows = 50000,
+                          max_rows = NULL,
                           ...,
                           call = caller_env()) {
-  validate_airtable(airtable)
+  check_airtable_obj(airtable)
   check_logical(id_to_col)
+  max_rows <- max_rows %||% 50000
   check_number_whole(max_rows, max = 50000)
 
-  dta <- get_airtable_data(airtable, fields, max_rows, ...)
+  dta <- get_airtable_data(airtable = airtable, fields = fields, max_rows = max_rows, ...)
 
   if ("data.frame" %in% unlist(lapply(dta[[1]], class))) {
     cli::cli_bullets(
@@ -54,6 +55,8 @@ read_airtable <- function(airtable,
 #' @noRd
 get_airtable_data <- function(airtable,
                               fields = NULL,
+                              id_col = getOption("rairtable.id_col", "airtable_record_id"),
+                              token = NULL,
                               max_rows = 50000,
                               ...) {
   # pre-allocate space for data
@@ -61,10 +64,18 @@ get_airtable_data <- function(airtable,
 
   offset <- NULL
 
+  view <- attr(airtable, "view")
+  if (is_empty(view) || view == "") {
+    view <- NULL
+  }
+
+  url <- attr(airtable, "request_url")
+
   .req <- req_airtable_query(
-    url = attr(airtable, "request_url"),
+    url = url,
     fields = fields,
-    view = attr(airtable, "view"),
+    view = view,
+    token = token,
     ...
   )
 
@@ -75,11 +86,13 @@ get_airtable_data <- function(airtable,
         offset = offset
       )
 
-    body <- httr2::resp_body_json(httr2::req_perform(req), simplifyVector = TRUE)
+    resp <- httr2::req_perform(req)
+
+    body <- httr2::resp_body_json(resp, simplifyVector = TRUE)
 
     # bind record IDs and fields into a dataframe
     dta[[idx]] <- cbind(
-      airtable_record_id = body[["records"]][["id"]],
+      rlang::set_names(list(body[["records"]][["id"]]), id_col),
       body[["records"]][["fields"]]
     )
 
@@ -90,7 +103,6 @@ get_airtable_data <- function(airtable,
 
     offset <- body[["offset"]]
   }
-
 
   dplyr::bind_rows(dta)
 }
