@@ -17,7 +17,8 @@ delete_records(
 
 \item{airtable}{An airtable object}
 
-\item{airtable_id_col}{Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from \code{read_airtable}.}
+\item{airtable_id_col}{Column containing Airtable record IDs. Not required if
+record IDs are stored in row names as returned from \code{read_airtable}.}
 
 \item{safely}{If \code{TRUE}, ask for confirmation before executing DELETE request}
 

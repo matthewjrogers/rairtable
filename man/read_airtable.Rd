@@ -4,19 +4,35 @@
 \alias{read_airtable}
 \title{Read table from Airtable}
 \usage{
-read_airtable(airtable, fields = NULL, id_to_col = TRUE, max_rows = 50000)
+read_airtable(
+  airtable,
+  fields = NULL,
+  id_to_col = TRUE,
+  max_rows = 50000,
+  ...,
+  call = caller_env()
+)
 }
 \arguments{
 \item{airtable}{An airtable object}
 
 \item{fields}{An optional list of fields to select.}
 
-\item{id_to_col}{If TRUE, store airtable ID as a column rather than as row names}
+\item{id_to_col}{If \code{TRUE}, store airtable ID as a column rather than as row
+names}
 
 \item{max_rows}{Optional maximum number of rows to read}
+
+\item{...}{Additional parameters passed to \code{\link[=req_airtable_query]{req_airtable_query()}}}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
-A dataframe containing the data read from the specified 'Airtable' table
+A data.frame containing the data read from the specified 'Airtable'
+table
 }
 \description{
 Connect to and read values from an Airtable table.

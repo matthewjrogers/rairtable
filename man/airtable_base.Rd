@@ -2,23 +2,27 @@
 % Please edit documentation in R/airtable_base.R
 \name{airtable_base}
 \alias{airtable_base}
-\title{Title}
+\title{Get metadata for an Airtable base}
 \usage{
 airtable_base(
-  base_id,
-  metadata_api_url_pattern = "https://api.airtable.com/v0/meta/bases/\%s/tables"
+  base,
+  metadata_api_url_pattern = "meta/bases/{base}/tables",
+  token = NULL
 )
 }
 \arguments{
-\item{base_id}{A valid Airtable base ID}
+\item{base}{A valid Airtable base ID}
 
-\item{metadata_api_url_pattern}{URL for GET request. By default 'https://api.airtable.com/v0/meta/bases/%s/tables'}
+\item{metadata_api_url_pattern}{URL for GET request. Defaults to
+"meta/bases/{base_id}/tables"}
+
+\item{token}{Airtable personal access token}
 }
 \value{
-an `airtable_base_schema` object
+an \code{airtable_base_schema} object
 }
 \description{
-Title
+Get metadata for an Airtable base.
 }
 \examples{
 \dontrun{

@@ -1,144 +1,18 @@
-
-
-new_airtable <- function(table = character(), base = character(), view = character(), fields = list(), api_url = character(), api_version = integer()) {
-  
-  stopifnot(is.character(table))
-  stopifnot(is.character(base))
-  stopifnot(is.character(view) | is.null(view))
-  stopifnot(is.character(api_url))
-  stopifnot(is.integer(api_version))
-  stopifnot(length(api_version) == 1)
-  stopifnot(is.list(fields))
-
-  atbl <- new.env()
-  atbl$table <- table
-  atbl$fields <- fields
-  
-  class(atbl) <- "airtable"
-
-  attr(atbl, "base") <- base
-  attr(atbl, "view") <- view
-  attr(atbl, "request_url") <- paste(api_url, sprintf("v%s", api_version), base, utils::URLencode(table), sep = "/")
-
-  validate_airtable(atbl)
-
-  atbl
-
-}
-
-# validate a new airtable object
-
-validate_airtable <- function(airtable_obj){
-
-  table <- airtable_obj$table
-  base <- attr(airtable_obj, "base")
-  view <- attr(airtable_obj, "view")
-  request_url <- attr(airtable_obj, "request_url")
-  fields <- airtable_obj$fields
-  
-  
-  if (!is.list(fields)){
-    stop("The fields of the provided Airtable object is not a list")
-  }
-  
-  if (!inherits(fields, 'airtable_fields_schema')){
-    stop("The fields of the provided Airtable object must be of class `airtable_fields_schema`")
-  }
-  
-  if (!inherits(airtable_obj, 'airtable')){
-    stop("The provided airtable object is not of class `airtable`")
+#' @noRd
+is_url <- function(x) {
+  if (is_null(x)) {
+    return(FALSE)
   }
 
-  if (length(table) > 1){
-    stop("You can only connect to one Airtable table at a time. `table` should be a single character value", call. = FALSE)
-  }
-
-  if (length(table) < 1){
-    stop("You muist provide an Airtable table name. `table` should be a single character value", call. = FALSE)
-  }
-
-  if (length(base) > 1){
-    stop("Tables appear in a single Airtable base. `base` should be a single character value", call. = FALSE)
-  }
-
-  if (length(base) < 1){
-    stop("You must provide an Airtable base name. `base` should be a single character value", call. = FALSE)
-  }
-
-  if (length(view) > 1){
-    stop("You can only connect to one Airtable view at a time. `view` must be either NULL or a single character value", call. = FALSE)
-  }
-
-  if (length(view) < 1 & !is.null(view)){
-    stop("`view` must be either NULL or a single character value", call. = FALSE)
-  }
-
-  if (grepl("\\s", request_url)){
-    stop("`request_url` cannot contain any spaces", call. = FALSE)
-  }
-
-}
-
-#' @keywords internal
-#' @export
-#'
-
-print.airtable <- function(x, ...){
-
-  cat("Table: ", x$table, "\n", sep = "")
-  if (!is.null(attr(x, 'view'))){
-    cat("   View: ", attr(x, 'view'), "\n", sep = "")
-  }
-  cat("   Base: ", attr(x, 'base'), "\n", sep = "")
-}
-
-#' @keywords internal
-#' @export
-#'
-
-str.airtable = function(object, ...) {
-
-  view <- ifelse(is.null(attr(object, "view")), "", paste0('."', attr(object, "view"), '"'))
-  cat(" Airtable: ", object$table, view, " @ ", attr(object, "base"), "\n", sep = "")
-
-}
-
-# Retrieve API Key
-
-get_airtable_api_key <- function(){
-
-  key <- Sys.getenv("AIRTABLE_API_KEY")
-
-  if (key == ""){
-    stop("No Airtable personal access tokens or API keys set. API keys will be deprecated in 2024. Use `set_airtable_pat()` to set a personal access token")
-  }
-
-  key
-}
-
-get_airtable_pat <- function(){
-  
-  key <- Sys.getenv("AIRTABLE_PAT")
-  
-  if (key == ""){
-    stop("No Airtable personal access tokens set. Use `set_airtable_pat()` to set your personal access token.")
-  }
-  
-  key
-}
-
-# while both PATs and keys are supported, this function will let us get 
-get_airtable_pat_or_key <- function(){
-  tryCatch(
-    get_airtable_pat(),
-    error = function(e){
-      get_airtable_api_key()
-    }
+  grepl(
+    "http[s]?://(?:[[:alnum:]]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+    x
   )
 }
+
 # Split a dataframe by row
 
-split_rows <- function(df, chunk_size){
+split_rows <- function(df, chunk_size) {
   n_rows <- nrow(df)
   split_vec  <- rep(1:ceiling(n_rows / chunk_size), each = chunk_size)[1:n_rows]
   res <- split(df, split_vec)
@@ -146,13 +20,10 @@ split_rows <- function(df, chunk_size){
   res
 }
 
-
-
-
-adorn_text <- function(text, mode = 'success'){
+adorn_text <- function(text, mode = 'success') {
   md <- match.arg(mode, c('success', 'failure'))
 
-  if (md == 'success'){
+  if (md == 'success') {
     res <- paste(crayon::green(cli::symbol$tick), text, sep = " ")
   } else {
     res <- paste(crayon::red(cli::symbol$cross), text, sep = " ")
@@ -162,28 +33,25 @@ adorn_text <- function(text, mode = 'success'){
 }
 
 
-get_ids <- function(df, id_col){
-  if (is.null(id_col)){
+get_ids <- function(df, id_col, call = caller_env()) {
+  if (is.null(id_col)) {
 
-    if (!tibble::has_rownames(df)){
-      stop("Data must either have Airtable IDs in row names or a provided ID column", call. = FALSE)
+    if (!tibble::has_rownames(df)) {
+      cli_abort(
+        "Data must either have Airtable IDs in row names or a provided ID column",
+        call = call
+        )
     }
 
-    ids <- row.names(df)
-
-  } else {
-
-    ids <- df %>% select(!!id_col) %>% dplyr::pull()
-
+    return(row.names(df))
   }
 
-  ids
-
+  df %>% select(!!id_col) %>% dplyr::pull()
 }
 
 # Split list or vector into equal size pieces
 
-split_list <- function(lst, chunk_size = 10){
+split_list <- function(lst, chunk_size = 10) {
   mapply(
     function(a, b) (lst[a:b]),
     seq.int(from = 1, to = length(lst), by = chunk_size),
@@ -192,14 +60,14 @@ split_list <- function(lst, chunk_size = 10){
   )
 }
 
-stop_quietly <- function(...) {
+stop_quietly <- function(..., call = caller_env()) {
   opt <- options(show.error.messages = FALSE)
   on.exit(options(opt))
-  message(paste(..., collapse = " "))
-  stop()
+  cli::cli_alert(paste(..., collapse = " "))
+  abort(call = call)
 }
 
-process_error <- function(response_status){
+process_error <- function(response_status) {
 
   statuses <- data.frame(
     code = c(400,  401, 403,  404, 408, 413, 422, 503),
@@ -215,7 +83,7 @@ process_error <- function(response_status){
     )
   )
 
-  if (response_status %in% statuses$code){
+  if (response_status %in% statuses$code) {
     return(sprintf("Error Code %s: %s", statuses[statuses$code == response_status, 'code'], statuses[statuses$code == response_status, 'description']))
   }
 
@@ -225,17 +93,17 @@ process_error <- function(response_status){
 
 # If the user chooses to execute safely, confirm action before proceeding
 
-safety_check <- function(safely, cancel_message, ...){
+safety_check <- function(safely, cancel_message, ...) {
 
-  stopifnot(is.logical(safely))
+  check_logical(safely)
 
-  if (safely){
+  if (safely) {
 
     ans <- menu(c(paste(crayon::green(cli::symbol$tick), 'Yes'),
                   paste(crayon::red(cli::symbol$cross), 'No')),
                 title = paste0(..., collapse = ""))
 
-    if (ans != 1){
+    if (ans != 1) {
       stop_quietly(crayon::red(cli::symbol$cross), cancel_message)
     }
   }

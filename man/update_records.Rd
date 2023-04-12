@@ -11,7 +11,8 @@ update_records(
   airtable_id_col = "airtable_record_id",
   safely = TRUE,
   parallel = FALSE,
-  batch_size = 10
+  batch_size = 10,
+  call = caller_env()
 )
 }
 \arguments{
@@ -19,19 +20,31 @@ update_records(
 
 \item{airtable}{An airtable object}
 
-\item{columns}{Columns in the data to update on Airtable. Can be a vector of character strings, unquoted column names, or a \code{dplyr} tidyselect helper like \code{starts_with()}, \code{ends_with()} or \code{everything()}. Defaults to \code{dplyr::everything()}}
+\item{columns}{Columns in the data to update on Airtable. Can be a vector of
+character strings, unquoted column names, or a tidyselect helper like
+\code{\link[dplyr:reexports]{dplyr::starts_with()}}, \code{\link[dplyr:reexports]{dplyr::ends_with()}} or \code{\link[dplyr:reexports]{dplyr::everything()}}.
+Defaults to \code{\link[dplyr:reexports]{dplyr::everything()}}}
 
-\item{airtable_id_col}{Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from \code{read_airtable}}
+\item{airtable_id_col}{Column containing Airtable record IDs. Not required if
+record IDs are stored in row names as returned from \code{\link[=read_airtable]{read_airtable()}}}
 
-\item{safely}{If \code{TRUE}, confirm number and names of columns to update and number of rows before executing update.}
+\item{safely}{If \code{TRUE}, confirm number and names of columns to update and
+number of rows before executing update.}
 
 \item{parallel}{If \code{TRUE} use parallel processing for encoding large tables}
 
 \item{batch_size}{Number of records to update per request. Maximum of 10}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
-A dataframe (invisibly) of the input data, to be stored as an object or piped into further `dplyr` functions
+A data.frame (invisibly) of the input data, to be stored as an object
+or piped into further \code{dplyr} functions
 }
 \description{
-Update one or more columns of data in an Airtable table. Supports batch updates and parallel JSON encoding (recommended for large tables).
+Update one or more columns of data in an Airtable table. Supports batch
+updates and parallel JSON encoding (recommended for large tables).
 }

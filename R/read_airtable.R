@@ -4,88 +4,93 @@
 #'
 #' @param airtable An airtable object
 #' @param fields An optional list of fields to select.
-#' @param id_to_col If TRUE, store airtable ID as a column rather than as row names
+#' @param id_to_col If `TRUE`, store airtable ID as a column rather than as row
+#'   names
 #' @param max_rows Optional maximum number of rows to read
-#' 
-#' @return A dataframe containing the data read from the specified 'Airtable' table
-#' 
+#' @param ... Additional parameters passed to [req_airtable_query()]
+#' @inheritParams rlang::args_error_context
+#'
+#' @return A data.frame containing the data read from the specified 'Airtable'
+#'   table
+#'
 #' @export
 #'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#' @importFrom httr content
-#' @importFrom httr stop_for_status
-#' @importFrom jsonlite fromJSON
 #' @importFrom dplyr bind_rows
 #' @importFrom tibble column_to_rownames
-#'
 
-read_airtable <- function(airtable, fields = NULL, id_to_col = TRUE, max_rows = 50000){
-
+read_airtable <- function(airtable,
+                          fields = NULL,
+                          id_to_col = TRUE,
+                          max_rows = 50000,
+                          ...,
+                          call = caller_env()) {
   validate_airtable(airtable)
-  stopifnot(is.logical(id_to_col))
-  stopifnot(max_rows <= 50000)
+  check_logical(id_to_col)
+  check_number_whole(max_rows, max = 50000)
 
-  # pre-allocate space for data
-  dta <- vector(ceiling(max_rows/100), mode = 'list')
+  dta <- get_airtable_data(airtable, fields, max_rows, ...)
 
-  # create empty query body
-  query_body <- list()
-
-  if (!is.null(attr(airtable, 'view'))){
-    # add view to query if present
-    query_body['view'] <- attr(airtable, 'view')
-  }
-  
-  url <- attr(airtable, "request_url")
-  
-  if (!is.null(fields)){
-    url_params <- paste0("fields%5B%5D=", fields, collapse = "&")
-    url <- paste(url, url_params, sep = "?")
-  }
-  
-  for (idx in 1:length(dta)){
-
-    response <- httr::GET(url,
-                          config = httr::add_headers(
-                            Authorization = paste("Bearer", get_airtable_pat_or_key())
-                          ),
-                          query = query_body
+  if ("data.frame" %in% unlist(lapply(dta[[1]], class))) {
+    cli::cli_bullets(
+      c(
+        "!" = "This data may contain 'user' field types.",
+        "i" = "This type is currently unsupported in `insert_records` and `update_records`",
+        call = call
+      )
     )
+  }
 
-    # stop for errors
-    httr::stop_for_status(response, "Fetch Airtable records")
+  # collapse list to dataframe
+  table_data <- dplyr::bind_rows(dta)
 
-    # parse response
-    parsed_json_response <- jsonlite::fromJSON(httr::content(response, as = "text"))
+  if (!id_to_col) {
+    # set ids to rownames if not instructed to do otherwise
+    table_data <- tibble::column_to_rownames(table_data, "airtable_record_id")
+  }
+
+  table_data
+}
+
+#' @noRd
+get_airtable_data <- function(airtable,
+                              fields = NULL,
+                              max_rows = 50000,
+                              ...) {
+  # pre-allocate space for data
+  dta <- vector(ceiling(max_rows / 100), mode = "list")
+
+  offset <- NULL
+
+  .req <- req_airtable_query(
+    url = attr(airtable, "request_url"),
+    fields = fields,
+    view = attr(airtable, "view"),
+    ...
+  )
+
+  for (idx in seq_along(dta)) {
+    req <-
+      httr2::req_url_query(
+        .req = .req,
+        offset = offset
+      )
+
+    body <- httr2::resp_body_json(httr2::req_perform(req), simplifyVector = TRUE)
 
     # bind record IDs and fields into a dataframe
-    dta[[idx]] <- cbind(airtable_record_id = parsed_json_response$records$id, parsed_json_response$records$fields)
+    dta[[idx]] <- cbind(
+      airtable_record_id = body[["records"]][["id"]],
+      body[["records"]][["fields"]]
+    )
 
-    if (is.null(parsed_json_response$offset)){
+    if (is_null(body[["offset"]])) {
       # end loop if no offset returned
       break
     }
 
-    query_body['offset'] <- parsed_json_response$offset
-
-    # Sys.sleep(.2)
-
+    offset <- body[["offset"]]
   }
 
-  
-  if (any(unlist(lapply(dta[[1]], class)) == "data.frame")){
-    warning("This data may contain 'user' field types. This type is currently unsupported in `insert_records` and `update_records`", call. = FALSE)
-  }
-  
-  # collapse list to dataframe
-  table_data <- dplyr::bind_rows(dta)
 
-  if(!id_to_col){
-    # set ids to rownames if not instructed to do otherwise
-    table_data <- tibble::column_to_rownames(table_data, 'airtable_record_id')
-  }
-
-  return(table_data)
-
+  dplyr::bind_rows(dta)
 }
