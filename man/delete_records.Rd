@@ -5,11 +5,13 @@
 \title{Delete airtable records}
 \usage{
 delete_records(
-  data,
+  data = NULL,
   airtable,
-  airtable_id_col = "airtable_record_id",
+  airtable_id_col = deprecated(),
+  id_col = getOption("rairtable.id_col", "airtable_record_id"),
+  records = NULL,
   safely = TRUE,
-  batch_size = 10
+  batch_size = deprecated()
 )
 }
 \arguments{

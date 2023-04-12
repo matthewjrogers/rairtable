@@ -21,32 +21,95 @@
 #' @importFrom rlang enexpr
 #' @importFrom dplyr filter
 
-delete_records <- function(data,
+delete_records <- function(data = NULL,
                            airtable,
-                           airtable_id_col = 'airtable_record_id',
+                           airtable_id_col = deprecated(),
+                           id_col = getOption("rairtable.id_col", "airtable_record_id"),
+                           records = NULL,
                            safely = TRUE,
-                           batch_size = 10) {
+                           batch_size = deprecated()) {
+  check_airtable_obj(airtable)
 
-  validate_airtable(airtable)
-  check_data_frame(data)
-  check_number_whole(batch_size, max = 10)
+  if (is.data.frame(data)) {
+    records <- get_ids(df = data, id_col = rlang::enexpr(id_col))
+  } else if (is.character(data)) {
+    records <- records %||% data
+  }
+
+  check_character(records)
   check_bool(safely)
 
-  ids <- get_ids(df = data, id_col = rlang::enexpr(airtable_id_col))
+  safety_check(
+    safely,
+    cancel_message = "DELETE request cancelled.",
+    paste0("You are about to delete ", length(records), " Airtable records.\n\nDo you wish to proceed?")
+  )
 
-  safety_check(safely,
-               cancel_message = "DELETE request cancelled.",
-               paste0("You are about to delete ", length(ids), " Airtable records.\n\nDo you wish to proceed?")
-               )
+  url <- attr(airtable, "request_url")
 
-  id_batches <- lapply(split_list(ids, batch_size), function(x) paste0("records[]=", x, collapse = "&"))
+  req_delete_records(
+    url = url,
+    records = records
+  )
 
-  vdelete(ids = id_batches, airtable_obj = airtable)
+  cli::cli_inform("Deleted {length(records)} record{s}.")
 
-  cli::cli_inform("Deleted {length(ids)} record{s}.")
-
-  invisible(ids)
-
+  invisible(records)
 }
 
+#' Delete an individual record
+#'
+#' @noRd
+req_delete_record <- function(url = NULL, ..., record, call = caller_env()) {
+  req <- airtable_request(url = url, ...)
 
+  req <- req_airtable_query(
+    .req = req,
+    records = records,
+    template = "/{records}",
+    method = "DELETE"
+  )
+
+  httr2::req_perform(req)
+}
+
+#' Delete multiple records
+#'
+#' https://airtable.com/developers/web/api/delete-multiple-records
+#'
+#' @noRd
+req_delete_records <- function(url = NULL, ..., records, batch = TRUE, call = caller_env()) {
+  if (has_length(records, 1)) {
+    return(req_delete_record(url = url, ..., records = records, call = call))
+  }
+
+  check_string(records, call = call)
+  n_records <- length(records)
+
+  if ((n_records > 10) && is_true(batch)) {
+    record_batches <- split_list(records, 10)
+    batch_delete <- Vectorize(req_delete_records, vectorize.args = "records")
+    return(batch_delete(url = url, ..., records = record_batches, call = call))
+  }
+
+  check_number_whole(
+    n_records,
+    max = 10,
+    message = "{.arg records} must be provided in a batch of 10 or less, not {n_records}.",
+    call = call
+  )
+
+  req <- airtable_request(url = url, ...)
+
+  req <- req_airtable_query(
+    .req = req,
+    method = "DELETE"
+  )
+
+  req <- httr2::req_url_path_append(
+    req,
+    paste0("?", paste0("records=", records, collapse = "&"))
+  )
+
+  httr2::req_perform(req)
+}
