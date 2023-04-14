@@ -39,9 +39,10 @@ get_airtable_pat <- function(pat = NULL,
   )
 }
 
-#' Get an Airtable Personal Access Token or an API Key if PAT is not available
+#' Get an Airtable Personal Access Token or an API Key (if PAT is not available)
 #'
-#' @noRd
+#' @keywords internal
+#' @export
 get_airtable_pat_or_key <- function(token = NULL,
                                     default = c("AIRTABLE_PAT", "AIRTABLE_API_KEY"),
                                     call = caller_env()) {

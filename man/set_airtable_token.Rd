@@ -2,7 +2,8 @@
 % Please edit documentation in R/set_airtable_pat.R
 \name{set_airtable_token}
 \alias{set_airtable_token}
-\title{Set Airtable Personal Access Token or API Key}
+\alias{get_airtable_token}
+\title{Set or get an Airtable Personal Access Token or API Key}
 \usage{
 set_airtable_token(
   token,
@@ -11,11 +12,32 @@ set_airtable_token(
   default = "AIRTABLE_PAT",
   call = caller_env()
 )
+
+get_airtable_token(
+  token = NULL,
+  default = "AIRTABLE_PAT",
+  call = caller_env(),
+  ...
+)
 }
 \arguments{
-\item{token}{Airtable personal access token}
+\item{token}{Airtable personal access token or API key.}
+
+\item{install}{Add your personal access token to your \code{.Renviron} for future
+sessions.}
+
+\item{overwrite}{If \code{TRUE}, overwrite any existing Airtable personal access
+token.}
+
+\item{default}{Default name used for environmental variable where the
+personal access token is stored.}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
-Set Airtable Personal Access Token or API Key
+Set or get an Airtable Personal Access Token or API Key
 }
 \keyword{internal}

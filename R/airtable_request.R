@@ -13,7 +13,6 @@
 #' request. Most of the other data access functions in this package wrap
 #' [req_auth_airtable()].
 #'
-#'
 #' @param url A URL for an API call or an Airtable view. If url is provided and
 #'   is a valid URL, [airtable_request() ] returns  `httr2::request(url)`. url
 #'   is optional if airtable *or* base and table are supplied. If url is an
@@ -100,6 +99,10 @@ airtable_request <- function(url = NULL,
 
 #' @rdname airtable_request
 #' @name req_airtable_query
+#' @param .req,req A request object created by [httr2::request()] or
+#'   [airtable_request()]. If .req is provided to [req_airtable_query()], url,
+#'   api_url, api_version, and airtable parameters are ignored. req is required
+#'   for [req_auth_airtable()].
 #' @param template Template for query parameters passed to
 #'   [httr2::req_template()], Default: `NULL`.
 #' @inheritParams httr2::req_method
@@ -162,13 +165,14 @@ req_airtable_query <- function(.req = NULL,
 
 #' @rdname airtable_request
 #' @name req_auth_airtable
-#' @param token Airtable personal access token, Default: `NULL` (set to output
-#'   from `get_airtable_pat_or_key()`)
+#' @param token Airtable personal access token, Defaults to `NULL` which is set
+#'   to environmental variable for "AIRTABLE_PAT" (from [get_airtable_pat()]) or
+#'   "AIRTABLE_API_KEY" (from [get_airtable_api_key()]).
 #' @param default Default name for environmental variable for token.
 #' @param string Passed to [httr2::req_user_agent()], Default: `NULL` (set to
 #'   `getOption("rairtable.useragent", default = "rairtable
 #'   (https://github.com/matthewjrogers/rairtable)")`)
-#' @param rate Rate passed to [httr2::req_throttle()]. Defaults to `5 / 1`
+#' @param rate Rate passed to [httr2::req_throttle()]. Defaults to `5 / 1`.
 #' @param realm Passed to [httr2::req_throttle()]. Defaults to `NULL`.
 #' @export
 #' @importFrom httr2 req_auth_bearer_token req_user_agent req_throttle

@@ -42,9 +42,10 @@ install the personal access token to your .Renviron file for future use.
 }
 \examples{
 \dontrun{
-set_airtable_pat("XXXXXXXXXX", install = TRUE)
-}
+set_airtable_pat("<personal access token>", install = TRUE)
 
+get_airtable_pat()
+}
 }
 \seealso{
 \code{\link[=set_airtable_api_key]{set_airtable_api_key()}}
