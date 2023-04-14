@@ -41,19 +41,20 @@ is_airtable_url <- function(url, base_url = NULL) {
 #' @param api_url Expected base URL for an API url. Defaults to `NULL` and set
 #'   to `getOption("rairtable.api_url", "https://api.airtable.com")`.
 #' @export
-is_airtable_api_url <- function(x,
+is_airtable_api_url <- function(url,
                                 api_url = NULL) {
   api_url <- api_url %||%
     getOption("rairtable.api_url", "https://api.airtable.com")
-  is_url(x) & grepl(paste0("^", api_url), x)
+  is_url(url) & grepl(paste0("^", api_url), url)
 }
 
 #' @rdname airtable_url
 #' @name check_airtable_url
+#' @inheritParams rlang::args_error_context
 #' @export
 check_airtable_url <- function(url,
-                           base_url = NULL,
-                           call = caller_env()) {
+                               base_url = NULL,
+                               call = caller_env()) {
   check_string(url, call = call)
 
   if (is_airtable_url(url, base_url)) {
