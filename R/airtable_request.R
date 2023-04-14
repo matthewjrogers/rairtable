@@ -190,16 +190,20 @@ req_auth_airtable <- function(req,
   req <-
     httr2::req_auth_bearer_token(
       req = req,
-      token = token %||% get_airtable_pat(token, default = default)
+      token = token
+    )
+
+  string <-
+    string %||%
+    getOption(
+      "rairtable.useragent",
+      default = "rairtable (https://github.com/matthewjrogers/rairtable)"
     )
 
   req <-
     httr2::req_user_agent(
       req = req,
-      string = string %||% getOption(
-        "rairtable.useragent",
-        default = "rairtable (https://github.com/matthewjrogers/rairtable)"
-      )
+      string = string
     )
 
   httr2::req_throttle(
