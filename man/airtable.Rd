@@ -6,7 +6,7 @@
 \usage{
 airtable(
   table = NULL,
-  base,
+  base = NULL,
   view = NULL,
   fields = list(),
   api_url = NULL,

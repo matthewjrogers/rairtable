@@ -23,16 +23,13 @@
 #' table <- airtable("Table 1", "appXXXXXXXXXXXXX")
 #' }
 airtable <- function(table = NULL,
-                     base,
+                     base = NULL,
                      view = NULL,
                      fields = list(),
                      api_url = NULL,
                      api_version = NULL,
                      require_url = TRUE,
                      require_fields = FALSE) {
-  check_required(base)
-  check_required(table)
-
   atbl <- build_airtable_obj(
     table = table,
     base = base,
@@ -55,12 +52,20 @@ airtable <- function(table = NULL,
 #'
 #' @noRd
 build_airtable_obj <- function(table,
-                             base,
-                             view = NULL,
-                             fields = list(),
-                             api_url = NULL,
-                             api_version = NULL) {
+                               base,
+                               view = NULL,
+                               fields = list(),
+                               api_url = NULL,
+                               api_version = NULL) {
   check_string(table)
+
+  if (is_airtable_url(table)) {
+    ids <- parse_airtable_url(table)
+    table <- ids[["table"]]
+    base <- ids[["base"]]
+    view <- ids[["view"]]
+  }
+
   check_string(base)
   check_string(view, allow_null = TRUE)
   stopifnot(is.list(fields))
@@ -113,7 +118,7 @@ check_airtable_obj <- function(x,
   if (require_url) {
     url <- attr(x, "request_url")
 
-    check_airtable_url(
+    check_airtable_api_url(
       url,
       require_table = require_table,
       require_view = require_view
