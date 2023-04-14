@@ -2,32 +2,39 @@
 % Please edit documentation in R/delete_records.R
 \name{delete_records}
 \alias{delete_records}
-\title{Delete airtable records}
+\title{Delete records from an Airtable table}
 \usage{
 delete_records(
   data = NULL,
   airtable,
-  airtable_id_col = deprecated(),
-  id_col = getOption("rairtable.id_col", "airtable_record_id"),
+  airtable_id_col = NULL,
   records = NULL,
   safely = TRUE,
   batch_size = deprecated()
 )
 }
 \arguments{
-\item{data}{A data frame containing records to delete}
+\item{data}{A data.frame with a record ID column matching the value of
+airtable_id_col or rownames with record ID values.}
 
-\item{airtable}{An airtable object}
+\item{airtable}{An airtable class object.}
 
-\item{airtable_id_col}{Column containing Airtable record IDs. Not required if
-record IDs are stored in row names as returned from \code{read_airtable}.}
+\item{airtable_id_col}{Column name or tidyselect function identifying column
+containing Airtable record IDs. Optional if records is supplied or if
+record IDs are stored in row names (default option for \code{\link[=read_airtable]{read_airtable()}}).
+Defaults to \code{NULL} which is set to \code{getOption("rairtable.id_col", "airtable_record_id")}.}
 
-\item{safely}{If \code{TRUE}, ask for confirmation before executing DELETE request}
+\item{records}{Character vector with record IDs. Optional if data is
+provided.}
 
-\item{batch_size}{Number of requests to send at a time. Maximum of 10.}
+\item{safely}{If \code{TRUE}, ask for confirmation before deleting Airtable
+records and abort if confirmation is not provided.}
+
+\item{batch_size}{Deprecated. Number of records to delete in a single batch.
+batch_size can now be set using the "rairtable.batch_size" option.}
 }
 \value{
-A vector of IDs deleted
+A vector of deleted record IDs returned invisibly.
 }
 \description{
 Delete records in an Airtable table based on their Airtable record ID.
