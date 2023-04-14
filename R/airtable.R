@@ -58,19 +58,19 @@ build_airtable_obj <- function(table,
                                view = NULL,
                                fields = list(),
                                api_url = NULL,
-                               api_version = NULL) {
-  check_string(table)
+                               api_version = NULL,
+                               call = caller_env()) {
+  check_string(table, call = call)
 
   if (is_airtable_url(table)) {
-    ids <- parse_airtable_url(table)
+    ids <- parse_airtable_url(table, call = call)
     table <- ids[["table"]]
     base <- ids[["base"]]
     view <- ids[["view"]]
   }
 
-  check_string(base)
-  check_string(view, allow_null = TRUE)
-  stopifnot(is.list(fields))
+  check_string(base, call = call)
+  check_string(view, allow_null = TRUE, call = call)
 
   atbl <- new.env()
   atbl$table <- table
@@ -85,7 +85,8 @@ build_airtable_obj <- function(table,
       api_url = api_url,
       api_version = api_version,
       base = base,
-      table = table
+      table = table,
+      call = call
     )[["url"]]
 
   atbl
