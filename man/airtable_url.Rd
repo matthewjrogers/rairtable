@@ -4,14 +4,16 @@
 \alias{airtable_url}
 \alias{is_airtable_url}
 \alias{is_airtable_api_url}
-\alias{check_airtable_api_url}
 \alias{check_airtable_url}
+\alias{check_airtable_api_url}
 \alias{parse_airtable_url}
 \title{Test, check, and parse Airtable URLs and API URLs}
 \usage{
 is_airtable_url(url, base_url = NULL)
 
-is_airtable_api_url(x, api_url = NULL)
+is_airtable_api_url(url, api_url = NULL)
+
+check_airtable_url(url, base_url = NULL, call = caller_env())
 
 check_airtable_api_url(
   url,
@@ -21,8 +23,6 @@ check_airtable_api_url(
   api_url = NULL,
   call = caller_env()
 )
-
-check_airtable_url(url, base_url = NULL, call = caller_env())
 
 parse_airtable_url(
   url,
@@ -43,6 +43,11 @@ set to \code{getOption("rairtable.api_url", "https://airtable.com/")}.}
 
 \item{api_url}{Expected base URL for an API url. Defaults to \code{NULL} and set
 to \code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 
 \item{require_base}{If \code{TRUE}, the string "tbl" must be included in the
 supplied url.}

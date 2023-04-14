@@ -12,7 +12,7 @@ airtable_base(base, metadata_api_url_pattern = deprecated(), token = NULL)
 \item{metadata_api_url_pattern}{URL for GET request. Defaults to
 "meta/bases/{base_id}/tables"}
 
-\item{token}{Airtable personal access token}
+\item{token}{Airtable personal access token or API key.}
 }
 \value{
 an \code{airtable_base_schema} object

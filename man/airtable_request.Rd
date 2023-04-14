@@ -72,6 +72,11 @@ for a table being present in the URL.}
 string supplied to url.}
   }}
 
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+
 \item{.req, req}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
 \code{\link[=airtable_request]{airtable_request()}}. If .req is provided to \code{\link[=req_airtable_query]{req_airtable_query()}}, url,
 api_url, api_version, and airtable parameters are ignored. req is required
