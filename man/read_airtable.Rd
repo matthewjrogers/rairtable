@@ -8,6 +8,7 @@ read_airtable(
   airtable,
   fields = NULL,
   id_to_col = TRUE,
+  airtable_id_col = NULL,
   max_rows = NULL,
   ...,
   call = caller_env()
@@ -31,8 +32,8 @@ mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
-A data.frame containing the data read from the specified 'Airtable'
-table
+A data.frame with the records from the specified Airtable base and
+table.
 }
 \description{
 Connect to and read values from an Airtable table.
