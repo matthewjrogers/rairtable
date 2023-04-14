@@ -1,52 +1,97 @@
-#' Use httr2 to create and perform an Airtable API request
+#' Use httr2 to create an Airtable API request
 #'
-#' [req_auth_airtable()] supports the API request by setting rate limit, user
-#' agent, and authenticate Airtable request with key/token
+#' [airtable_request()] creates an initial request object based on an airtable
+#' object, API url, Airtable view URL, or base and table IDs.
 #'
-#' @param url If url is provided and is a URL, return `httr2::request(url)`.
-#' @param api_url Airtable API URL, Default: `NULL` (set to
-#'   getOption("rairtable.api_url", "https://api.airtable.com"))
-#' @param api_version Airtable API version number, Default: `NULL`  (set to
-#'   getOption("rairtable.api_version", 0))
-#' @param base Base id
-#' @param table Table id
+#' [req_auth_airtable()] set the rate limit, user agent, and authenticates the
+#' Airtable API request with an API key or personal access token.
+#'
+#' [req_airtable_query()] builds an API request optionally using a template or
+#' custom HTTP method (other than GET or POST). This function can create an
+#' initial request using a URL or airtable object or use an existing request
+#' object. The function also calls [req_auth_airtable()] before returning the
+#' request. Most of the other data access functions in this package wrap
+#' [req_auth_airtable()].
+#'
+#'
+#' @param url A URL for an API call or an Airtable view. If url is provided and
+#'   is a valid URL, [airtable_request() ] returns  `httr2::request(url)`. url
+#'   is optional if airtable *or* base and table are supplied. If url is an
+#'   Airtable view, any additional base or table values provided are ignored. If
+#'   airtable is provided, any additional value provided to url is ignored. For
+#'   the metadata API where only a base ID is required include `require_base =
+#'   TRUE` to pass to `check_airtable_api_url()`.
+#' @param api_url Airtable API URL, If `NULL` (default), the api_url is set to
+#'   getOption("rairtable.api_url", "https://api.airtable.com").
+#' @param api_version Airtable API version number, If `NULL` (default), the
+#'   api_version is set to getOption("rairtable.api_version", 0)).
+#' @param base Airtable base id starting with with "app".
+#' @param table Airtable table id or name. If table is a table ID it is a string
+#'   starting with "viw".
+#' @inheritParams is_airtable_obj
+#' @param ... For [airtable_request()], additional parameters passed to
+#'   [check_airtable_api_url()]. For [req_airtable_query()], additional
+#'   parameters passed to [httr2::req_template()] if template is not `NULL` or
+#'   [httr2::req_url_query()] if template is `NULL`.
+#' @inheritDotParams check_airtable_api_url
 #' @keywords internal
 #' @export
+#' @importFrom cli cli_alert_warning
 #' @importFrom httr2 request req_url_path_append
 airtable_request <- function(url = NULL,
                              api_url = NULL,
                              api_version = NULL,
                              base = NULL,
                              table = NULL,
-                             airtable = NULL) {
+                             airtable = NULL,
+                             ...,
+                             call = caller_env()) {
   if (!is_null(airtable) && is_airtable_obj(airtable)) {
-    url <- url %||% attr(airtable, "request_url")
+    if (!is_null(url)) {
+      cli::cli_alert_warning(
+        "{.arg url} is ignored when {.arg airtable} is supplied."
+      )
+    }
+
+    url <- attr(airtable, "request_url")
   }
 
-  if (is_url(url)) {
-    check_airtable_url(url)
+  if (is_airtable_api_url(url)) {
+    check_airtable_api_url(url, ..., api_url = api_url, call = call)
     return(httr2::request(url))
   }
 
-  api_url <- api_url %||% getOption("rairtable.api_hostname", "https://api.airtable.com")
-  check_string(api_url)
+  if (is_airtable_url(url)) {
+    ids <- parse_airtable_url(url, ...)
+    if (!is_null(base) | !is_null(table)) {
+      cli::cli_alert_warning(
+        "Any supplied {.arg base} and {.arg table} values are ignored when
+        {.arg url} is an Airtable view."
+      )
+    }
+
+    base <- ids[["base"]]
+    table <- ids[["table"]]
+  }
+
+  api_url <- api_url %||%
+    getOption("rairtable.api_url", "https://api.airtable.com")
+  check_string(api_url, call = call)
+
+  req <- httr2::request(api_url)
 
   api_version <- api_version %||% getOption("rairtable.api_version", 0)
-  check_number_whole(api_version)
+  check_number_whole(api_version, call = call)
 
-  req <-
-    httr2::req_url_path_append(
-      httr2::request(api_url),
-      sprintf("v%s", api_version)
-    )
+  req <- httr2::req_url_path_append(req, paste0("v", api_version))
 
   if (!is_null(base)) {
-    check_string(base)
+    check_string(base, call = call)
     req <- httr2::req_url_path_append(req, base)
   }
 
   if (!is_null(table)) {
-    check_string(table)
+    check_string(table, call = call)
     req <- httr2::req_url_path_append(req, table)
   }
 
@@ -57,26 +102,28 @@ airtable_request <- function(url = NULL,
 #' @name req_airtable_query
 #' @param template Template for query parameters passed to
 #'   [httr2::req_template()], Default: `NULL`.
-#' @param ... Additional parameters passed to [httr2::req_template()] if
-#'   template is not `NULL` or [httr2::req_url_query()] if template is `NULL`.
+#' @inheritParams httr2::req_method
+#' @inheritParams httr2::req_body_json
 #' @export
 #' @importFrom httr2 req_template req_url_query
 req_airtable_query <- function(.req = NULL,
                                ...,
                                template = NULL,
                                method = NULL,
+                               data = NULL,
                                url = NULL,
                                api_url = NULL,
                                api_version = NULL,
                                airtable = NULL,
                                token = NULL,
                                string = NULL) {
-  .req <- .req %||% airtable_request(
-    url = url,
-    api_url = api_url,
-    api_version = api_version,
-    airtable = airtable
-  )
+  .req <-
+    .req %||% airtable_request(
+      url = url,
+      api_url = api_url,
+      api_version = api_version,
+      airtable = airtable
+    )
 
   if (!is.null(template)) {
     .req <-
@@ -93,8 +140,16 @@ req_airtable_query <- function(.req = NULL,
       )
   }
 
-  if (!is.null(method)) {
+  if (!is_null(method)) {
     .req <- httr2::req_method(.req, method)
+  }
+
+  if (!is_null(data)) {
+    .req <-
+      httr2::req_body_json(
+        .req,
+        data = data
+      )
   }
 
   req_auth_airtable(
@@ -148,98 +203,4 @@ req_auth_airtable <- function(req,
     rate = rate,
     realm = realm
   )
-}
-
-#' @rdname airtable_request
-#' @name req_airtable_records
-#' @param base Airtable base identifier. Required. If base is an Airtable URL,
-#'   the base, table, and view identifiers are extracted from the URL and
-#'   assigned to any `NULL` values for table and view. Required if req is
-#'   `NULL`. Ignored if req is provided.
-#' @param table Airtable table name or identifier. Required if req is `NULL`.
-#'   Ignored if req is provided.
-#' @param view Airtable view identifier, Default: `NULL`
-#' @param record Airtable record identifier, Default: `NULL`
-#' @param fields Fields to return from Airtable base, Default: `NULL`
-#' @param filter Filter to apply to records, Note: This parameter is a
-#'   placeholder and is not currently implemented. Default: `NULL`
-#' @param sort Field to sort by, Default: `NULL`
-#' @param desc If `TRUE`, sort in descending order, Default: `FALSE`
-#' @param max_records Maximum number of records to return, Default: `NULL`. Must
-#'   be 100 or less.
-#' @param per_page Max records to return per page, Default: `NULL`
-#' @param cell_format Cell format for "Link to another record" fields (either
-#'   "json" (unique ID) or "string" (displayed character string)), Default:
-#'   'json'
-#' @param tz,locale Time zone and locale, Defaults: `NULL`
-#' @param fields_by_id If `TRUE`, return fields by id, Default: `FALSE`
-#' @export
-#' @importFrom httr2 req_url_path_append req_url_query
-req_airtable_records <- function(req = NULL,
-                                 url = NULL,
-                                 api_url = NULL,
-                                 api_version = NULL,
-                                 base = NULL,
-                                 table = NULL,
-                                 record = NULL,
-                                 view = NULL,
-                                 sort = NULL,
-                                 max_records = 100,
-                                 page_size = NULL,
-                                 tz = NULL,
-                                 locale = NULL,
-                                 fields_by_id = FALSE,
-                                 fields = NULL,
-                                 filter = NULL,
-                                 desc = FALSE,
-                                 cell_format = NULL,
-                                 token = NULL,
-                                 default = "AIRTABLE_PAT") {
-  req <- req %||% airtable_request(url, api_url, api_version, base, table)
-
-  if (!is.null(record)) {
-    req <- httr2::req_url_path_append(req, record)
-    return(req_auth_airtable(req, token = token, default = default))
-  }
-
-  if (!is.null(sort)) {
-    sort <- glue("field: \"{sort}\"")
-    if (desc) {
-      sort <- glue("{sort}, direction: \"desc\"")
-    }
-    sort <- glue("[{{sort}}]")
-  }
-
-  cell_format <- match.arg(cell_format, c("json", "string"))
-
-  if (cell_format == "string") {
-    tz <- Sys.timezone()
-    locale <- Sys.getlocale("LC_TIME")
-  }
-
-  if (!fields_by_id) {
-    fields_by_id <- NULL
-  }
-
-  req <- req_airtable_query(
-    req,
-    view = view,
-    sort = sort,
-    cellFormat = cell_format,
-    timeZone = tz,
-    userLocale = locale,
-    maxRecords = max_records,
-    pageSize = page_size,
-    returnFieldsByFieldId = fields_by_id,
-    token = token,
-    default = default
-  )
-
-  if (!is.null(fields)) {
-    for (field in fields) {
-      req <- httr2::req_url_query(req, field = glue("[{field}]"))
-    }
-  }
-
-  req
 }
