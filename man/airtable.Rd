@@ -16,25 +16,34 @@ airtable(
 )
 }
 \arguments{
-\item{table}{Table name in Airtable}
+\item{table}{Airtable table ID or name. Table ID values start with "tbl". If
+table is an Airtable URL matching the pattern
+"https://airtable.com/{baseID}/{tableIdOrName}/{viewId}" the URL is parsed
+to supply the values for base and table.}
 
-\item{base}{Airtable base containing table. A base functions like a schema in
-a traditional database. You can retrieve the base ID from the API
-documentation.}
+\item{base}{Airtable base ID. Base ID values start with "app". Optional if
+table is a URL containing a base ID or required otherwise.}
 
-\item{view}{Optional view of data to read}
+\item{view}{Optional Airtable view ID. View ID values starts with "viw".}
 
 \item{fields}{An optional \code{airtable_fields_schema} object. Automatically
-populated in tables created by \code{airtable_base()}}
+populated in tables created by \code{airtable_base()}.}
 
-\item{api_url}{API endpoint to connect to. Can be changed for API
-integrations that require custom endpoint}
+\item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
+getOption("rairtable.api_url", "https://api.airtable.com").}
 
-\item{api_version}{Version of API to use. Defaults to 0 (the current version
-as of Fall 2021)}
+\item{api_version}{Airtable API version number, If \code{NULL} (default), the
+api_version is set to getOption("rairtable.api_version", 0)).}
+
+\item{require_url}{If \code{TRUE} (default), check that x includes a "request_url"
+attribute that is a valid Airtable API url.}
+
+\item{require_fields}{If \code{TRUE}, check that x includes a "fields" value that
+is a list with the \code{airtable_fields_schema} class. Defaults to \code{FALSE}.}
 }
 \value{
-An airtable object
+An \code{airtable} class list of table and fields stored as values of the
+list and the base, view, and request_url stored as attributes.
 }
 \description{
 Creates an S3 airtable object, which serves as a pointer for rairtable
