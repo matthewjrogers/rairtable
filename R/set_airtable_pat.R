@@ -1,7 +1,70 @@
-#' Set Airtable Personal Access Token or API Key
+#' Set or get an Airtable personal access token
 #'
-#' @param token Airtable personal access token
+#' Set Airtable personal access token as an environment variable, and optionally
+#' install the personal access token to your .Renviron file for future use.
+#'
+#' @param pat A valid Airtable personal access token. Setup a token at
+#'   <https://airtable.com/create/tokens>
+#' @inheritParams set_airtable_token
+#' @return Invisibly return personal access token value
+#'
+#' @seealso [set_airtable_api_key()]
+#' @examples
+#' \dontrun{
+#' set_airtable_pat("<personal access token>", install = TRUE)
+#'
+#' get_airtable_pat()
+#' }
+#' @export
+set_airtable_pat <- function(pat,
+                             install = FALSE,
+                             overwrite = FALSE,
+                             default = "AIRTABLE_PAT",
+                             call = caller_env()) {
+  set_airtable_token(pat, install, overwrite, default, call)
+}
+
+#' @rdname set_airtable_pat
+#' @name get_airtable_pat
+#' @export
+get_airtable_pat <- function(pat = NULL,
+                             default = "AIRTABLE_PAT",
+                             call = caller_env()) {
+  get_airtable_token(
+    pat,
+    message = c("Personal access token can't be found at {.envvar {default}}.",
+      "*" = "Use {.fn set_airtable_pat} to set {.envvar {default}}."
+    ),
+    default = default, call = call
+  )
+}
+
+#' Get an Airtable Personal Access Token or an API Key if PAT is not available
+#'
+#' @noRd
+get_airtable_pat_or_key <- function(token = NULL,
+                                    default = c("AIRTABLE_PAT", "AIRTABLE_API_KEY"),
+                                    call = caller_env()) {
+  rlang::try_fetch(
+    get_airtable_pat(token, call = call, default = default[[1]]),
+    error = function(cnd) {
+      get_airtable_api_key(token, call = call, default = default[[2]])
+    }
+  )
+}
+
+#' Set or get an Airtable Personal Access Token or API Key
+#'
+#' @param token Airtable personal access token or API key.
+#' @param install Add your personal access token to your `.Renviron` for future
+#'   sessions.
+#' @param default Default name used for environmental variable where the
+#'   personal access token is stored.
+#' @param overwrite If `TRUE`, overwrite any existing Airtable personal access
+#'   token.
+#' @inheritParams rlang::args_error_context
 #' @keywords internal
+#' @export
 #' @importFrom rlang caller_call call_name
 #' @importFrom cli cli_bullets cli_alert_success
 #' @importFrom utils read.table write.table
@@ -73,9 +136,10 @@ set_airtable_token <- function(token,
   invisible(token)
 }
 
-#' Retrieve a environmental variable for use as a token
-#'
+#' @rdname set_airtable_token
+#' @name get_airtable_token
 #' @keywords internal
+#' @export
 get_airtable_token <- function(token = NULL,
                                default = "AIRTABLE_PAT",
                                call = caller_env(),
@@ -90,67 +154,5 @@ get_airtable_token <- function(token = NULL,
   cli_abort(
     ...,
     call = call
-  )
-}
-
-#' Set or get an Airtable personal access token
-#'
-#' Set Airtable personal access token as an environment variable, and optionally
-#' install the personal access token to your .Renviron file for future use.
-#'
-#' @param pat A valid Airtable personal access token. Setup a token at
-#'   <https://airtable.com/create/tokens>
-#' @param install Add your personal access token to your `.Renviron` for future
-#'   sessions.
-#' @param default Default name used for environmental variable where the
-#'   personal access token is stored.
-#' @param overwrite If `TRUE`, overwrite any existing Airtable personal access
-#'   token.
-#' @inheritParams rlang::args_error_context
-#'
-#' @return Invisibly return personal access token value
-#'
-#' @seealso [set_airtable_api_key()]
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' set_airtable_pat("XXXXXXXXXX", install = TRUE)
-#' }
-#'
-set_airtable_pat <- function(pat,
-                             install = FALSE,
-                             overwrite = FALSE,
-                             default = "AIRTABLE_PAT",
-                             call = caller_env()) {
-  set_airtable_token(pat, install, overwrite, default, call)
-}
-
-#' @rdname set_airtable_pat
-#' @name get_airtable_pat
-#' @export
-get_airtable_pat <- function(pat = NULL,
-                             default = "AIRTABLE_PAT",
-                             call = caller_env()) {
-  get_airtable_token(
-    pat,
-    message = c("Personal access token can't be found at {.envvar {default}}.",
-      "*" = "Use {.fn set_airtable_pat} to set {.envvar {default}}."
-    ),
-    default = default, call = call
-  )
-}
-
-#' Get an Airtable Personal Access Token or an API Key if PAT is not available
-#'
-#' @noRd
-get_airtable_pat_or_key <- function(token = NULL,
-                                    default = c("AIRTABLE_PAT", "AIRTABLE_API_KEY"),
-                                    call = caller_env()) {
-  rlang::try_fetch(
-    get_airtable_pat(token, call = call, default = default[[1]]),
-    error = function(cnd) {
-      get_airtable_api_key(token, call = call, default = default[[2]])
-    }
   )
 }
