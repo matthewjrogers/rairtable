@@ -83,7 +83,7 @@ req_delete_records <- function(url = NULL,
                                batch = TRUE,
                                call = caller_env()) {
   if (has_length(records, 1)) {
-    return(req_delete_record(url = url, ..., records = records, call = call))
+    return(req_delete_record(url = url, ..., record = records, call = call))
   }
 
   batch_size <- as.integer(getOption("rairtable.batch_size", 10))
@@ -138,8 +138,8 @@ req_delete_record <- function(url = NULL, ..., record, call = caller_env()) {
 
   req <- req_airtable_query(
     .req = req,
-    records = records,
-    template = "/{records}",
+    record = record,
+    template = "/{record}",
     method = "DELETE",
     call = call
   )
