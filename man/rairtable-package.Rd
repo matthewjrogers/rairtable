@@ -19,5 +19,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Matthew Rogers \email{matthew.rogers09@gmail.com}
 
+Authors:
+\itemize{
+  \item Eli Pousson (\href{https://orcid.org/0000-0001-8280-1706}{ORCID}) [contributor]
+}
+
 }
 \keyword{internal}
