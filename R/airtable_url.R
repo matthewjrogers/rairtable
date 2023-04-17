@@ -146,36 +146,39 @@ check_airtable_api_url <- function(url,
 parse_airtable_url <- function(url,
                                base_url = NULL,
                                api_url = NULL,
+                               api_version = NULL,
                                table_name = NULL,
                                view_name = NULL,
                                call = caller_env()) {
   base_url <- base_url %||%
     getOption("rairtable.base_url", "https://airtable.com/")
 
-  api_url <- api_url %||%
-    getOption("rairtable.api_url", "https://api.airtable.com")
+  base_pattern <- glue("(?<={base_url})app[[:alnum:]]+(?=/)")
+
+  if (!is_airtable_url(url, base_url)) {
+    api_url <- api_url %||%
+      getOption("rairtable.api_url", "https://api.airtable.com/")
+    api_version <- api_version %||%
+      getOption("rairtable.api_version", "0")
+
+    base_pattern <- glue(
+      "(?<={api_url}v{api_version}/)",
+      "app[[:alnum:]]+(?=/)"
+      )
+  }
 
   table_name <- table_name %||% "tbl[[:alnum:]]+"
-  view_name <- view_name %||% "viw[[:alnum:]]+"
   check_string(table_name, call = call)
+  table_pattern <- glue("(?<=/){table_name}(?=/)")
+
+  view_name <- view_name %||% "viw[[:alnum:]]+"
   check_string(view_name, call = call)
+  view_pattern <- glue("(?<=/){view_name}(?=/|\\?)")
 
   list(
-    "base" = string_extract(
-      url,
-      glue(
-        "((?<={base_url})app[[:alnum:]]+(?=/))|",
-        "((?<={api_url})app[[:alnum:]]+(?=/))"
-      )
-    ),
-    "table" = string_extract(
-      url,
-      glue("(?<=/){table_name}+(?=/)")
-    ),
-    "view" = string_extract(
-      url,
-      glue("(?<=/){view_name}(?=\\?|/)")
-    )
+    "base" = string_extract(url, base_pattern),
+    "table" = string_extract(url, table_pattern),
+    "view" = string_extract(url, view_pattern)
   )
 }
 

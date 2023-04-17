@@ -28,6 +28,7 @@ parse_airtable_url(
   url,
   base_url = NULL,
   api_url = NULL,
+  api_version = NULL,
   table_name = NULL,
   view_name = NULL,
   call = caller_env()

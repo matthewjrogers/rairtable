@@ -72,14 +72,21 @@ string_extract <- function(string, pattern, perl = TRUE) {
     return(NA_character_)
   }
 
-  regmatches(
-    x = string,
-    m = regexpr(
-      pattern = pattern,
-      text = string,
-      perl = perl
+  match <-
+    regmatches(
+      x = string,
+      m = regexpr(
+        pattern = pattern,
+        text = string,
+        perl = perl
+      )
     )
-  )
+
+  if (is_empty(match)) {
+    return(NULL)
+  }
+
+  match
 }
 
 #' Split a data.frame by row
