@@ -49,8 +49,8 @@ running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 
-\item{require_base}{If \code{TRUE}, the string "tbl" must be included in the
-supplied url.}
+\item{require_base}{If \code{TRUE} (default), the string "app" must be included in
+the supplied url.}
 
 \item{require_table}{If \code{TRUE}, the string "tbl" must be included in the
 supplied url. If a string with a table name is provided, the string must be
@@ -58,14 +58,16 @@ part of the string supplied to url. If \code{FALSE} (default), there is no check
 for a table being present in the URL.}
 
 \item{require_view}{If \code{TRUE}, the string "viw" must be included in the
-string supplied to url.}
+string supplied to url. If \code{FALSE} (default), there is no check
+for a view being present in the URL.}
 
 \item{table_name, view_name}{Pattern to use when parsing a table name or view
 name. Defaults to \code{NULL} which extracts strings starting with "tbl" for
 tables IDs and "viw" for view IDs.}
 }
 \description{
-Utility functions for checking and validating Airtable URLs and API URLs:
+Utility functions for checking and validating Airtable URLs and API URLs. See
+details for a description of each function.
 }
 \details{
 \itemize{

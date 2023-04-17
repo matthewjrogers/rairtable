@@ -1,6 +1,7 @@
 #' Test, check, and parse Airtable URLs and API URLs
 #'
-#' Utility functions for checking and validating Airtable URLs and API URLs:
+#' Utility functions for checking and validating Airtable URLs and API URLs. See
+#' details for a description of each function.
 #'
 #' - [is_airtable_url()] returns `TRUE` if a url starts with the base_url value.
 #' - [is_airtable_api_url()] returns `TRUE` if a url starts with the api_url value.
@@ -43,6 +44,10 @@ is_airtable_url <- function(url, base_url = NULL) {
 #' @export
 is_airtable_api_url <- function(url,
                                 api_url = NULL) {
+  if (is.null(url)) {
+    return(FALSE)
+  }
+
   api_url <- api_url %||%
     getOption("rairtable.api_url", "https://api.airtable.com")
   is_url(url) & grepl(paste0("^", api_url), url)
@@ -72,14 +77,15 @@ check_airtable_url <- function(url,
 
 #' @rdname airtable_url
 #' @name check_airtable_api_url
-#' @param require_base If `TRUE`, the string "tbl" must be included in the
-#'   supplied url.
+#' @param require_base If `TRUE` (default), the string "app" must be included in
+#'   the supplied url.
 #' @param require_table If `TRUE`, the string "tbl" must be included in the
 #'   supplied url. If a string with a table name is provided, the string must be
 #'   part of the string supplied to url. If `FALSE` (default), there is no check
 #'   for a table being present in the URL.
 #' @param require_view If `TRUE`, the string "viw" must be included in the
-#'   string supplied to url.
+#'   string supplied to url. If `FALSE` (default), there is no check
+#'   for a view being present in the URL.
 #' @export
 check_airtable_api_url <- function(url,
                                    require_base = TRUE,
@@ -151,6 +157,8 @@ parse_airtable_url <- function(url,
 
   table_name <- table_name %||% "tbl[[:alnum:]]+"
   view_name <- view_name %||% "viw[[:alnum:]]+"
+  check_string(table_name, call = call)
+  check_string(view_name, call = call)
 
   list(
     "base" = string_extract(
