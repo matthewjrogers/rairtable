@@ -2,23 +2,42 @@
 % Please edit documentation in R/airtable_base.R
 \name{airtable_base}
 \alias{airtable_base}
-\title{Get metadata for an Airtable base}
+\alias{list_airtable_bases}
+\title{Get metadata for an Airtable base or list bases for an account}
 \usage{
-airtable_base(base, metadata_api_url_pattern = deprecated(), token = NULL)
+airtable_base(
+  base = NULL,
+  ...,
+  metadata_api_url_pattern = deprecated(),
+  as_tibble = FALSE,
+  token = NULL
+)
+
+list_airtable_bases(..., token = NULL)
 }
 \arguments{
-\item{base}{A valid Airtable base ID}
+\item{base}{A valid Airtable base ID. Optional if url or airtable parameters
+are supplied to the additional parameters.}
 
-\item{metadata_api_url_pattern}{URL for GET request. Defaults to
-"meta/bases/{base_id}/tables"}
+\item{...}{Additional parameters passed to \code{\link[=req_airtable_schema]{req_airtable_schema()}}. Supports
+the use of an optional url or airtable parameter instead of base for
+\code{\link[=airtable_base]{airtable_base()}}. Additional parameters are not used by
+\code{\link[=list_airtable_bases]{list_airtable_bases()}} at present.}
+
+\item{metadata_api_url_pattern}{Metadata API URL pattern. Deprecated.}
+
+\item{as_tibble}{If \code{TRUE}, return a tibble with a row for each table list
+column of fields. Defaults to \code{FALSE}.}
 
 \item{token}{Airtable personal access token or API key.}
 }
 \value{
-an \code{airtable_base_schema} object
+An \code{airtable_base_schema} object or a tibble.
 }
 \description{
-Get metadata for an Airtable base.
+Get an "airtable_base_schema" object, a tibble with a list of tables, or a
+tibble with a list of bases associated with the provided personal access
+token.
 }
 \examples{
 \dontrun{
