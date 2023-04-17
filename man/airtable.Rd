@@ -11,8 +11,7 @@ airtable(
   fields = list(),
   api_url = NULL,
   api_version = NULL,
-  require_url = TRUE,
-  require_fields = FALSE
+  ...
 )
 }
 \arguments{
@@ -35,11 +34,8 @@ getOption("rairtable.api_url", "https://api.airtable.com").}
 \item{api_version}{Airtable API version number, If \code{NULL} (default), the
 api_version is set to getOption("rairtable.api_version", 0)).}
 
-\item{require_url}{If \code{TRUE} (default), check that x includes a "request_url"
-attribute that is a valid Airtable API url.}
-
-\item{require_fields}{If \code{TRUE}, check that x includes a "fields" value that
-is a list with the \code{airtable_fields_schema} class. Defaults to \code{FALSE}.}
+\item{...}{Additional parameters passed to \code{\link[=check_airtable_obj]{check_airtable_obj()}}. Primarily
+intended for internal use.}
 }
 \value{
 An \code{airtable} class list of table and fields stored as values of the

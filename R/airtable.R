@@ -13,7 +13,8 @@
 #' @param fields An optional `airtable_fields_schema` object. Automatically
 #'   populated in tables created by `airtable_base()`.
 #' @inheritParams airtable_request
-#' @inheritParams check_airtable_obj
+#' @param ... Additional parameters passed to [check_airtable_obj()]. Primarily
+#'   intended for internal use.
 #'
 #' @return An `airtable` class list of table and fields stored as values of the
 #'   list and the base, view, and request_url stored as attributes.
@@ -30,8 +31,7 @@ airtable <- function(table = NULL,
                      fields = list(),
                      api_url = NULL,
                      api_version = NULL,
-                     require_url = TRUE,
-                     require_fields = FALSE) {
+                     ...) {
   atbl <- build_airtable_obj(
     table = table,
     base = base,
@@ -43,8 +43,7 @@ airtable <- function(table = NULL,
 
   check_airtable_obj(
     atbl,
-    require_url = require_url,
-    require_fields = require_fields
+    ...
   )
 
   atbl
