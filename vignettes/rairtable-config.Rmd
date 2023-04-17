@@ -21,6 +21,11 @@ A number of functions use the `airtable_id_col` parameter to set the name of the
 
 The rairtable package uses [httr2::req_user_agent()] to pass a User-Agent header with each API call. The default value "rairtable (https://github.com/matthewjrogers/rairtable)" can be modified using the  `rairtable.user_agent` option.
 
+### `rairtable.safely`
+
+The default value for `rairtable.safely` (`TRUE`) requires user confirmation every time the user deletes, modifies, or creates records for Airtable. This can be modified using the `rairtable.safely` option.
+
+
 ## API-specific environment variables
 
 The API environment variables should remain the same unless the Airtable API changes.
