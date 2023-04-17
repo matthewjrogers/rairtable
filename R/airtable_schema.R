@@ -46,12 +46,14 @@ get_airtable_base <- function(base = NULL,
 #' Create a request for the Airtable metadata API
 #'
 #' Create a request to get metadata or update metadata for bases, tables, or
-#' fields using the Airtable metadata API.
+#' fields using the Airtable metadata API. Note that the metadata API does not
+#' support the legacy Airtable API key so a personal access token is required.
+#' You can save a personal access token with [set_airtable_pat()].
 #'
 #' @inheritParams airtable_request
 #' @param column Column ID, Defaults to `NULL`. Only required when type =
 #'   "update" and from = "field".
-#' @param ... PARAM_DESCRIPTION
+#' @param ... Additional parameters passed to [req_query_airtable()]
 #' @param type Type of API call to use, Default: c("schema", "list", "update", "create")
 #' @param from Is the API call for bases, tables, or fields? Default: c("base",
 #'   "table", "field"). Not all combinations of type and from are supported.
@@ -99,11 +101,12 @@ req_airtable_schema <- function(url = NULL,
       )
     )
 
-  req_airtable_query(
+  req_query_airtable(
     template = template,
     base = base,
     token = token,
     ...,
-    call = call
+    call = call,
+    allow_key = FALSE
   )
 }

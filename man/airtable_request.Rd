@@ -2,7 +2,7 @@
 % Please edit documentation in R/airtable_request.R
 \name{airtable_request}
 \alias{airtable_request}
-\alias{req_airtable_query}
+\alias{req_query_airtable}
 \alias{req_auth_airtable}
 \title{Use httr2 to create an Airtable API request}
 \usage{
@@ -17,7 +17,7 @@ airtable_request(
   call = caller_env()
 )
 
-req_airtable_query(
+req_query_airtable(
   .req = NULL,
   ...,
   template = NULL,
@@ -28,7 +28,8 @@ req_airtable_query(
   api_version = NULL,
   airtable = NULL,
   token = NULL,
-  string = NULL
+  string = NULL,
+  allow_key = TRUE
 )
 
 req_auth_airtable(
@@ -37,7 +38,8 @@ req_auth_airtable(
   default = "AIRTABLE_PAT",
   string = NULL,
   rate = 5/1,
-  realm = NULL
+  realm = NULL,
+  allow_key = TRUE
 )
 }
 \arguments{
@@ -62,14 +64,15 @@ starting with "viw".}
 \item{...}{
   Arguments passed on to \code{\link[=check_airtable_api_url]{check_airtable_api_url}}
   \describe{
-    \item{\code{require_base}}{If \code{TRUE}, the string "tbl" must be included in the
-supplied url.}
+    \item{\code{require_base}}{If \code{TRUE} (default), the string "app" must be included in
+the supplied url.}
     \item{\code{require_table}}{If \code{TRUE}, the string "tbl" must be included in the
 supplied url. If a string with a table name is provided, the string must be
 part of the string supplied to url. If \code{FALSE} (default), there is no check
 for a table being present in the URL.}
     \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
-string supplied to url.}
+string supplied to url. If \code{FALSE} (default), there is no check
+for a view being present in the URL.}
   }}
 
 \item{call}{The execution environment of a currently
@@ -78,7 +81,7 @@ mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 
 \item{.req, req}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
-\code{\link[=airtable_request]{airtable_request()}}. If .req is provided to \code{\link[=req_airtable_query]{req_airtable_query()}}, url,
+\code{\link[=airtable_request]{airtable_request()}}. If .req is provided to \code{\link[=req_query_airtable]{req_query_airtable()}}, url,
 api_url, api_version, and airtable parameters are ignored. req is required
 for \code{\link[=req_auth_airtable]{req_auth_airtable()}}.}
 
@@ -103,18 +106,21 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 \item{realm}{Passed to \code{\link[httr2:req_throttle]{httr2::req_throttle()}}. Defaults to \code{NULL}.}
 }
 \description{
-\code{\link[=airtable_request]{airtable_request()}} creates an initial request object based on an airtable
-object, API url, Airtable view URL, or base and table IDs.
+These functions are designed primarily for developers interested in
+interacting directly with the Airtable API without using the airtable class
+implemented in this package.
 }
 \details{
+\code{\link[=airtable_request]{airtable_request()}} creates an initial request object based on an airtable
+object, API url, Airtable view URL, or base and table IDs.
+
 \code{\link[=req_auth_airtable]{req_auth_airtable()}} set the rate limit, user agent, and authenticates the
 Airtable API request with an API key or personal access token.
 
-\code{\link[=req_airtable_query]{req_airtable_query()}} builds an API request optionally using a template or
+\code{\link[=req_query_airtable]{req_query_airtable()}} builds an API request optionally using a template or
 custom HTTP method (other than GET or POST). This function can create an
 initial request using a URL or airtable object or use an existing request
 object. The function also calls \code{\link[=req_auth_airtable]{req_auth_airtable()}} before returning the
 request. Most of the other data access functions in this package wrap
 \code{\link[=req_auth_airtable]{req_auth_airtable()}}.
 }
-\keyword{internal}

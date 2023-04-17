@@ -1,4 +1,89 @@
-#' Split a dataframe by row
+#' Check if user, confirm action before proceeding
+#'
+#' @param yes Character vector of acceptable "yes" response options.
+#' @inheritParams cli_ask
+#' @noRd
+safety_check <- function(safely = NULL,
+                         ...,
+                         prompt = "Do you want to continue?",
+                         yes = c("", "Y", "Yes", "Yup", "Yep", "Yeah"),
+                         message = "Aborted. A yes is required to continue.",
+                         .envir = parent.frame(),
+                         call = rlang::caller_env()) {
+  safely <- safely %||% getOption("rairtable.safely", TRUE)
+  check_bool(safely, call = call)
+
+  if (is_false(safely)) {
+    return(invisible(NULL))
+  }
+
+  check_logical(safely)
+
+  resp <- cli_ask(..., prompt = paste0("?\u00a0", prompt, "\u00a0(Y/n)"), .envir = .envir)
+
+  if (!all(tolower(resp) %in% tolower(yes))) {
+    cli::cli_abort(
+      message = message,
+      .envir = .envir,
+      call = call
+    )
+  }
+}
+
+#' Adapted from cliExtras::cli_ask()
+#'
+#' @noRd
+cli_ask <- function(prompt = "?",
+                    ...,
+                    .envir = rlang::caller_env(),
+                    call = .envir) {
+  if (!rlang::is_interactive()) {
+    cli::cli_abort(
+      "User interaction is required.",
+      call = call
+    )
+  }
+
+  if (!rlang::is_empty(rlang::list2(...))) {
+    cli::cli_bullets(..., .envir = .envir)
+  }
+  readline(paste0(prompt, "\u00a0"))
+}
+
+#' @keywords internal
+#' @importFrom rlang zap current_env
+#' @importFrom vctrs vec_rbind
+list_rbind <- function(x, names_to = rlang::zap(), ptype = NULL) {
+  vctrs::vec_rbind(
+    !!!x,
+    .names_to = names_to,
+    .ptype = ptype,
+    .error_call = rlang::current_env()
+  )
+}
+
+#' Extract pattern from a length 1 string
+#'
+#' @param string Passed to x parameter of [regmatches()]
+#' @inheritParams base::regexpr
+#' @noRd
+string_extract <- function(string, pattern, perl = TRUE) {
+  if (is.na(string)) {
+    return(NA_character_)
+  }
+
+  regmatches(
+    x = string,
+    m = regexpr(
+      pattern = pattern,
+      text = string,
+      perl = perl
+    )
+  )
+}
+
+#' Split a data.frame by row
+#'
 #' @noRd
 split_rows <- function(df, chunk_size) {
   n_rows <- nrow(df)
@@ -8,54 +93,16 @@ split_rows <- function(df, chunk_size) {
   res
 }
 
-#' @noRd
-adorn_text <- function(text, mode = "success") {
-  md <- match.arg(mode, c("success", "failure"))
-
-  if (md == "success") {
-    res <- paste(crayon::green(cli::symbol$tick), text, sep = " ")
-  } else {
-    res <- paste(crayon::red(cli::symbol$cross), text, sep = " ")
-  }
-
-  res
-}
-
-#' @noRd
-get_ids <- function(df, id_col, call = caller_env()) {
-  if (is.null(id_col)) {
-    if (!tibble::has_rownames(df)) {
-      cli_abort(
-        "Data must either have Airtable IDs in row names or a provided ID column",
-        call = call
-      )
-    }
-
-    return(row.names(df))
-  }
-
-  df %>%
-    select(!!id_col) %>%
-    dplyr::pull()
-}
-
 #' Split list or vector into equal size pieces
+#'
 #' @noRd
-split_list <- function(lst, chunk_size = 10) {
+split_list <- function(x, chunk_size = 10) {
   mapply(
-    function(a, b) (lst[a:b]),
-    seq.int(from = 1, to = length(lst), by = chunk_size),
-    pmin(seq.int(from = 1, to = length(lst), by = chunk_size) + (chunk_size - 1), length(lst)),
+    function(a, b) (x[a:b]),
+    seq.int(from = 1, to = length(x), by = chunk_size),
+    pmin(seq.int(from = 1, to = length(x), by = chunk_size) + (chunk_size - 1), length(x)),
     SIMPLIFY = FALSE
   )
-}
-
-#' @noRd
-stop_quietly <- function(..., call = caller_env()) {
-  opt <- options(show.error.messages = FALSE)
-  on.exit(options(opt))
-  cli::cli_alert(paste(..., collapse = " "))
-  abort(call = call)
 }
 
 #' @noRd
@@ -81,23 +128,10 @@ process_error <- function(response_status) {
   sprintf("Error Code %s", response_status)
 }
 
-
-#' If the user chooses to execute safely, confirm action before proceeding
-#' @noRd
-safety_check <- function(safely, cancel_message, ...) {
-  check_logical(safely)
-
-  if (safely) {
-    ans <- menu(
-      c(
-        paste(crayon::green(cli::symbol$tick), "Yes"),
-        paste(crayon::red(cli::symbol$cross), "No")
-      ),
-      title = paste0(..., collapse = "")
-    )
-
-    if (ans != 1) {
-      stop_quietly(crayon::red(cli::symbol$cross), cancel_message)
-    }
-  }
+#' @export
+#' @importFrom utils str
+str.airtable <- function(object, ...) {
+  view <- ifelse(is.null(attr(object, "view")), "", paste0('."', attr(object, "view"), '"'))
+  cat(" Airtable: ", object$table, view, " @ ", attr(object, "base"), "\n", sep = "")
+  utils::str(object)
 }

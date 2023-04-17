@@ -1,12 +1,16 @@
 #' Use httr2 to create an Airtable API request
 #'
+#' These functions are designed primarily for developers interested in
+#' interacting directly with the Airtable API without using the airtable class
+#' implemented in this package.
+#'
 #' [airtable_request()] creates an initial request object based on an airtable
 #' object, API url, Airtable view URL, or base and table IDs.
 #'
 #' [req_auth_airtable()] set the rate limit, user agent, and authenticates the
 #' Airtable API request with an API key or personal access token.
 #'
-#' [req_airtable_query()] builds an API request optionally using a template or
+#' [req_query_airtable()] builds an API request optionally using a template or
 #' custom HTTP method (other than GET or POST). This function can create an
 #' initial request using a URL or airtable object or use an existing request
 #' object. The function also calls [req_auth_airtable()] before returning the
@@ -29,11 +33,10 @@
 #'   starting with "viw".
 #' @inheritParams is_airtable_obj
 #' @param ... For [airtable_request()], additional parameters passed to
-#'   [check_airtable_api_url()]. For [req_airtable_query()], additional
+#'   [check_airtable_api_url()]. For [req_query_airtable()], additional
 #'   parameters passed to [httr2::req_template()] if template is not `NULL` or
 #'   [httr2::req_url_query()] if template is `NULL`.
 #' @inheritDotParams check_airtable_api_url
-#' @keywords internal
 #' @export
 #' @importFrom cli cli_alert_warning
 #' @importFrom httr2 request req_url_path_append
@@ -98,9 +101,9 @@ airtable_request <- function(url = NULL,
 }
 
 #' @rdname airtable_request
-#' @name req_airtable_query
+#' @name req_query_airtable
 #' @param .req,req A request object created by [httr2::request()] or
-#'   [airtable_request()]. If .req is provided to [req_airtable_query()], url,
+#'   [airtable_request()]. If .req is provided to [req_query_airtable()], url,
 #'   api_url, api_version, and airtable parameters are ignored. req is required
 #'   for [req_auth_airtable()].
 #' @param template Template for query parameters passed to
@@ -109,7 +112,7 @@ airtable_request <- function(url = NULL,
 #' @inheritParams httr2::req_body_json
 #' @export
 #' @importFrom httr2 req_template req_url_query
-req_airtable_query <- function(.req = NULL,
+req_query_airtable <- function(.req = NULL,
                                ...,
                                template = NULL,
                                method = NULL,
@@ -119,7 +122,8 @@ req_airtable_query <- function(.req = NULL,
                                api_version = NULL,
                                airtable = NULL,
                                token = NULL,
-                               string = NULL) {
+                               string = NULL,
+                               allow_key = TRUE) {
   .req <-
     .req %||% airtable_request(
       url = url,
@@ -158,7 +162,8 @@ req_airtable_query <- function(.req = NULL,
   req_auth_airtable(
     req = .req,
     token = token,
-    string = string
+    string = string,
+    allow_key = allow_key
   )
 }
 
@@ -181,8 +186,13 @@ req_auth_airtable <- function(req,
                               default = "AIRTABLE_PAT",
                               string = NULL,
                               rate = 5 / 1,
-                              realm = NULL) {
-  token <- token %||% get_airtable_pat(token, default = default)
+                              realm = NULL,
+                              allow_key = TRUE) {
+  if (allow_key) {
+    token <- token %||% get_airtable_pat_or_key(token)
+  } else {
+    token <- token %||% get_airtable_pat(token, default = default)
+  }
   # FIXME: Sys.getenv() had some odd issues with the period in pat so escaping
   # the token then removing escaping characters may be necessary in some cases
   token <- sub("\\\\", "", token)

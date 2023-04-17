@@ -33,7 +33,7 @@ starting with "viw".}
 \item{column}{Column ID, Defaults to \code{NULL}. Only required when type =
 "update" and from = "field".}
 
-\item{...}{PARAM_DESCRIPTION}
+\item{...}{Additional parameters passed to \code{\link[=req_query_airtable]{req_query_airtable()}}}
 
 \item{type}{Type of API call to use, Default: c("schema", "list", "update", "create")}
 
@@ -56,6 +56,8 @@ A modified HTTP request.
 }
 \description{
 Create a request to get metadata or update metadata for bases, tables, or
-fields using the Airtable metadata API.
+fields using the Airtable metadata API. Note that the metadata API does not
+support the legacy Airtable API key so a personal access token is required.
+You can save a personal access token with \code{\link[=set_airtable_pat]{set_airtable_pat()}}.
 }
 \keyword{internal}

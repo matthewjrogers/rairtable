@@ -2,6 +2,8 @@
 % Please edit documentation in R/read_airtable.R
 \name{read_airtable}
 \alias{read_airtable}
+\alias{read_airtable_records}
+\alias{read_airtable_record}
 \title{Read table from Airtable}
 \usage{
 read_airtable(
@@ -13,23 +15,88 @@ read_airtable(
   ...,
   call = caller_env()
 )
+
+read_airtable_records(
+  airtable = NULL,
+  url = NULL,
+  base = NULL,
+  table = NULL,
+  view = NULL,
+  sort = NULL,
+  max_records = 100,
+  page_size = NULL,
+  tz = NULL,
+  locale = NULL,
+  fields_by_id = FALSE,
+  fields = NULL,
+  desc = FALSE,
+  cell_format = NULL,
+  token = NULL,
+  offset = NULL
+)
+
+read_airtable_record(
+  airtable = NULL,
+  url = NULL,
+  base = NULL,
+  table = NULL,
+  record,
+  airtable_id_col = NULL,
+  ...,
+  token = NULL
+)
 }
 \arguments{
 \item{airtable}{An airtable object}
 
-\item{fields}{An optional list of fields to select.}
+\item{fields}{Fields to return from Airtable base, Default: \code{NULL}}
 
 \item{id_to_col}{If \code{TRUE}, store airtable ID as a column rather than as row
 names}
 
 \item{max_rows}{Optional maximum number of rows to read}
 
-\item{...}{Additional parameters passed to \code{\link[=req_airtable_query]{req_airtable_query()}}}
+\item{...}{Additional parameters passed to \code{\link[=req_query_airtable]{req_query_airtable()}}}
 
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+
+\item{url}{A URL for an API call or an Airtable view. If url is provided and
+is a valid URL, \link{airtable_request() } returns  \code{httr2::request(url)}. url
+is optional if airtable \emph{or} base and table are supplied. If url is an
+Airtable view, any additional base or table values provided are ignored. If
+airtable is provided, any additional value provided to url is ignored. For
+the metadata API where only a base ID is required include \code{require_base = TRUE} to pass to \code{check_airtable_api_url()}.}
+
+\item{base}{Airtable base id starting with with "app".}
+
+\item{table}{Airtable table id or name. If table is a table ID it is a string
+starting with "viw".}
+
+\item{view}{Airtable view ID, Default: \code{NULL}}
+
+\item{sort}{Field to sort by, Default: \code{NULL}}
+
+\item{max_records}{Maximum number of records to return, Default: \code{NULL}. Must
+be 100 or less.}
+
+\item{tz, locale}{Time zone and locale, Defaults: \code{NULL}}
+
+\item{fields_by_id}{If \code{TRUE}, return fields by id, Default: \code{FALSE}}
+
+\item{desc}{If \code{TRUE}, sort in descending order, Default: \code{FALSE}}
+
+\item{cell_format}{Cell format for "Link to another record" fields (either
+"json" (unique ID) or "string" (displayed character string)), Default:
+'json'}
+
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{per_page}{Max records to return per page, Default: \code{NULL}}
 }
 \value{
 A data.frame with the records from the specified Airtable base and
