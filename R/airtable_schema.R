@@ -39,7 +39,7 @@ get_airtable_base <- function(base = NULL,
   }
 
   if (is_url(base)) {
-    return(parse_airtable_url(x)[["base"]])
+    return(parse_airtable_url(base)[["base"]])
   }
 }
 
