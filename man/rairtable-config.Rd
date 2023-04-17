@@ -21,6 +21,11 @@ A number of functions use the \code{airtable_id_col} parameter to set the name o
 The rairtable package uses \code{\link[httr2:req_user_agent]{httr2::req_user_agent()}} to pass a User-Agent header with each API call. The default value "rairtable (https://github.com/matthewjrogers/rairtable)" can be modified using the  \code{rairtable.user_agent} option.
 }
 
+\subsection{\code{rairtable.safely}}{
+
+The default value for \code{rairtable.safely} (\code{TRUE}) requires user confirmation every time the user deletes, modifies, or creates records for Airtable. This can be modified using the \code{rairtable.safely} option.
+}
+
 }
 
 \subsection{API-specific environment variables}{

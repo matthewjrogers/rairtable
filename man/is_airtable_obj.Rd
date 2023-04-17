@@ -28,7 +28,8 @@ part of the string supplied to url. If \code{FALSE} (default), there is no check
 for a table being present in the URL.}
 
 \item{require_view}{If \code{TRUE}, the string "viw" must be included in the
-string supplied to url.}
+string supplied to url. If \code{FALSE} (default), there is no check
+for a view being present in the URL.}
 
 \item{require_fields}{If \code{TRUE}, check that x includes a "fields" value that
 is a list with the \code{airtable_fields_schema} class. Defaults to \code{FALSE}.}
