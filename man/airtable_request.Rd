@@ -73,10 +73,6 @@ for a table being present in the URL.}
     \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
 string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the URL.}
-    \item{\code{call}}{The execution environment of a currently
-running function, e.g. \code{caller_env()}. The function will be
-mentioned in error messages as the source of the error. See the
-\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
   }}
 
 \item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
@@ -84,6 +80,11 @@ mentioned in error messages as the source of the error. See the
 
 \item{api_version}{Airtable API version number, If \code{NULL} (default), the
 api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 
 \item{.req, req}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
 \code{\link[=airtable_request]{airtable_request()}}. If .req is provided to \code{\link[=req_query_airtable]{req_query_airtable()}}, url,
@@ -103,6 +104,11 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 
 \item{string}{Passed to \code{\link[httr2:req_user_agent]{httr2::req_user_agent()}}, Default: \code{NULL} (set to
 \code{getOption("rairtable.useragent", default = "rairtable (https://github.com/matthewjrogers/rairtable)")})}
+
+\item{allow_key}{If \code{TRUE}, allow use of an Airtable API key or an Airtable
+personal access token (PAT) to authenticate the request. The metadata API
+does not support the API key so allow_key is set to \code{FALSE} for any
+functions that call that API.}
 
 \item{default}{Default name for environmental variable for token.}
 

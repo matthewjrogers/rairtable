@@ -13,6 +13,7 @@ read_airtable(
   airtable_id_col = NULL,
   max_rows = NULL,
   ...,
+  token = NULL,
   call = caller_env()
 )
 
@@ -55,9 +56,17 @@ read_airtable_record(
 returned data.frame column. If \code{FALSE}, the row names will be set to the
 airtable record IDs.}
 
+\item{airtable_id_col}{Airtable record ID column name assigned to returned
+data.frame. Ignored if id_to_col is \code{TRUE}. Defaults to \code{NULL} which is set
+to \code{getOption("rairtable.id_col", "airtable_record_id")}.}
+
 \item{max_rows}{Optional maximum number of rows to read. Defaults to \code{NULL}}
 
-\item{...}{Additional parameters passed to \code{\link[=req_query_airtable]{req_query_airtable()}}}
+\item{...}{Additional parameters passed to \code{\link[=req_query_airtable]{req_query_airtable()}}.}
+
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be
@@ -85,6 +94,8 @@ starting with "viw".}
 \item{max_records}{Maximum number of records to return, Default: \code{NULL}. Must
 be 100 or less.}
 
+\item{page_size}{Max records to return per page, Default: \code{NULL}}
+
 \item{tz, locale}{Time zone and locale, Defaults: \code{NULL}}
 
 \item{fields_by_id}{If \code{TRUE}, return fields by id, Default: \code{FALSE}}
@@ -93,13 +104,11 @@ be 100 or less.}
 
 \item{cell_format}{Cell format for "Link to another record" fields (either
 "json" (unique ID) or "string" (displayed character string)), Default:
-'json'}
+"json"}
 
-\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
-to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
-"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+\item{offset}{Offset value}
 
-\item{per_page}{Max records to return per page, Default: \code{NULL}}
+\item{record}{Record ID number. Required for \code{\link[=read_airtable_record]{read_airtable_record()}}.}
 }
 \value{
 A data.frame with the records from the Airtable base and table

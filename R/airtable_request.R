@@ -41,8 +41,11 @@
 #'   parameters passed to [httr2::req_template()] if template is not `NULL` or
 #'   [httr2::req_url_query()] if template is `NULL`.
 #' @inheritDotParams check_airtable_api_url
+#' @inheritParams rlang::args_error_context
+#'
 #' @returns [airtable_request()] returns an HTTP response: an S3 list with class
 #'   httr2_request. Other functions return modified modified HTTP requests.
+#'
 #' @export
 #' @importFrom cli cli_alert_warning
 #' @importFrom httr2 request req_url_path_append
@@ -116,6 +119,10 @@ airtable_request <- function(url = NULL,
 #'   [httr2::req_template()], Default: `NULL`.
 #' @inheritParams httr2::req_method
 #' @inheritParams httr2::req_body_json
+#' @param allow_key If `TRUE`, allow use of an Airtable API key or an Airtable
+#'   personal access token (PAT) to authenticate the request. The metadata API
+#'   does not support the API key so allow_key is set to `FALSE` for any
+#'   functions that call that API.
 #' @export
 #' @importFrom httr2 req_template req_url_query
 req_query_airtable <- function(.req = NULL,

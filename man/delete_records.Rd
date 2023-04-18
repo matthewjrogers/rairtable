@@ -9,7 +9,7 @@ delete_records(
   airtable,
   airtable_id_col = NULL,
   records = NULL,
-  safely = TRUE,
+  safely = NULL,
   batch_size = deprecated()
 )
 }

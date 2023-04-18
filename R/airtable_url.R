@@ -15,6 +15,7 @@
 #' <https://airtable.com/developers/web/api/introduction>
 #'
 #' @name airtable_url
+#' @inheritParams airtable_request
 NULL
 
 #' @rdname airtable_url
@@ -23,7 +24,7 @@ NULL
 #'   "https://api.airtable.com/v0/{baseId}/{tableIdOrName}" or
 #'   "https://airtable.com/{baseID}/{tableIdOrName}/{viewId}"
 #' @param base_url Base URL for an Airtable base or view. Defaults `NULL` and
-#'   set to `getOption("rairtable.api_url", "https://airtable.com/")`.
+#'   set to `getOption("rairtable.base_url", "https://airtable.com/")`.
 #' @export
 is_airtable_url <- function(url, base_url = NULL) {
   if (is_null(url)) {
@@ -164,7 +165,7 @@ parse_airtable_url <- function(url,
     base_pattern <- glue(
       "(?<={api_url}v{api_version}/)",
       "app[[:alnum:]]+(?=/)"
-      )
+    )
   }
 
   table_name <- table_name %||% "tbl[[:alnum:]]+"

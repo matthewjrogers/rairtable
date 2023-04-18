@@ -52,6 +52,11 @@ only work with "update" and "create".}
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
 A modified HTTP request.

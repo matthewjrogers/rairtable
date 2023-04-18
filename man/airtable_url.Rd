@@ -40,7 +40,7 @@ parse_airtable_url(
 "https://airtable.com/{baseID}/{tableIdOrName}/{viewId}"}
 
 \item{base_url}{Base URL for an Airtable base or view. Defaults \code{NULL} and
-set to \code{getOption("rairtable.api_url", "https://airtable.com/")}.}
+set to \code{getOption("rairtable.base_url", "https://airtable.com/")}.}
 
 \item{api_url}{Expected base URL for an API url. Defaults to \code{NULL} and set
 to \code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
@@ -61,6 +61,9 @@ for a table being present in the URL.}
 \item{require_view}{If \code{TRUE}, the string "viw" must be included in the
 string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the URL.}
+
+\item{api_version}{Airtable API version number, If \code{NULL} (default), the
+api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
 
 \item{table_name, view_name}{Pattern to use when parsing a table name or view
 name. Defaults to \code{NULL} which extracts strings starting with "tbl" for

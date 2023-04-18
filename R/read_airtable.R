@@ -8,8 +8,11 @@
 #' @param id_to_col If `TRUE`, the airtable record IDs will be added to the
 #'   returned data.frame column. If `FALSE`, the row names will be set to the
 #'   airtable record IDs.
+#' @param airtable_id_col Airtable record ID column name assigned to returned
+#'   data.frame. Ignored if id_to_col is `TRUE`. Defaults to `NULL` which is set
+#'   to `getOption("rairtable.id_col", "airtable_record_id")`.
 #' @param max_rows Optional maximum number of rows to read. Defaults to `NULL`
-#' @param ... Additional parameters passed to [req_query_airtable()]
+#' @param ... Additional parameters passed to [req_query_airtable()].
 #' @inheritParams rlang::args_error_context
 #'
 #' @return A data.frame with the records from the Airtable base and table
@@ -26,6 +29,7 @@ read_airtable <- function(airtable,
                           airtable_id_col = NULL,
                           max_rows = NULL,
                           ...,
+                          token = NULL,
                           call = caller_env()) {
   check_airtable_obj(airtable)
 
@@ -90,12 +94,13 @@ read_airtable <- function(airtable,
 #' @param desc If `TRUE`, sort in descending order, Default: `FALSE`
 #' @param max_records Maximum number of records to return, Default: `NULL`. Must
 #'   be 100 or less.
-#' @param per_page Max records to return per page, Default: `NULL`
+#' @param page_size Max records to return per page, Default: `NULL`
 #' @param cell_format Cell format for "Link to another record" fields (either
 #'   "json" (unique ID) or "string" (displayed character string)), Default:
-#'   'json'
+#'   "json"
 #' @param tz,locale Time zone and locale, Defaults: `NULL`
 #' @param fields_by_id If `TRUE`, return fields by id, Default: `FALSE`
+#' @param offset Offset value
 #' @export
 #' @importFrom httr2 req_url_path_append req_url_query
 read_airtable_records <- function(airtable = NULL,
@@ -114,6 +119,14 @@ read_airtable_records <- function(airtable = NULL,
                                   cell_format = NULL,
                                   token = NULL,
                                   offset = NULL) {
+
+  req <- airtable_request(
+    url = url,
+    base = base,
+    table = table,
+    airtable = airtable
+  )
+
   if (!is.null(sort)) {
     sort <- glue("field: \"{sort}\"")
     if (desc) {
@@ -132,13 +145,6 @@ read_airtable_records <- function(airtable = NULL,
   if (!fields_by_id) {
     fields_by_id <- NULL
   }
-
-  req <- airtable_request(
-    url = url,
-    base = base,
-    table = table,
-    airtable = airtable
-  )
 
   req <- req_query_airtable(
     req,
@@ -164,6 +170,8 @@ read_airtable_records <- function(airtable = NULL,
 
 #' @rdname read_airtable
 #' @name read_airtable_record
+#' @param record Record ID number. Required for [read_airtable_record()].
+#' @export
 read_airtable_record <- function(airtable = NULL,
                                  url = NULL,
                                  base = NULL,
@@ -200,11 +208,13 @@ read_airtable_record <- function(airtable = NULL,
 #'
 #' @param req A modified HTTP request from [airtable_request()] or a httr2
 #'   function.
-#' @param offset Offset value to pass to [httr2::req_url_query()] for API call.
+#' @param offset Offset value to passed to [httr2::req_url_query()] as part of
+#'   the API call. See
+#'   <https://airtable.com/developers/web/api/list-records#response-offset> for
+#'   more information on how the offset value is used by the Airtable API.
 #' @keywords internal httr2
 #' @export
 #' @importFrom httr2 req_url_query req_perform resp_body_json
-#' @importFrom vctrs vec_cbind
 #' @importFrom rlang set_names
 #' @importFrom tibble as_tibble
 req_perform_records <- function(req,
@@ -290,6 +300,8 @@ resp_body_records <- function(resp,
   if (!is_null(record_nm)) {
     records <- rlang::set_names(records, nm)
   }
+
+  rlang::check_installed("vctrs")
 
   switch(type,
     "records" = records,

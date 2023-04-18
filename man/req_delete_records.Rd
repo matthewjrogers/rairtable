@@ -2,28 +2,36 @@
 % Please edit documentation in R/delete_records.R
 \name{req_delete_records}
 \alias{req_delete_records}
+\alias{req_delete_record}
 \title{Delete one or more records from an Airtable table}
 \usage{
 req_delete_records(url = NULL, ..., records, batch = TRUE, call = caller_env())
+
+req_delete_record(url = NULL, ..., record, call = caller_env())
 }
 \arguments{
 \item{url}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \link{airtable_request() } returns  \code{httr2::request(url)}. url
+is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For
-the metadata API where only a base ID is required include \code{require_base = TRUE} to pass to \code{check_airtable_api_url()}.}
+the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
 
 \item{...}{
   Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
   \describe{
-    \item{\code{api_url}}{Airtable API URL, If \code{NULL} (default), the api_url is set to
-getOption("rairtable.api_url", "https://api.airtable.com").}
-    \item{\code{api_version}}{Airtable API version number, If \code{NULL} (default), the
-api_version is set to getOption("rairtable.api_version", 0)).}
-    \item{\code{base}}{Airtable base id starting with with "app".}
+    \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
+airtable are supplied. base and table are both required if url and airtable
+are \code{NULL}.}
     \item{\code{table}}{Airtable table id or name. If table is a table ID it is a string
 starting with "viw".}
+    \item{\code{airtable}}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
+must include a request_url attribute. url is ignored if airtable is
+provided.  Optional if url or base \emph{and} table are supplied.}
+    \item{\code{api_url}}{Airtable API URL, If \code{NULL} (default), the api_url is set to
+\code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
+    \item{\code{api_version}}{Airtable API version number, If \code{NULL} (default), the
+api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
   }}
 
 \item{records}{Required. Character vector with record IDs. If only one record
@@ -35,6 +43,11 @@ records vector is split into batches of 10. If batch is \code{FALSE}, records
 must be length 10 or less. This default batch size is set by
 "rairtable.batch_size" option. The option default is 10 may be changed if
 the API limit is modified in the future.}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
 Delete one record from an Airtable table with \code{\link[=req_delete_record]{req_delete_record()}} or delete
