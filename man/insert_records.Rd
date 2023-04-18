@@ -2,30 +2,53 @@
 % Please edit documentation in R/insert_records.R
 \name{insert_records}
 \alias{insert_records}
+\alias{create_records}
 \title{Insert records into an Airtable table}
 \usage{
 insert_records(
   data,
-  airtable,
+  airtable = NULL,
+  ...,
   typecast = FALSE,
   parallel = FALSE,
-  batch_size = 10
+  return_json = FALSE,
+  batch_size = deprecated()
 )
 }
 \arguments{
-\item{data}{A dataframe containing records to insert}
+\item{data}{A data.frame or list with records to insert.}
 
-\item{airtable}{An airtable object}
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
+must include a request_url attribute. url is ignored if airtable is
+provided.  Optional if url or base \emph{and} table are supplied.}
 
-\item{typecast}{If \code{TRUE}, values will be converted to match the base if possible. Set to \code{TRUE} to add new values to a multi select field.}
+\item{...}{For \code{\link[=airtable_request]{airtable_request()}}, additional parameters passed to
+\code{\link[=check_airtable_api_url]{check_airtable_api_url()}}. For \code{\link[=req_query_airtable]{req_query_airtable()}}, additional
+parameters passed to \code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
+\code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
 
-\item{parallel}{If \code{TRUE}, use parallel processing for encoding large tables}
+\item{typecast}{If \code{TRUE} (default), values will be converted to match the
+base if possible. typecase must be set to \code{TRUE} to add new values to a
+multiselect field type.
+base. Required.}
 
-\item{batch_size}{Number of records per request to insert. Maximum of 10}
+\item{parallel}{If \code{TRUE}, use parallel processing for encoding large tables.
+Not currently supported in development version.}
+
+\item{return_json}{If \code{TRUE}, return the response from the Airtable API as
+list. If \code{FALSE} (default), return the input data.frame or list.}
+
+\item{batch_size}{Deprecated. Set using the \code{rairtable.batch_size} option.}
 }
 \value{
-A dataframe (invisibly) of the input data, to be stored as an object or piped into further \code{dplyr} functions
+A data.frame (invisibly) of the input data, to be stored as an object
+or piped into additional functions or, if as_json is \code{TRUE}, the function
+returns the parsed API response from \code{\link[httr2:resp_body_raw]{httr2::resp_body_json()}}.
 }
 \description{
-Insert rows into an Airtable table. Requires that data names and types exactly match column names and types in Airtable. Violating this assumption will return a 422 Unprocessable Entity error. Supports batch insert and parallel JSON encoding (recommended for large tables).
+Create new records in an Airtable table from a data.frame or list. The column
+names and types for the input data must exactly match the column names and
+types in the Airtable table. These fields are not validated before calling
+the API but supplying any other names or types returns a 422 Unprocessable
+Entity error. Supports batch insert.
 }

@@ -1,45 +1,50 @@
 #' Insert records into an Airtable table
 #'
-#' Insert rows into an Airtable table. Requires that data names and types exactly match column names and types in Airtable. Violating this assumption will return a 422 Unprocessable Entity error. Supports batch insert and parallel JSON encoding (recommended for large tables).
+#' Create new records in an Airtable table from a data.frame or list. The column
+#' names and types for the input data must exactly match the column names and
+#' types in the Airtable table. These fields are not validated before calling
+#' the API but supplying any other names or types returns a 422 Unprocessable
+#' Entity error. Supports batch insert.
 #'
-#' @param data A dataframe containing records to insert
-#' @param airtable An airtable object
-#' @param typecast If `TRUE`, values will be converted to match the base if possible. Set to `TRUE` to add new values to a multi select field.
-#' @param parallel If `TRUE`, use parallel processing for encoding large tables
-#' @param batch_size Number of records per request to insert. Maximum of 10
+#' @param data A data.frame or list with records to insert.
+#' @inheritParams airtable_request
+#' @inheritParams req_create_record
+#' @param return_json If `TRUE`, return the response from the Airtable API as
+#'   list. If `FALSE` (default), return the input data.frame or list.
+#' @param parallel If `TRUE`, use parallel processing for encoding large tables.
+#'   Not currently supported in development version.
+#' @param batch_size Deprecated. Set using the `rairtable.batch_size` option.
+#' @return A data.frame (invisibly) of the input data, to be stored as an object
+#'   or piped into additional functions or, if as_json is `TRUE`, the function
+#'   returns the parsed API response from [httr2::resp_body_json()].
 #'
-#' @return A dataframe (invisibly) of the input data, to be stored as an object or piped into further `dplyr` functions
-#'
+#' @aliases create_records
 #' @export
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#' @importFrom httr status_code
-#' @importFrom dplyr `%>%`
-#' @importFrom crayon green
-#' @importFrom cli symbol
-#' @importFrom progress progress_bar
-#' @importFrom jsonlite toJSON
-#'
-
 insert_records <- function(data,
-                           airtable,
+                           airtable = NULL,
+                           ...,
                            typecast = FALSE,
                            parallel = FALSE,
-                           batch_size = 10) {
+                           return_json = FALSE,
+                           batch_size = deprecated()) {
+  if (parallel) {
+    cli::cli_warn(
+      "{.arg parallel} is currently not supported in this development version."
+    )
+  }
 
-  validate_airtable(airtable)
-  check_data_frame(data)
-  check_number_whole(batch_size, max = 10)
+  check_airtable_obj(airtable, allow_null = TRUE)
 
-  batch_json_requests <- batch_encode_post(data, batch_size = batch_size, parallel = parallel, typecast = typecast)
+  resp <- req_create_record(
+    airtable = airtable,
+    ...,
+    data = data,
+    typecast = typecast
+  )
 
+  if (return_json) {
+    return(resp)
+  }
 
-  pb <- progress::progress_bar$new(total = length(batch_json_requests),
-                                   format = "  Creating records: [:bar] :percent eta: :eta"
-                                   )
-
-  vpost(records = batch_json_requests, airtable_obj = airtable, prog_bar = pb)
-
-  return(invisible(data))
+  invisible(data)
 }
