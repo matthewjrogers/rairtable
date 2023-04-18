@@ -25,7 +25,7 @@ delete_records <- function(data = NULL,
                            airtable,
                            airtable_id_col = NULL,
                            records = NULL,
-                           safely = TRUE,
+                           safely = NULL,
                            batch_size = deprecated()) {
   airtable_id_col <- airtable_id_col %||%
     getOption("rairtable.id_col", "airtable_record_id")
@@ -33,16 +33,11 @@ delete_records <- function(data = NULL,
 
   records <- get_records(data, airtable_id_col, records)
   n_records <- length(records)
-  check_character(records)
-  check_bool(safely)
 
   safety_check(
-    safely,
-    cancel_message = "DELETE request cancelled.",
-    c(
-      "You are about to delete {n_records} Airtable record{s}.",
-      "Do you wish to proceed?"
-    )
+    safely = safely,
+    message = "Record deletion cancelled.",
+    c(">" = "Ready to delete {n_records} Airtable record{?s}.")
   )
 
   req_delete_records(
@@ -50,7 +45,7 @@ delete_records <- function(data = NULL,
     records = records
   )
 
-  cli::cli_alert_info("Deleted {length(records)} record{s}.")
+  cli::cli_alert_success("{n_records} record{?s} deleted.")
 
   invisible(records)
 }
@@ -95,7 +90,7 @@ req_delete_records <- function(url = NULL,
     if (!batch) {
       cli_abort(
         c("{.arg records} must be length {batch_size}, not length {n_records}.",
-          "*" = "Set {.code batch = TRUE} to delete more than {batch_size} record{s}."
+          "*" = "Set {.code batch = TRUE} to delete more than {batch_size} record{?s}."
         ),
         call = call
       )
@@ -116,7 +111,7 @@ req_delete_records <- function(url = NULL,
 
   req <- airtable_request(url = url, ..., call = call)
 
-  req <- req_airtable_query(
+  req <- req_query_airtable(
     .req = req,
     method = "DELETE",
     call = call
@@ -132,11 +127,11 @@ req_delete_records <- function(url = NULL,
 
 #' @rdname req_delete_records
 #' @name req_delete_record
-#' @noRd
+#' @export
 req_delete_record <- function(url = NULL, ..., record, call = caller_env()) {
   req <- airtable_request(url = url, ..., call = call)
 
-  req <- req_airtable_query(
+  req <- req_query_airtable(
     .req = req,
     record = record,
     template = "/{record}",
