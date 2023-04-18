@@ -29,10 +29,10 @@ table is a URL containing a base ID or required otherwise.}
 populated in tables created by \code{airtable_base()}.}
 
 \item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
-getOption("rairtable.api_url", "https://api.airtable.com").}
+\code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
 
 \item{api_version}{Airtable API version number, If \code{NULL} (default), the
-api_version is set to getOption("rairtable.api_version", 0)).}
+api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
 
 \item{...}{Additional parameters passed to \code{\link[=check_airtable_obj]{check_airtable_obj()}}. Primarily
 intended for internal use.}

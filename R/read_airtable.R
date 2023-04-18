@@ -2,16 +2,18 @@
 #'
 #' Connect to and read values from an Airtable table.
 #'
-#' @param airtable An airtable object
-#' @param fields An optional list of fields to select.
-#' @param id_to_col If `TRUE`, store airtable ID as a column rather than as row
-#'   names
-#' @param max_rows Optional maximum number of rows to read
+#' @param airtable An airtable class object. Required.
+#' @param fields Character vector with field names or field IDs to return.
+#'   Optional.
+#' @param id_to_col If `TRUE`, the airtable record IDs will be added to the
+#'   returned data.frame column. If `FALSE`, the row names will be set to the
+#'   airtable record IDs.
+#' @param max_rows Optional maximum number of rows to read. Defaults to `NULL`
 #' @param ... Additional parameters passed to [req_query_airtable()]
 #' @inheritParams rlang::args_error_context
 #'
-#' @return A data.frame with the records from the specified Airtable base and
-#'   table.
+#' @return A data.frame with the records from the Airtable base and table
+#'   provided by the airtable parameter.
 #'
 #' @export
 #'
@@ -64,18 +66,18 @@ read_airtable <- function(airtable,
     )
   }
 
-  check_logical(id_to_col)
+  check_logical(id_to_col, call = call)
 
-  if (!id_to_col) {
-    # set ids to rownames if not instructed to do otherwise
-    table_data <-
-      tibble::column_to_rownames(
-        table_data,
-        airtable_id_col
-      )
+  if (id_to_col) {
+    return(data)
   }
 
-  table_data
+  # set ids to rownames if not instructed to do otherwise
+    tibble::column_to_rownames(
+      data,
+      airtable_id_col
+    )
+
 }
 
 

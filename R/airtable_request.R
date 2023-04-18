@@ -18,35 +18,41 @@
 #' [req_auth_airtable()].
 #'
 #' @param url A URL for an API call or an Airtable view. If url is provided and
-#'   is a valid URL, [airtable_request() ] returns  `httr2::request(url)`. url
+#'   is a valid URL, [airtable_request()] returns  `httr2::request(url)`. url
 #'   is optional if airtable *or* base and table are supplied. If url is an
 #'   Airtable view, any additional base or table values provided are ignored. If
 #'   airtable is provided, any additional value provided to url is ignored. For
-#'   the metadata API where only a base ID is required include `require_base =
-#'   TRUE` to pass to `check_airtable_api_url()`.
-#' @param api_url Airtable API URL, If `NULL` (default), the api_url is set to
-#'   getOption("rairtable.api_url", "https://api.airtable.com").
-#' @param api_version Airtable API version number, If `NULL` (default), the
-#'   api_version is set to getOption("rairtable.api_version", 0)).
-#' @param base Airtable base id starting with with "app".
+#'   the metadata API (where only a base ID is required) include `require_base =
+#'   TRUE` to pass to [check_airtable_api_url()] when creating a request.
+#' @param base Airtable base id starting with with "app". Optional if url or
+#'   airtable are supplied. base and table are both required if url and airtable
+#'   are `NULL`.
 #' @param table Airtable table id or name. If table is a table ID it is a string
 #'   starting with "viw".
-#' @inheritParams is_airtable_obj
+#' @param airtable An airtable class object created with [airtable()]. airtable
+#'   must include a request_url attribute. url is ignored if airtable is
+#'   provided.  Optional if url or base *and* table are supplied.
+#' @param api_url Airtable API URL, If `NULL` (default), the api_url is set to
+#'   `getOption("rairtable.api_url", "https://api.airtable.com")`.
+#' @param api_version Airtable API version number, If `NULL` (default), the
+#'   api_version is set to `getOption("rairtable.api_version", 0))`.
 #' @param ... For [airtable_request()], additional parameters passed to
 #'   [check_airtable_api_url()]. For [req_query_airtable()], additional
 #'   parameters passed to [httr2::req_template()] if template is not `NULL` or
 #'   [httr2::req_url_query()] if template is `NULL`.
 #' @inheritDotParams check_airtable_api_url
+#' @returns [airtable_request()] returns an HTTP response: an S3 list with class
+#'   httr2_request. Other functions return modified modified HTTP requests.
 #' @export
 #' @importFrom cli cli_alert_warning
 #' @importFrom httr2 request req_url_path_append
 airtable_request <- function(url = NULL,
-                             api_url = NULL,
-                             api_version = NULL,
                              base = NULL,
                              table = NULL,
                              airtable = NULL,
                              ...,
+                             api_url = NULL,
+                             api_version = NULL,
                              call = caller_env()) {
   if (!is_null(airtable) && is_airtable_obj(airtable)) {
     if (!is_null(url)) {

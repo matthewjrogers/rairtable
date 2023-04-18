@@ -19,13 +19,15 @@ req_airtable_schema(
 }
 \arguments{
 \item{url}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \link{airtable_request() } returns  \code{httr2::request(url)}. url
+is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For
-the metadata API where only a base ID is required include \code{require_base = TRUE} to pass to \code{check_airtable_api_url()}.}
+the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
 
-\item{base}{Airtable base id starting with with "app".}
+\item{base}{Airtable base id starting with with "app". Optional if url or
+airtable are supplied. base and table are both required if url and airtable
+are \code{NULL}.}
 
 \item{table}{Airtable table id or name. If table is a table ID it is a string
 starting with "viw".}
@@ -33,9 +35,14 @@ starting with "viw".}
 \item{column}{Column ID, Defaults to \code{NULL}. Only required when type =
 "update" and from = "field".}
 
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
+must include a request_url attribute. url is ignored if airtable is
+provided.  Optional if url or base \emph{and} table are supplied.}
+
 \item{...}{Additional parameters passed to \code{\link[=req_query_airtable]{req_query_airtable()}}}
 
-\item{type}{Type of API call to use, Default: c("schema", "list", "update", "create")}
+\item{type}{Type of API call to use, Default: c("schema", "list", "update",
+"create")}
 
 \item{from}{Is the API call for bases, tables, or fields? Default: c("base",
 "table", "field"). Not all combinations of type and from are supported.
@@ -45,11 +52,6 @@ only work with "update" and "create".}
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
-
-\item{call}{The execution environment of a currently
-running function, e.g. \code{caller_env()}. The function will be
-mentioned in error messages as the source of the error. See the
-\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
 A modified HTTP request.

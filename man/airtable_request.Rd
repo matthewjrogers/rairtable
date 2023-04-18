@@ -8,12 +8,12 @@
 \usage{
 airtable_request(
   url = NULL,
-  api_url = NULL,
-  api_version = NULL,
   base = NULL,
   table = NULL,
   airtable = NULL,
   ...,
+  api_url = NULL,
+  api_version = NULL,
   call = caller_env()
 )
 
@@ -44,22 +44,22 @@ req_auth_airtable(
 }
 \arguments{
 \item{url}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \link{airtable_request() } returns  \code{httr2::request(url)}. url
+is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For
-the metadata API where only a base ID is required include \code{require_base = TRUE} to pass to \code{check_airtable_api_url()}.}
+the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
 
-\item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
-getOption("rairtable.api_url", "https://api.airtable.com").}
-
-\item{api_version}{Airtable API version number, If \code{NULL} (default), the
-api_version is set to getOption("rairtable.api_version", 0)).}
-
-\item{base}{Airtable base id starting with with "app".}
+\item{base}{Airtable base id starting with with "app". Optional if url or
+airtable are supplied. base and table are both required if url and airtable
+are \code{NULL}.}
 
 \item{table}{Airtable table id or name. If table is a table ID it is a string
 starting with "viw".}
+
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
+must include a request_url attribute. url is ignored if airtable is
+provided.  Optional if url or base \emph{and} table are supplied.}
 
 \item{...}{
   Arguments passed on to \code{\link[=check_airtable_api_url]{check_airtable_api_url}}
@@ -73,12 +73,17 @@ for a table being present in the URL.}
     \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
 string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the URL.}
-  }}
-
-\item{call}{The execution environment of a currently
+    \item{\code{call}}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+  }}
+
+\item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
+\code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
+
+\item{api_version}{Airtable API version number, If \code{NULL} (default), the
+api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
 
 \item{.req, req}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
 \code{\link[=airtable_request]{airtable_request()}}. If .req is provided to \code{\link[=req_query_airtable]{req_query_airtable()}}, url,
@@ -104,6 +109,10 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 \item{rate}{Rate passed to \code{\link[httr2:req_throttle]{httr2::req_throttle()}}. Defaults to \code{5 / 1}.}
 
 \item{realm}{Passed to \code{\link[httr2:req_throttle]{httr2::req_throttle()}}. Defaults to \code{NULL}.}
+}
+\value{
+\code{\link[=airtable_request]{airtable_request()}} returns an HTTP response: an S3 list with class
+httr2_request. Other functions return modified modified HTTP requests.
 }
 \description{
 These functions are designed primarily for developers interested in

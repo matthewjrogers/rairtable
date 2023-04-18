@@ -47,14 +47,15 @@ read_airtable_record(
 )
 }
 \arguments{
-\item{airtable}{An airtable object}
+\item{airtable}{An airtable class object. Required.}
 
 \item{fields}{Fields to return from Airtable base, Default: \code{NULL}}
 
-\item{id_to_col}{If \code{TRUE}, store airtable ID as a column rather than as row
-names}
+\item{id_to_col}{If \code{TRUE}, the airtable record IDs will be added to the
+returned data.frame column. If \code{FALSE}, the row names will be set to the
+airtable record IDs.}
 
-\item{max_rows}{Optional maximum number of rows to read}
+\item{max_rows}{Optional maximum number of rows to read. Defaults to \code{NULL}}
 
 \item{...}{Additional parameters passed to \code{\link[=req_query_airtable]{req_query_airtable()}}}
 
@@ -64,13 +65,15 @@ mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 
 \item{url}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \link{airtable_request() } returns  \code{httr2::request(url)}. url
+is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For
-the metadata API where only a base ID is required include \code{require_base = TRUE} to pass to \code{check_airtable_api_url()}.}
+the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
 
-\item{base}{Airtable base id starting with with "app".}
+\item{base}{Airtable base id starting with with "app". Optional if url or
+airtable are supplied. base and table are both required if url and airtable
+are \code{NULL}.}
 
 \item{table}{Airtable table id or name. If table is a table ID it is a string
 starting with "viw".}
@@ -99,8 +102,8 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 \item{per_page}{Max records to return per page, Default: \code{NULL}}
 }
 \value{
-A data.frame with the records from the specified Airtable base and
-table.
+A data.frame with the records from the Airtable base and table
+provided by the airtable parameter.
 }
 \description{
 Connect to and read values from an Airtable table.

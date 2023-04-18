@@ -54,7 +54,8 @@ get_airtable_base <- function(base = NULL,
 #' @param column Column ID, Defaults to `NULL`. Only required when type =
 #'   "update" and from = "field".
 #' @param ... Additional parameters passed to [req_query_airtable()]
-#' @param type Type of API call to use, Default: c("schema", "list", "update", "create")
+#' @param type Type of API call to use, Default: c("schema", "list", "update",
+#'   "create")
 #' @param from Is the API call for bases, tables, or fields? Default: c("base",
 #'   "table", "field"). Not all combinations of type and from are supported.
 #'   "base" works with "schema", "create", and "list", "table" and "field" both
