@@ -13,6 +13,7 @@ check_airtable_obj(
   require_table = TRUE,
   require_view = FALSE,
   require_fields = FALSE,
+  allow_null = FALSE,
   call = caller_env()
 )
 }

@@ -21,7 +21,12 @@ check_airtable_obj <- function(x,
                                require_table = TRUE,
                                require_view = FALSE,
                                require_fields = FALSE,
+                               allow_null = FALSE,
                                call = caller_env()) {
+  if (allow_null && is_null(x)) {
+    return(invisible(NULL))
+  }
+
   if (!is_airtable_obj(x)) {
     cli_abort("{.arg airtable} must be an {.cls airtable} class object.")
   }
