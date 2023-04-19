@@ -23,7 +23,7 @@ req_create_records <- function(url = NULL,
                                typecast = TRUE,
                                token = NULL,
                                call = caller_env()) {
-  check_required(records, call = call)
+  check_required(data, call = call)
   check_logical(typecast, call = call)
   data <- make_field_list(data, call = call)
 

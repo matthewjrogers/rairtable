@@ -298,7 +298,7 @@ resp_body_records <- function(resp,
   }
 
   if (!is_null(record_nm)) {
-    records <- rlang::set_names(records, nm)
+    records <- rlang::set_names(records, record_nm)
   }
 
   rlang::check_installed("vctrs")
