@@ -28,7 +28,10 @@ check_airtable_obj <- function(x,
   }
 
   if (!is_airtable_obj(x)) {
-    cli_abort("{.arg airtable} must be an {.cls airtable} class object.")
+    cli_abort(
+    "{.arg airtable} must be an {.cls airtable} object, not a
+    {.obj_type_friendly {class(airtable)}}."
+    )
   }
 
   check_string(attr(x, "base"), call = call)
@@ -61,7 +64,8 @@ check_airtable_obj <- function(x,
 
     if (!inherits(fields, "airtable_fields_schema")) {
       cli_abort(
-        "{.arg airtable} must have {.cls airtable_fields_schema} class fields."
+        "{.arg airtable} fields must have the
+        {.cls airtable_fields_schema} class."
       )
     }
   }

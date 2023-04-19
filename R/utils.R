@@ -1,19 +1,3 @@
-#' Convert a data.frame into a list of lists
-#'
-#' @noRd
-make_field_list <- function(data, call = caller_env()) {
-  check_required(data, call = call)
-
-  if (is_list(data)) {
-    return(data)
-  }
-  check_data_frame(data, call = call)
-  do.call(
-    "mapply",
-    c(list, data, SIMPLIFY = FALSE, USE.NAMES = FALSE)
-  )
-}
-
 #' Split list or vector into equal size pieces
 #'
 #' @noRd
@@ -29,6 +13,21 @@ split_list <- function(x, batch_size = 10) {
     ),
     SIMPLIFY = FALSE
   )
+}
+
+#' @noRd
+check_list <- function(x,
+                       allow_na = FALSE,
+                       allow_null = FALSE,
+                       arg = caller_arg(x),
+                       call = caller_env()) {
+  if (!is_list(x)) {
+    stop_input_type(
+      x, what = "a list",
+      allow_na = allow_na, allow_null = allow_null,
+      arg = arg, call = call
+      )
+  }
 }
 
 #' Check if user, confirm action before proceeding
