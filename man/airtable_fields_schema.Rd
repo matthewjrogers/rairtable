@@ -2,8 +2,7 @@
 % Please edit documentation in R/airtable_fields_schema.R
 \name{airtable_fields_schema}
 \alias{airtable_fields_schema}
-\title{Create an \code{airtable_fields_schema} object that can be used for data
-validation}
+\title{Create an \code{airtable_fields_schema} objec}
 \usage{
 airtable_fields_schema(field_schema)
 }
@@ -15,6 +14,6 @@ airtable_fields_schema(field_schema)
 An \code{airtable_fields_schema}object
 }
 \description{
-Create an \code{airtable_fields_schema} object that can be used for data
-validation
+Create an \code{airtable_fields_schema} object from a list of lists to use for data
+validation.
 }

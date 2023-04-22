@@ -6,43 +6,59 @@
 \usage{
 update_records(
   data,
-  airtable,
-  columns = dplyr::everything(),
-  airtable_id_col = "airtable_record_id",
+  airtable = NULL,
+  airtable_id_col = NULL,
+  columns = tidyselect::everything(),
+  records = NULL,
   safely = TRUE,
+  return_json = FALSE,
   parallel = FALSE,
-  batch_size = 10,
-  call = caller_env()
+  ...
 )
 }
 \arguments{
-\item{data}{A dataframe containing the records and fields to update}
+\item{data}{A data.frame containing the fields to update and, if records is
+\code{NULL}, a column or rownames with record IDs.}
 
-\item{airtable}{An airtable object}
-
-\item{columns}{Columns in the data to update on Airtable. Can be a vector of
-character strings, unquoted column names, or a tidyselect helper like
-\code{\link[dplyr:reexports]{dplyr::starts_with()}}, \code{\link[dplyr:reexports]{dplyr::ends_with()}} or \code{\link[dplyr:reexports]{dplyr::everything()}}.
-Defaults to \code{\link[dplyr:reexports]{dplyr::everything()}}}
+\item{airtable}{An airtable object. Optional if url or base and table are
+provided with additional parameters passed to \code{\link[=airtable_request]{airtable_request()}}.}
 
 \item{airtable_id_col}{Column containing Airtable record IDs. Not required if
 record IDs are stored in row names as returned from \code{\link[=read_airtable]{read_airtable()}}}
 
+\item{columns}{Columns in the data to update on Airtable. Can be a vector of
+character strings, unquoted column names, or a tidyselect helper like
+\code{\link[tidyselect:starts_with]{tidyselect::starts_with()}}, \code{\link[tidyselect:starts_with]{tidyselect::ends_with()}} or
+\code{\link[tidyselect:everything]{tidyselect::everything()}}. Defaults to \code{\link[tidyselect:everything]{tidyselect::everything()}}}
+
 \item{safely}{If \code{TRUE}, confirm number and names of columns to update and
 number of rows before executing update.}
 
-\item{parallel}{If \code{TRUE} use parallel processing for encoding large tables}
+\item{return_json}{If \code{TRUE}, return JSON repsponse from the Airtable web API
+as a list. If \code{FALSE} (default), return input data.}
 
-\item{batch_size}{Number of records to update per request. Maximum of 10}
+\item{parallel}{If \code{TRUE} use parallel processing for encoding large tables.
+Currently not implemented in development version.}
 
-\item{call}{The execution environment of a currently
-running function, e.g. \code{caller_env()}. The function will be
-mentioned in error messages as the source of the error. See the
-\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+\item{...}{
+  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
+  \describe{
+    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
+is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
+is optional if airtable \emph{or} base and table are supplied. If url is an
+Airtable view, any additional base or table values provided are ignored. If
+airtable is provided, any additional value provided to url is ignored. For
+the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
+    \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
+airtable are supplied. base and table are both required if url and airtable
+are \code{NULL}.}
+    \item{\code{table}}{Airtable table id or name. If table is a table ID it is a string
+starting with "viw".}
+  }}
 }
 \value{
 A data.frame (invisibly) of the input data, to be stored as an object
-or piped into further \code{dplyr} functions
+or piped into further additional functions.
 }
 \description{
 Update one or more columns of data in an Airtable table. Supports batch

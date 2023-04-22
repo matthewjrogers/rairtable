@@ -5,9 +5,9 @@
 \alias{req_delete_record}
 \title{Delete one or more records from an Airtable table}
 \usage{
-req_delete_records(url = NULL, ..., records, batch = TRUE, call = caller_env())
+req_delete_records(url = NULL, ..., records, token = NULL, call = caller_env())
 
-req_delete_record(url = NULL, ..., record, call = caller_env())
+req_delete_record(url = NULL, ..., record, token = NULL, call = caller_env())
 }
 \arguments{
 \item{url}{A URL for an API call or an Airtable view. If url is provided and
@@ -38,16 +38,20 @@ api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
 is provided, the parameters are passed to \code{\link[=req_delete_record]{req_delete_record()}}
 https://airtable.com/developers/web/api/delete-multiple-records.}
 
-\item{batch}{If \code{TRUE} (default) and more than 10 records are provided, the
-records vector is split into batches of 10. If batch is \code{FALSE}, records
-must be length 10 or less. This default batch size is set by
-"rairtable.batch_size" option. The option default is 10 may be changed if
-the API limit is modified in the future.}
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+
+\item{batch}{If \code{TRUE} (default) and more than 10 records are provided, the
+records vector is split into batches of 10. If batch is \code{FALSE}, records
+must be length 10 or less. This default batch size is set by
+"rairtable.batch_size" option. The option default is 10 may be changed if
+the API limit is modified in the future.}
 }
 \description{
 Delete one record from an Airtable table with \code{\link[=req_delete_record]{req_delete_record()}} or delete

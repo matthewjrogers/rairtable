@@ -6,18 +6,23 @@
 \usage{
 delete_records(
   data = NULL,
-  airtable,
+  airtable = NULL,
   airtable_id_col = NULL,
   records = NULL,
   safely = NULL,
-  batch_size = deprecated()
+  batch_size = deprecated(),
+  return_json = FALSE,
+  token = NULL,
+  ...
 )
 }
 \arguments{
 \item{data}{A data.frame with a record ID column matching the value of
 airtable_id_col or rownames with record ID values.}
 
-\item{airtable}{An airtable class object.}
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
+must include a request_url attribute. url is ignored if airtable is
+provided.  Optional if url or base \emph{and} table are supplied.}
 
 \item{airtable_id_col}{Column name or tidyselect function identifying column
 containing Airtable record IDs. Optional if records is supplied or if
@@ -32,6 +37,29 @@ records and abort if confirmation is not provided.}
 
 \item{batch_size}{Deprecated. Number of records to delete in a single batch.
 batch_size can now be set using the "rairtable.batch_size" option.}
+
+\item{return_json}{If \code{TRUE}, return the JSON response from the Airtable API.
+If \code{FALSE} (default), return a vector of deleted record IDs.}
+
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{...}{
+  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
+  \describe{
+    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
+is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
+is optional if airtable \emph{or} base and table are supplied. If url is an
+Airtable view, any additional base or table values provided are ignored. If
+airtable is provided, any additional value provided to url is ignored. For
+the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
+    \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
+airtable are supplied. base and table are both required if url and airtable
+are \code{NULL}.}
+    \item{\code{table}}{Airtable table id or name. If table is a table ID it is a string
+starting with "viw".}
+  }}
 }
 \value{
 A vector of deleted record IDs returned invisibly.

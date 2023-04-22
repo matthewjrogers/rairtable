@@ -20,7 +20,7 @@ resp_body_records(
   simplifyVector = TRUE,
   type = "combine",
   record_cols = c("id", "createdTime"),
-  record_nm = record_cols,
+  record_nm = NULL,
   ...
 )
 }
@@ -39,11 +39,12 @@ in the response. Additional supported options are "records" and "fields".}
 \item{record_cols}{Column names for columns to retain from records data.frame
 when type is "records" or "combine".}
 
+\item{record_nm}{Column names to}
+
 \item{id_col}{An alternate name to use for the id column of the response
 data.frame.}
 }
 \description{
 Get the body from API requests with a series of offset values
 }
-\keyword{httr2}
 \keyword{internal}
