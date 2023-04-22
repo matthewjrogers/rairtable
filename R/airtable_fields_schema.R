@@ -1,18 +1,18 @@
-#' Create an `airtable_fields_schema` object that can be used for data
-#' validation
+#' Create an `airtable_fields_schema` objec
+#'
+#' Create an `airtable_fields_schema` object from a list of lists to use for data
+#' validation.
 #'
 #' @param field_schema A list of lists. Each child list should have a `name`,
 #'   `type`, and `id` as well as an optional `options`
-#'
 #' @return An `airtable_fields_schema`object
 #' @export
-#'
 airtable_fields_schema <- function(field_schema) {
-  return(make_airtable_fields_schema(field_schema))
+  new_airtable_fields_schema(field_schema)
 }
 
 #' @noRd
-make_airtable_fields_schema <- function(fields, call = caller_env()) {
+new_airtable_fields_schema <- function(fields, call = caller_env()) {
   check_list(fields, call = call)
   class(fields) <- "airtable_fields_schema"
   check_airtable_fields_schema(fields)
@@ -43,24 +43,13 @@ check_airtable_fields_schema <- function(fields, call = caller_env()) {
   }
 }
 
-#' @keywords internal
-#' @export
-print.airtable_fields_schema <- function(x, ...) {
-  prefix <- "  "
-  for (i in seq_along(x)) {
-    cat(prefix, sprintf("Field Name: %s\n", x[[i]]$name))
-    cat(prefix, sprintf(". ID: %s\n", x[[i]]$id))
-    cat(prefix, sprintf(". Type: %s\n", x[[i]]$type))
-
-    if (!is.null(x[[i]]$options)) {
-      cat(prefix, " . Choices:\n")
-      for (choice in x[[i]]$options$choices) {
-        fmt <- "  .  %s (ID %s, %s) \n"
-        cat(prefix, sprintf(fmt, choice$name, choice$id, choice$color))
-      }
+modify_fields <- function(fields, drop = NULL) {
+  lapply(fields, function(x) {
+    if (!is_null(drop)) {
+      x[[drop]] <- NULL
+      x
     }
-  }
-  invisible(x)
+  })
 }
 
 #' Vector of field types as of 2023-04-18
@@ -93,11 +82,12 @@ make_field_list <- function(data,
     return(data)
   }
 
-  check_data_frame(data, call = call)
+  check_data_frame(data, arg = arg, call = call)
   if (!is_null(max_rows) && (nrow(data) > max_rows)) {
     cli_abort(
       "{.arg {arg}} must be a list or data.frame with {max_rows} row{?s},
-        not {nrow(data)} row{?s}."
+        not {nrow(data)} row{?s}.",
+      call = call
     )
   }
 
@@ -108,9 +98,13 @@ make_field_list <- function(data,
 }
 
 make_field_array <- function(fields = NULL,
+                             arg = caller_arg(fields),
                              call = caller_env()) {
   list(
-    "fields" = lapply(make_field_list(fields), make_field_config)
+    "fields" = lapply(
+      make_field_list(fields, arg = arg, call = call),
+      make_field_config
+      )
   )
 }
 
@@ -127,7 +121,7 @@ make_field_config <- function(field = NULL,
                               ...,
                               call = caller_env()) {
   if (is.data.frame(field)) {
-    field <- make_field_list(field, max_rows = 1)
+    field <- make_field_list(field, max_rows = 1, call = call)
   }
 
   field <- field %||% list(name = name, type = type, ...)
@@ -136,7 +130,8 @@ make_field_config <- function(field = NULL,
 
   if (!all(has_name(field, c("name", "type")))) {
     cli_abort(
-      "{.arg field} must have the names {.val name} and {.val type}."
+      "{.arg field} must have the names {.val name} and {.val type}.",
+      call = call
     )
   }
 
