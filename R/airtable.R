@@ -33,7 +33,7 @@ airtable <- function(table = NULL,
                      api_version = NULL,
                      token = NULL,
                      ...) {
-  atbl <- build_airtable_obj(
+  atbl <- new_airtable_obj(
     base = base,
     table = table,
     view = view,
@@ -55,14 +55,14 @@ airtable <- function(table = NULL,
 #'
 #' @noRd
 #' @importFrom vctrs new_vctr
-build_airtable_obj <- function(base,
-                               table,
-                               view = NULL,
-                               fields = NULL,
-                               api_url = NULL,
-                               api_version = NULL,
-                               token = NULL,
-                               call = caller_env()) {
+new_airtable_obj <- function(base,
+                             table,
+                             view = NULL,
+                             fields = NULL,
+                             api_url = NULL,
+                             api_version = NULL,
+                             token = NULL,
+                             call = caller_env()) {
   check_string(table, call = call)
 
   if (is_airtable_url(table)) {
