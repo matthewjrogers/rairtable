@@ -64,7 +64,7 @@ airtable_request <- function(url = NULL,
       )
     }
 
-    url <- attr(airtable, "request_url")
+    url <- airtable[["request_url"]]
   }
 
   if (is_airtable_api_url(url)) {
@@ -91,7 +91,8 @@ airtable_request <- function(url = NULL,
 
   req <- httr2::request(api_url)
 
-  api_version <- api_version %||% getOption("rairtable.api_version", 0)
+  api_version <- api_version %||%
+    getOption("rairtable.api_version", 0)
   check_number_whole(api_version, call = call)
 
   req <- httr2::req_url_path_append(req, paste0("v", api_version))
@@ -136,28 +137,21 @@ req_query_airtable <- function(.req = NULL,
                                airtable = NULL,
                                token = NULL,
                                string = NULL,
-                               allow_key = TRUE) {
+                               allow_key = TRUE,
+                               call = caller_env()) {
   .req <-
     .req %||% airtable_request(
       url = url,
       api_url = api_url,
       api_version = api_version,
-      airtable = airtable
+      airtable = airtable,
+      call = call
     )
 
-  if (!is.null(template)) {
-    .req <-
-      httr2::req_template(
-        .req,
-        template = template,
-        ...
-      )
+  if (!is_null(template)) {
+    .req <- httr2::req_template(.req, template = template, ...)
   } else {
-    .req <-
-      httr2::req_url_query(
-        .req,
-        ...
-      )
+    .req <- httr2::req_url_query(.req, ...)
   }
 
   if (!is_null(method)) {
@@ -165,11 +159,7 @@ req_query_airtable <- function(.req = NULL,
   }
 
   if (!is_null(data)) {
-    .req <-
-      httr2::req_body_json(
-        .req,
-        data = data
-      )
+    .req <- httr2::req_body_json(.req, data = data)
   }
 
   req_auth_airtable(
@@ -229,9 +219,24 @@ req_auth_airtable <- function(req,
       string = string
     )
 
+  req <- httr2::req_error(req, body = airtable_error_body)
+
   httr2::req_throttle(
     req = req,
     rate = rate,
     realm = realm
   )
+}
+
+#' @noRd
+airtable_error_body <- function(resp) {
+  error <- httr2::resp_body_json(resp)[["error"]]
+  if (has_name(error, "message")) {
+    c(
+      error[["message"]],
+      "More information on API errors: <https://airtable.com/developers/web/api/errors>"
+    )
+  } else {
+    error
+  }
 }
