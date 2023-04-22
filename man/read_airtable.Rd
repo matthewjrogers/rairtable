@@ -7,14 +7,13 @@
 \title{Read table from Airtable}
 \usage{
 read_airtable(
-  airtable,
+  airtable = NULL,
   fields = NULL,
   id_to_col = TRUE,
   airtable_id_col = NULL,
   max_rows = NULL,
-  ...,
   token = NULL,
-  call = caller_env()
+  ...
 )
 
 read_airtable_records(
@@ -62,16 +61,11 @@ to \code{getOption("rairtable.id_col", "airtable_record_id")}.}
 
 \item{max_rows}{Optional maximum number of rows to read. Defaults to \code{NULL}}
 
-\item{...}{Additional parameters passed to \code{\link[=req_query_airtable]{req_query_airtable()}}.}
-
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{call}{The execution environment of a currently
-running function, e.g. \code{caller_env()}. The function will be
-mentioned in error messages as the source of the error. See the
-\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+\item{...}{Additional parameters passed to \code{\link[=req_query_airtable]{req_query_airtable()}}.}
 
 \item{url}{A URL for an API call or an Airtable view. If url is provided and
 is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url

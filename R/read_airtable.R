@@ -23,29 +23,20 @@
 #' @importFrom cli cli_bullets
 #' @importFrom tibble column_to_rownames
 
-read_airtable <- function(airtable,
+read_airtable <- function(airtable = NULL,
                           fields = NULL,
                           id_to_col = TRUE,
                           airtable_id_col = NULL,
                           max_rows = NULL,
-                          ...,
                           token = NULL,
-                          call = caller_env()) {
-  check_airtable_obj(airtable)
-
-  url <- attr(airtable, "request_url")
-  view <- attr(airtable, "view")
-
-  if (is_empty(view) || view == "") {
-    view <- NULL
-  }
+                          ...) {
+  check_airtable_obj(airtable, allow_null = TRUE)
 
   .req <- req_query_airtable(
-    url = url,
+    airtable = airtable,
+    ...,
     fields = fields,
-    view = view,
-    token = token,
-    ...
+    token = token
   )
 
   airtable_id_col <- airtable_id_col %||%
@@ -55,8 +46,7 @@ read_airtable <- function(airtable,
     req_perform_records(
       req = .req,
       record_cols = "id",
-      record_nm = airtable_id_col,
-      call = call
+      record_nm = airtable_id_col
     )
 
   if ("data.frame" %in% lapply(data, class)) {
@@ -64,24 +54,22 @@ read_airtable <- function(airtable,
       c(
         "!" = "This data may contain {.val user} field types.",
         "i" = "This field type is not supported by
-        {.fn insert_records} or {.fn update_records}.",
-        call = call
+        {.fn insert_records} or {.fn update_records}."
       )
     )
   }
 
-  check_logical(id_to_col, call = call)
+  check_logical(id_to_col)
 
   if (id_to_col) {
     return(data)
   }
 
   # set ids to rownames if not instructed to do otherwise
-    tibble::column_to_rownames(
-      data,
-      airtable_id_col
-    )
-
+  tibble::column_to_rownames(
+    data,
+    airtable_id_col
+  )
 }
 
 
@@ -119,7 +107,6 @@ read_airtable_records <- function(airtable = NULL,
                                   cell_format = NULL,
                                   token = NULL,
                                   offset = NULL) {
-
   req <- airtable_request(
     url = url,
     base = base,
@@ -172,6 +159,7 @@ read_airtable_records <- function(airtable = NULL,
 #' @name read_airtable_record
 #' @param record Record ID number. Required for [read_airtable_record()].
 #' @export
+#' @importFrom httr2 req_url_path_append req_perform
 read_airtable_record <- function(airtable = NULL,
                                  url = NULL,
                                  base = NULL,
@@ -212,10 +200,9 @@ read_airtable_record <- function(airtable = NULL,
 #'   the API call. See
 #'   <https://airtable.com/developers/web/api/list-records#response-offset> for
 #'   more information on how the offset value is used by the Airtable API.
-#' @keywords internal httr2
+#' @keywords internal
 #' @export
-#' @importFrom httr2 req_url_query req_perform resp_body_json
-#' @importFrom rlang set_names
+#' @importFrom httr2 req_url_query req_perform
 #' @importFrom tibble as_tibble
 req_perform_records <- function(req,
                                 offset = NULL,
@@ -244,16 +231,16 @@ req_perform_records <- function(req,
       resp_body_records(
         resp,
         type = type,
-        record_nm = record_nm,
-        record_cols = record_cols
+        record_cols = record_cols,
+        record_nm = record_nm
       )
 
-    if (is_null(body[["offset"]])) {
+    if (is_null(body_list[[i]][["offset"]])) {
       # End loop if no offset returned
       break
     }
 
-    offset <- body[["offset"]]
+    offset <- body_list[[i]][["offset"]]
   }
 
   tibble::as_tibble(
@@ -271,13 +258,15 @@ req_perform_records <- function(req,
 #'   data.frame.
 #' @param record_cols Column names for columns to retain from records data.frame
 #'   when type is "records" or "combine".
-#' @keywords internal httr2
+#' @param record_nm Column names to
+#' @keywords internal
 #' @export
+#' @importFrom vctrs vec_cbind
 resp_body_records <- function(resp,
                               simplifyVector = TRUE,
                               type = "combine",
                               record_cols = c("id", "createdTime"),
-                              record_nm = record_cols,
+                              record_nm = NULL,
                               ...) {
   body <- httr2::resp_body_json(resp, simplifyVector = simplifyVector)
 
@@ -287,27 +276,28 @@ resp_body_records <- function(resp,
     # Used by read_airtable and read_airtable_records
     records <- body[["records"]]
     fields <- records[["fields"]]
-    records <- records[, record_cols]
+
+    if (has_length(record_cols, 1)) {
+      records <- records[record_cols]
+    } else {
+      records <- records[, record_cols]
+    }
   } else if (has_name(body, c("fields"))) {
     # Used by read_airtable_record
-    fields <- as.data.frame(body[["fields"]])
+    fields <- body[["fields"]]
     records <- data.frame(
       "id" = body[["id"]],
       "createdTime" = body[["createdTime"]]
     )
   }
 
-  if (!is_null(record_nm)) {
-    records <- rlang::set_names(records, record_nm)
-  }
-
-  rlang::check_installed("vctrs")
+  record_nm <- record_nm %||% names(records)
 
   switch(type,
     "records" = records,
     "fields" = fields,
     "combine" = vctrs::vec_cbind(
-      records,
+      set_names(records, record_nm),
       fields,
       ...
     )

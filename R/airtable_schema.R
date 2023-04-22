@@ -135,7 +135,7 @@ get_airtable_base <- function(base = NULL,
   }
 
   if (is_airtable_obj(base)) {
-    return(attr(airtable, "base"))
+    return(base[["base"]])
   }
 
   if (is_url(base)) {

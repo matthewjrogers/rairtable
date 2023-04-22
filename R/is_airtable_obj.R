@@ -34,14 +34,14 @@ check_airtable_obj <- function(x,
     )
   }
 
-  check_string(attr(x, "base"), call = call)
+  check_string(x[["base"]], call = call)
 
   if (require_table) {
-    check_string(x$table, call = call)
+    check_string(x[["table"]], call = call)
   }
 
   if (require_url) {
-    url <- attr(x, "request_url")
+    url <- x[["request_url"]]
 
     check_airtable_api_url(
       url,
@@ -52,7 +52,7 @@ check_airtable_obj <- function(x,
   }
 
   if (require_view) {
-    check_string(attr(x, "view"), call = call)
+    check_string(x[["view"]], call = call)
   }
 
   if (require_fields) {
