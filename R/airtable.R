@@ -31,14 +31,16 @@ airtable <- function(table = NULL,
                      fields = list(),
                      api_url = NULL,
                      api_version = NULL,
+                     token = NULL,
                      ...) {
   atbl <- build_airtable_obj(
-    table = table,
     base = base,
+    table = table,
     view = view,
     fields = fields,
     api_url = api_url,
-    api_version = api_version
+    api_version = api_version,
+    token = token
   )
 
   check_airtable_obj(
@@ -52,43 +54,53 @@ airtable <- function(table = NULL,
 #' Create a new airtable object
 #'
 #' @noRd
-build_airtable_obj <- function(table,
-                               base,
+#' @importFrom vctrs new_vctr
+build_airtable_obj <- function(base,
+                               table,
                                view = NULL,
-                               fields = list(),
+                               fields = NULL,
                                api_url = NULL,
                                api_version = NULL,
+                               token = NULL,
                                call = caller_env()) {
   check_string(table, call = call)
 
   if (is_airtable_url(table)) {
     ids <- parse_airtable_url(table, call = call)
-    table <- ids[["table"]]
     base <- ids[["base"]]
+    table <- ids[["table"]]
     view <- ids[["view"]]
   }
 
   check_string(base, call = call)
   check_string(view, allow_null = TRUE, call = call)
 
-  atbl <- new.env()
-  atbl$table <- table
-  atbl$fields <- fields
+  req <- airtable_request(
+    base = base,
+    table = table,
+    api_url = api_url,
+    api_version = api_version,
+    call = call
+  )
 
-  class(atbl) <- "airtable"
-  attr(atbl, "base") <- base
-  attr(atbl, "view") <- view %||% character()
+  base_info <- list_airtable_bases(
+    base = base,
+    call = call,
+    token = token
+  )
 
-  attr(atbl, "request_url") <-
-    airtable_request(
-      api_url = api_url,
-      api_version = api_version,
-      base = base,
-      table = table,
-      call = call
-    )[["url"]]
-
-  atbl
+  vctrs::new_vctr(
+    .data = list(
+      "base" = base,
+      "table" = table,
+      "view" = view,
+      "fields" = fields %||% list(),
+      "name" = base_info[["name"]],
+      "permissions" = base_info[["permissionLevel"]],
+      "request_url" = req[["url"]]
+    ),
+    class = "airtable"
+  )
 }
 
 #' print method for an airtable object
@@ -96,9 +108,9 @@ build_airtable_obj <- function(table,
 #' @keywords internal
 #' @export
 print.airtable <- function(x, ...) {
-  cat("Table: ", x$table, "\n", sep = "")
-  if (!is.null(attr(x, "view"))) {
-    cat("   View: ", attr(x, "view"), "\n", sep = "")
+  cat("Table: ", x[["table"]], "\n", sep = "")
+  if (!is.null(x[["view"]])) {
+    cat("   View: ", x[["view"]], "\n", sep = "")
   }
-  cat("   Base: ", attr(x, "base"), "\n", sep = "")
+  cat("   Base: ", x[["base"]], "\n", sep = "")
 }

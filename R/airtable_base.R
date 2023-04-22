@@ -15,7 +15,8 @@
 #'   column of fields. Defaults to `FALSE`.
 #' @inheritParams set_airtable_token
 #'
-#' @returns An `airtable_base_schema` object or a tibble.
+#' @returns An `airtable_base_schema` object or a tibble listing the tables from
+#'   the Airtable base.
 #' @export
 #'
 #' @importFrom httr2 req_perform resp_body_json
@@ -77,10 +78,14 @@ airtable_base <- function(base = NULL,
 
 #' @rdname airtable_base
 #' @name list_airtable_bases
+#' @param base A character vector of base id values. If supplied to
+#'   [list_airtable_bases()], return only those Airtable bases with matching
+#'   IDs.
 #' @export
 #' @importFrom httr2 req_perform resp_body_json
 #' @importFrom tibble as_tibble
 list_airtable_bases <- function(...,
+                                base = NULL,
                                 token = NULL) {
   req <- req_airtable_schema(
     ...,
@@ -91,6 +96,11 @@ list_airtable_bases <- function(...,
 
   resp <- httr2::req_perform(req)
   body <- httr2::resp_body_json(resp, simplifyVector = TRUE)
+  bases <- tibble::as_tibble(body[["bases"]])
 
-  tibble::as_tibble(body[["bases"]])
+  if (is_null(base)) {
+    return(bases)
+  }
+
+  bases[base == bases[["id"]], ]
 }

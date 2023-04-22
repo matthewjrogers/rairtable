@@ -11,6 +11,7 @@ airtable(
   fields = list(),
   api_url = NULL,
   api_version = NULL,
+  token = NULL,
   ...
 )
 }
@@ -33,6 +34,10 @@ populated in tables created by \code{airtable_base()}.}
 
 \item{api_version}{Airtable API version number, If \code{NULL} (default), the
 api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
+
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
 \item{...}{Additional parameters passed to \code{\link[=check_airtable_obj]{check_airtable_obj()}}. Primarily
 intended for internal use.}

@@ -13,11 +13,12 @@ airtable_base(
   token = NULL
 )
 
-list_airtable_bases(..., token = NULL)
+list_airtable_bases(..., base = NULL, token = NULL)
 }
 \arguments{
-\item{base}{A valid Airtable base ID. Optional if url or airtable parameters
-are supplied to the additional parameters.}
+\item{base}{A character vector of base id values. If supplied to
+\code{\link[=list_airtable_bases]{list_airtable_bases()}}, return only those Airtable bases with matching
+IDs.}
 
 \item{...}{Additional parameters passed to \code{\link[=req_airtable_schema]{req_airtable_schema()}}. Supports
 the use of an optional url or airtable parameter instead of base for
@@ -32,7 +33,8 @@ column of fields. Defaults to \code{FALSE}.}
 \item{token}{Airtable personal access token or API key.}
 }
 \value{
-An \code{airtable_base_schema} object or a tibble.
+An \code{airtable_base_schema} object or a tibble listing the tables from
+the Airtable base.
 }
 \description{
 Get an "airtable_base_schema" object, a tibble with a list of tables, or a
