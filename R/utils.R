@@ -1,7 +1,32 @@
+# ---
+# repo: r-lib/rlang
+# file: standalone-purrr.R
+# last-updated: 2023-02-23
+# license: https://unlicense.org
+# imports: rlang
+# ---
+#' map (from standalone-purrr.R)
+#'
+#' @noRd
+map <- function(.x, .f, ...) {
+  .f <- rlang::as_function(.f, env = rlang::global_env())
+  lapply(.x, .f, ...)
+}
+
 #' Split list or vector into equal size pieces
 #'
 #' @noRd
-split_list <- function(x, batch_size = 10) {
+split_list <- function(x,
+                       batch_size = NULL,
+                       arg = caller_arg(x),
+                       call = caller_env()) {
+  check_required(x, arg = arg)
+
+  batch_size <- batch_size %||%
+    as.integer(getOption("rairtable.batch_size", 10))
+
+  check_number_whole(batch_size, call = call)
+
   mapply(
     FUN = function(a, b) {
       x[a:b]
@@ -15,6 +40,8 @@ split_list <- function(x, batch_size = 10) {
   )
 }
 
+#' Check if object is a list
+#'
 #' @noRd
 check_list <- function(x,
                        allow_na = FALSE,
@@ -23,10 +50,11 @@ check_list <- function(x,
                        call = caller_env()) {
   if (!is_list(x)) {
     stop_input_type(
-      x, what = "a list",
+      x,
+      what = "a list",
       allow_na = allow_na, allow_null = allow_null,
       arg = arg, call = call
-      )
+    )
   }
 }
 
@@ -49,21 +77,23 @@ safety_check <- function(safely = NULL,
     return(invisible(NULL))
   }
 
-  check_logical(safely)
-
-  resp <- cli_ask(
+  answer <- cli_ask(
     ...,
     prompt = paste0("?\u00a0", prompt, "\u00a0(Y/n)"),
     .envir = .envir
   )
 
-  if (!all(tolower(resp) %in% tolower(yes))) {
-    cli::cli_abort(
-      message = message,
-      .envir = .envir,
-      call = call
-    )
+  if (all(tolower(answer) %in% tolower(yes))) {
+    return(invisible(NULL))
   }
+
+  check_character(message, call = call)
+
+  cli::cli_abort(
+    message = message,
+    .envir = .envir,
+    call = call
+  )
 }
 
 #' Adapted from cliExtras::cli_ask()
@@ -86,15 +116,15 @@ cli_ask <- function(prompt = "?",
   readline(paste0(prompt, "\u00a0"))
 }
 
-#' @keywords internal
+#' @noRd
 #' @importFrom rlang zap current_env
-list_rbind <- function(x, names_to = rlang::zap(), ptype = NULL) {
-  rlang::check_installed("vctrs")
+#' @importFrom vctrs vec_rbind
+list_rbind <- function(x, names_to = zap(), ptype = NULL) {
   vctrs::vec_rbind(
     !!!x,
     .names_to = names_to,
     .ptype = ptype,
-    .error_call = rlang::current_env()
+    .error_call = current_env()
   )
 }
 
@@ -123,12 +153,4 @@ string_extract <- function(string, pattern, perl = TRUE) {
   }
 
   match
-}
-
-#' @export
-#' @importFrom utils str
-str.airtable <- function(object, ...) {
-  view <- ifelse(is.null(attr(object, "view")), "", paste0('."', attr(object, "view"), '"'))
-  cat(" Airtable: ", object$table, view, " @ ", attr(object, "base"), "\n", sep = "")
-  utils::str(object)
 }
