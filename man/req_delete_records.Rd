@@ -5,21 +5,23 @@
 \alias{req_delete_record}
 \title{Delete one or more records from an Airtable table}
 \usage{
-req_delete_records(url = NULL, ..., records, token = NULL, call = caller_env())
+req_delete_records(req = NULL, ..., records, token = NULL, call = caller_env())
 
-req_delete_record(url = NULL, ..., record, token = NULL, call = caller_env())
+req_delete_record(req = NULL, ..., record, token = NULL, call = caller_env())
 }
 \arguments{
-\item{url}{A URL for an API call or an Airtable view. If url is provided and
+\item{req}{If req is supplied, url or any additional parameters passed to ...
+are ignored.}
+
+\item{...}{
+  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
+  \describe{
+    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
 is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For
 the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
-
-\item{...}{
-  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
-  \describe{
     \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
 airtable are supplied. base and table are both required if url and airtable
 are \code{NULL}.}

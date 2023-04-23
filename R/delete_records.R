@@ -22,7 +22,7 @@
 #' @returns A vector of deleted record IDs returned invisibly.
 #'
 #' @export
-#' @importFrom cli cli_alert_info
+#' @importFrom cli cli_alert_warning cli_alert_success
 #' @importFrom httr2 resp_body_json
 delete_records <- function(data = NULL,
                            airtable = NULL,
@@ -33,21 +33,28 @@ delete_records <- function(data = NULL,
                            return_json = FALSE,
                            token = NULL,
                            ...) {
-  airtable_id_col <- airtable_id_col %||%
-    getOption("rairtable.id_col", "airtable_record_id")
-  check_airtable_obj(airtable, allow_null = TRUE)
+  if (is_null(data) && is_null(records)) {
+    cli_abort(
+      "{.arg data} or {.arg records} must be supplied."
+    )
+  } else if (!is_null(data)) {
+    if (!is_null(records)) {
+      cli::cli_alert_warning(
+        "Existing {.arg records} values are ignored when {.arg data} is supplied."
+      )
+    }
 
-  if (!is_null(data)) {
     records <- get_record_id_col(data, id_col = airtable_id_col)
   }
 
+  check_character(records)
   n_records <- length(records)
 
   text <- "Deleting {n_records} record{?s} from Airtable."
 
-  if (!is_null(airtable)) {
-    text <-
-      "Deleting {n_records} record{?s} from base: {.field {airtable$name}}"
+  if (!is_null(airtable[["name"]])) {
+    text <- "Deleting {n_records} record{?s} from base:
+    {.field {airtable[['name']]}}"
   }
 
   safety_check(
@@ -66,6 +73,11 @@ delete_records <- function(data = NULL,
   cli::cli_alert_success("{n_records} record{?s} deleted.")
 
   if (return_json) {
+    if (!inherits(resp, "httr2_response")) {
+      # FIXME: body from the batched requests should be combined not returned as a list
+      return(map(lapply, httr2::resp_body_json))
+    }
+
     return(httr2::resp_body_json(resp))
   }
 
@@ -83,6 +95,8 @@ delete_records <- function(data = NULL,
 #' - <https://airtable.com/developers/web/api/delete-multiple-records>
 #'
 #' @inheritParams airtable_request
+#' @param req If req is supplied, url or any additional parameters passed to ...
+#'   are ignored.
 #' @param records Required. Character vector with record IDs. If only one record
 #'   is provided, the parameters are passed to [req_delete_record()]
 #'   https://airtable.com/developers/web/api/delete-multiple-records.
@@ -94,27 +108,29 @@ delete_records <- function(data = NULL,
 #' @inheritDotParams airtable_request
 #' @keywords internal
 #' @export
-req_delete_records <- function(url = NULL,
+#' @importFrom httr2 req_url_path_append req_perform
+req_delete_records <- function(req = NULL,
                                ...,
                                records,
                                token = NULL,
                                call = caller_env()) {
-  if (has_length(records, 1)) {
-    return(req_delete_record(url = url, ..., record = records, call = call))
-  }
-
+  check_character(records, call = call)
+  n_records <- length(records)
   batch_size <- as.integer(getOption("rairtable.batch_size", 10))
 
-  check_string(records, call = call)
-  n_records <- length(records)
+  if (n_records == 1) {
+    resp <- req_delete_record(
+      req = req,
+      ...,
+      record = records,
+      token = token,
+      call = call
+    )
 
-  if (n_records > batch_size) {
-    record_batches <- split_list(records, batch_size)
-    batch_delete <- Vectorize(req_delete_records, vectorize.args = "records")
-    return(batch_delete(url = url, ..., records = record_batches, call = call))
+    return(resp)
   }
 
-  req <- airtable_request(url = url, ..., call = call)
+  req <- req %||% airtable_request(..., call = call)
 
   req <- req_query_airtable(
     .req = req,
@@ -122,6 +138,17 @@ req_delete_records <- function(url = NULL,
     token = token,
     call = call
   )
+
+  if (n_records > batch_size) {
+    resp <- batch_delete_records(
+      req = req,
+      records = records,
+      batch_size = batch_size,
+      call = call
+    )
+
+    return(resp)
+  }
 
   req <- httr2::req_url_path_append(
     req,
@@ -134,12 +161,13 @@ req_delete_records <- function(url = NULL,
 #' @rdname req_delete_records
 #' @name req_delete_record
 #' @export
-req_delete_record <- function(url = NULL,
+#' @importFrom httr2 req_perform
+req_delete_record <- function(req = NULL,
                               ...,
                               record,
                               token = NULL,
                               call = caller_env()) {
-  req <- airtable_request(url = url, ..., call = call)
+  req <- req %||% airtable_request(..., call = call)
 
   req <- req_query_airtable(
     .req = req,
@@ -151,4 +179,31 @@ req_delete_record <- function(url = NULL,
   )
 
   httr2::req_perform(req)
+}
+
+#' Batch delete records
+#'
+#' @noRd
+#' @importFrom cli cli_progress_along
+batch_delete_records <- function(req,
+                                 records,
+                                 batch_size = NULL,
+                                 action = "Deleting records",
+                                 call = caller_env()) {
+  batch_size <- batch_size %||%
+    as.integer(getOption("rairtable.batch_size", 10))
+
+  batched_records <- split_list(records, batch_size)
+
+  format <-
+    "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
+
+  map(
+    cli::cli_progress_along(batched_records, format = format),
+    ~ req_delete_records(
+      records = batched_records[[.x]],
+      req = req,
+      call = call
+    )
+  )
 }
