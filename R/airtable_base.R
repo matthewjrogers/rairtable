@@ -102,5 +102,7 @@ list_airtable_bases <- function(...,
     return(bases)
   }
 
+  check_string(base, allow_empty = FALSE)
+
   bases[base == bases[["id"]], ]
 }
