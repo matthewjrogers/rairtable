@@ -17,74 +17,91 @@
 #' @export
 #' @inheritParams rlang::args_error_context
 #' @inheritParams airtable_request
-req_create_records <- function(url = NULL,
+req_create_records <- function(req = NULL,
                                ...,
                                data,
                                typecast = TRUE,
                                token = NULL,
                                call = caller_env()) {
-  check_required(data, call = call)
-  check_logical(typecast, call = call)
-  data <- make_field_list(data, call = call)
+  req <- req %||%
+    req_auth_airtable(
+      req = airtable_request(..., call = call),
+      token = token
+    )
 
+  data <- make_field_list(data, call = call)
+  n_records <- length(data)
   batch_size <- as.integer(getOption("rairtable.batch_size", 10))
 
-  if (length(data) > batch_size) {
-    batched_data <- split_list(data, batch_size)
-    batch_req_create <- Vectorize(
-      req_create_records,
-      vectorize.args = "data"
+  if (n_records > batch_size) {
+    resp <- batch_create_records(
+      req = req,
+      data = data,
+      batch_size = batch_size,
+      call = call
     )
 
-    return(
-      batch_req_create(
-        url = url,
-        data = batched_data,
-        ...,
-        typecast = typecast,
-        token = token,
-        call = call
-      )
-    )
+    return(resp)
   }
 
-  req <- airtable_request(url = url, ..., call = call)
+  data <- set_names(data, rep_len("fields", length(data)))
 
-  data <- rlang::set_names(data, rep("fields", length(data)))
+  check_bool(typecast, call = call)
 
-  req <- req_query_airtable(
-    .req = req,
-    data = list("records" = split_list(data, 1), "typecast" = typecast),
-    token = token,
-    call = call
+  req <- httr2::req_body_json(
+    req,
+    data = list("records" = split_list(data, 1), "typecast" = typecast)
   )
 
-  resp <- httr2::req_perform(req)
-
-  invisible(httr2::resp_body_json(resp))
+  httr2::req_perform(req)
 }
 
 #' @rdname req_create_records
 #' @name req_create_record
 #' @export
-req_create_record <- function(url = NULL,
+req_create_record <- function(req = NULL,
                               data,
                               ...,
                               typecast = TRUE,
                               call = caller_env(),
                               token = NULL) {
-  check_logical(typecast, call = call)
-  req <- airtable_request(url = url, ..., call = call)
-  data <- make_field_list(data, call = call)
+  check_bool(typecast, call = call)
 
   req <- req_query_airtable(
-    .req = req,
+    .req = req %||% airtable_request(..., call = call),
+    data = list(
+      "fields" = make_field_list(data, call = call),
+      "typecast" = typecast
+    ),
     token = token,
-    data = list("fields" = data, "typecast" = typecast),
     call = call
   )
 
-  resp <- httr2::req_perform(req)
+  httr2::req_perform(req)
+}
 
-  invisible(httr2::resp_body_json(resp))
+#' Create records in an Airtable table in batches
+#'
+#' @noRd
+batch_create_records <- function(req,
+                                 data,
+                                 batch_size = NULL,
+                                 action = "Creating records",
+                                 call = caller_env()) {
+  batch_size <- batch_size %||%
+    as.integer(getOption("rairtable.batch_size", 10))
+
+  batched_data <- split_list(data, call = call)
+
+  format <-
+    "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
+
+  map(
+    cli::cli_progress_along(batched_data, format = format),
+    ~ req_create_records(
+      req = req,
+      data = batched_data[[.x]],
+      call = call
+    )
+  )
 }

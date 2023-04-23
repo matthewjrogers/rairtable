@@ -2,11 +2,11 @@
 #'
 #' Create new records in an Airtable table from a data.frame or list. The column
 #' names and types for the input data must exactly match the column names and
-#' types in the Airtable table. These fields are not validated before calling
-#' the API but supplying any other names or types returns a 422 Unprocessable
-#' Entity error. Supports batch insert.
+#' types in the Airtable table. Fields are not validated before calling
+#' the API so supplying any other names or types returns an error.
+#' [create_records()] and [insert_records()] are identical.
 #'
-#' @param data A data.frame or list with records to insert.
+#' @param data A data.frame with records to insert.
 #' @inheritParams airtable_request
 #' @inheritParams req_create_record
 #' @param return_json If `TRUE`, return the response from the Airtable API as
@@ -18,15 +18,14 @@
 #'   or piped into additional functions or, if as_json is `TRUE`, the function
 #'   returns the parsed API response from [httr2::resp_body_json()].
 #'
-#' @aliases create_records
 #' @export
 insert_records <- function(data,
                            airtable = NULL,
-                           ...,
                            typecast = FALSE,
                            parallel = FALSE,
+                           batch_size = deprecated(),
                            return_json = FALSE,
-                           batch_size = deprecated()) {
+                           ...) {
   if (parallel) {
     cli::cli_warn(
       "{.arg parallel} is currently not supported in this development version."
@@ -34,17 +33,49 @@ insert_records <- function(data,
   }
 
   check_airtable_obj(airtable, allow_null = TRUE)
+  check_data_frame(data)
+  n_records <- nrow(data)
 
-  resp <- req_create_record(
+  cli::cli_alert_info("Creating {n_records} record{?s}.")
+
+  resp <- req_create_records(
     airtable = airtable,
     ...,
     data = data,
     typecast = typecast
   )
 
+  cli::cli_alert_success("{n_records} record{?s} created.")
+
   if (return_json) {
-    return(resp)
+    if (!inherits(resp, "httr2_response")) {
+      # FIXME: The body from the batched requests should be combined if possible
+      return(lapply(resp, httr2::resp_body_json))
+    }
+
+    return(httr2::resp_body_json(resp))
   }
 
   invisible(data)
+}
+
+#' @rdname insert_records
+#' @name create_records
+#' @export
+create_records <- function(data,
+                           airtable = NULL,
+                           typecast = FALSE,
+                           parallel = FALSE,
+                           batch_size = deprecated(),
+                           return_json = FALSE,
+                           ...) {
+  insert_records(
+    data = data,
+    airtable = airtable,
+    typecast = typecast,
+    parallel = parallel,
+    batch_size = batch_size,
+    return_json = return_json,
+    ...
+  )
 }

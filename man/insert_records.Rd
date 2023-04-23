@@ -8,24 +8,29 @@
 insert_records(
   data,
   airtable = NULL,
-  ...,
   typecast = FALSE,
   parallel = FALSE,
+  batch_size = deprecated(),
   return_json = FALSE,
-  batch_size = deprecated()
+  ...
+)
+
+create_records(
+  data,
+  airtable = NULL,
+  typecast = FALSE,
+  parallel = FALSE,
+  batch_size = deprecated(),
+  return_json = FALSE,
+  ...
 )
 }
 \arguments{
-\item{data}{A data.frame or list with records to insert.}
+\item{data}{A data.frame with records to insert.}
 
 \item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
 must include a request_url attribute. url is ignored if airtable is
 provided.  Optional if url or base \emph{and} table are supplied.}
-
-\item{...}{For \code{\link[=airtable_request]{airtable_request()}}, additional parameters passed to
-\code{\link[=check_airtable_api_url]{check_airtable_api_url()}}. For \code{\link[=req_query_airtable]{req_query_airtable()}}, additional
-parameters passed to \code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
-\code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
 
 \item{typecast}{If \code{TRUE} (default), values will be converted to match the
 base if possible. typecase must be set to \code{TRUE} to add new values to a
@@ -35,10 +40,15 @@ base. Required.}
 \item{parallel}{If \code{TRUE}, use parallel processing for encoding large tables.
 Not currently supported in development version.}
 
+\item{batch_size}{Deprecated. Set using the \code{rairtable.batch_size} option.}
+
 \item{return_json}{If \code{TRUE}, return the response from the Airtable API as
 list. If \code{FALSE} (default), return the input data.frame or list.}
 
-\item{batch_size}{Deprecated. Set using the \code{rairtable.batch_size} option.}
+\item{...}{For \code{\link[=airtable_request]{airtable_request()}}, additional parameters passed to
+\code{\link[=check_airtable_api_url]{check_airtable_api_url()}}. For \code{\link[=req_query_airtable]{req_query_airtable()}}, additional
+parameters passed to \code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
+\code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
 }
 \value{
 A data.frame (invisibly) of the input data, to be stored as an object
@@ -48,7 +58,7 @@ returns the parsed API response from \code{\link[httr2:resp_body_raw]{httr2::res
 \description{
 Create new records in an Airtable table from a data.frame or list. The column
 names and types for the input data must exactly match the column names and
-types in the Airtable table. These fields are not validated before calling
-the API but supplying any other names or types returns a 422 Unprocessable
-Entity error. Supports batch insert.
+types in the Airtable table. Fields are not validated before calling
+the API so supplying any other names or types returns an error.
+\code{\link[=create_records]{create_records()}} and \code{\link[=insert_records]{insert_records()}} are identical.
 }

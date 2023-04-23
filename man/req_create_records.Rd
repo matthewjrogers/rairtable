@@ -6,7 +6,7 @@
 \title{Use httr2 to make a POST request to create records in an Airtable table}
 \usage{
 req_create_records(
-  url = NULL,
+  req = NULL,
   ...,
   data,
   typecast = TRUE,
@@ -15,7 +15,7 @@ req_create_records(
 )
 
 req_create_record(
-  url = NULL,
+  req = NULL,
   data,
   ...,
   typecast = TRUE,
@@ -24,16 +24,20 @@ req_create_record(
 )
 }
 \arguments{
-\item{url}{A URL for an API call or an Airtable view. If url is provided and
+\item{req}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
+\code{\link[=airtable_request]{airtable_request()}}. If .req is provided to \code{\link[=req_query_airtable]{req_query_airtable()}}, url,
+api_url, api_version, and airtable parameters are ignored. req is required
+for \code{\link[=req_auth_airtable]{req_auth_airtable()}}.}
+
+\item{...}{
+  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
+  \describe{
+    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
 is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For
 the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
-
-\item{...}{
-  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
-  \describe{
     \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
 airtable are supplied. base and table are both required if url and airtable
 are \code{NULL}.}
