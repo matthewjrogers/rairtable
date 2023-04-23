@@ -5,8 +5,11 @@
 #' @import rlang
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
+#' @importFrom cli cli_progress_along
+#' @importFrom cli symbol
+#' @importFrom cli pb_bar
+#' @importFrom cli pb_percent
 #' @importFrom glue glue
 #' @importFrom lifecycle deprecated
-#' @importFrom rlang caller_env
 ## usethis namespace: end
 NULL
