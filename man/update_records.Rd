@@ -2,7 +2,7 @@
 % Please edit documentation in R/update_records.R
 \name{update_records}
 \alias{update_records}
-\title{Update Airtable records}
+\title{Update records in an Airtable table}
 \usage{
 update_records(
   data,
@@ -17,19 +17,26 @@ update_records(
 )
 }
 \arguments{
-\item{data}{A data.frame containing the fields to update and, if records is
-\code{NULL}, a column or rownames with record IDs.}
+\item{data}{A \code{data.frame} containing the fields to update. If records is
+\code{NULL}, data must include a column of record IDs (named by airtable_id_col)
+or rownames with record IDs.}
 
-\item{airtable}{An airtable object. Optional if url or base and table are
+\item{airtable}{An \code{airtable} object. Optional if url or base and table are
 provided with additional parameters passed to \code{\link[=airtable_request]{airtable_request()}}.}
 
 \item{airtable_id_col}{Column containing Airtable record IDs. Not required if
 record IDs are stored in row names as returned from \code{\link[=read_airtable]{read_airtable()}}}
 
 \item{columns}{Columns in the data to update on Airtable. Can be a vector of
-character strings, unquoted column names, or a tidyselect helper like
-\code{\link[tidyselect:starts_with]{tidyselect::starts_with()}}, \code{\link[tidyselect:starts_with]{tidyselect::ends_with()}} or
-\code{\link[tidyselect:everything]{tidyselect::everything()}}. Defaults to \code{\link[tidyselect:everything]{tidyselect::everything()}}}
+character strings, unquoted column names, or a tidyselect helper. Defaults
+to \code{\link[tidyselect:everything]{tidyselect::everything()}}. See
+\url{https://tidyselect.r-lib.org/reference/index.html#language-and-helpers}
+for documentation on helpers.}
+
+\item{records}{A character vector of record IDs indicating which Airtable
+records to replace with the updated values from data. Optional if data has
+a record ID column (named by airtable_id_col) or rownames with record IDs.
+Defaults to \code{NULL}.}
 
 \item{safely}{If \code{TRUE}, confirm number and names of columns to update and
 number of rows before executing update.}
@@ -57,10 +64,9 @@ starting with "viw".}
   }}
 }
 \value{
-A data.frame (invisibly) of the input data, to be stored as an object
+A \code{data.frame} (invisibly) of the input data, to be stored as an object
 or piped into further additional functions.
 }
 \description{
-Update one or more columns of data in an Airtable table. Supports batch
-updates and parallel JSON encoding (recommended for large tables).
+Update one or more fields in an Airtable table.
 }

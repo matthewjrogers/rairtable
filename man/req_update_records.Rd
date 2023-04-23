@@ -3,20 +3,21 @@
 \name{req_update_records}
 \alias{req_update_records}
 \alias{req_update_record}
-\title{Update one or more records}
+\title{Update one or more records in an Airtable base}
 \usage{
 req_update_records(
-  url = NULL,
+  req = NULL,
   ...,
   records,
   data,
   typecast = FALSE,
   method = NULL,
+  token = NULL,
   call = caller_env()
 )
 
 req_update_record(
-  url = NULL,
+  req = NULL,
   ...,
   record,
   data,
@@ -26,24 +27,38 @@ req_update_record(
 )
 }
 \arguments{
-\item{url}{A URL for an API call or an Airtable view. If url is provided and
+\item{req}{A HTTP response created by \code{\link[=req_query_airtable]{req_query_airtable()}}. Optional if
+airttable, url, \emph{or} base and table are passed to \code{\link[=airtable_request]{airtable_request()}}.}
+
+\item{...}{
+  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
+  \describe{
+    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
 is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For
 the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
+    \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
+airtable are supplied. base and table are both required if url and airtable
+are \code{NULL}.}
+    \item{\code{table}}{Airtable table id or name. If table is a table ID it is a string
+starting with "viw".}
+    \item{\code{airtable}}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
+must include a request_url attribute. url is ignored if airtable is
+provided.  Optional if url or base \emph{and} table are supplied.}
+  }}
 
-\item{...}{For \code{\link[=airtable_request]{airtable_request()}}, additional parameters passed to
-\code{\link[=check_airtable_api_url]{check_airtable_api_url()}}. For \code{\link[=req_query_airtable]{req_query_airtable()}}, additional
-parameters passed to \code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
-\code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
-
-\item{records, record}{Record ID or IDs to update as a list or character
-vector.}
+\item{records, record}{Record ID or IDs to update as a character vector.
+Required.}
 
 \item{data}{Data to include in body.}
 
 \item{method}{Custom HTTP method}
+
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be
@@ -51,7 +66,8 @@ mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
-https://airtable.com/developers/web/api/update-record
-https://airtable.com/developers/web/api/update-multiple-records
+For more information on the Airtable API, see
+\url{https://airtable.com/developers/web/api/update-record} or
+\url{https://airtable.com/developers/web/api/update-multiple-records}.
 }
 \keyword{internal}
