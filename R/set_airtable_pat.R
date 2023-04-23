@@ -46,7 +46,7 @@ get_airtable_pat <- function(pat = NULL,
 get_airtable_pat_or_key <- function(token = NULL,
                                     default = c("AIRTABLE_PAT", "AIRTABLE_API_KEY"),
                                     call = caller_env()) {
-  rlang::try_fetch(
+  try_fetch(
     get_airtable_pat(token, call = call, default = default[[1]]),
     error = function(cnd) {
       get_airtable_api_key(token, call = call, default = default[[2]])
@@ -74,13 +74,13 @@ set_airtable_token <- function(token,
                                overwrite = FALSE,
                                default = "AIRTABLE_PAT",
                                call = caller_env()) {
-  check_logical(install)
+  check_bool(install, call = call)
 
   if (!install) {
     caller_name <- "set_airtable_token"
-    caller <- rlang::caller_call()
+    caller <- caller_call()
     if (!is.null(caller)) {
-      caller_name <- rlang::call_name(caller)
+      caller_name <- call_name(caller)
     }
 
     cli::cli_bullets(
