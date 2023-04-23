@@ -73,7 +73,7 @@ new_airtable_obj <- function(base,
   }
 
   check_string(base, call = call)
-  check_string(view, allow_null = TRUE, call = call)
+  check_character(view, allow_null = TRUE, call = call)
 
   req <- airtable_request(
     base = base,
