@@ -104,7 +104,7 @@ make_field_array <- function(fields = NULL,
     "fields" = lapply(
       make_field_list(fields, arg = arg, call = call),
       make_field_config
-      )
+    )
   )
 }
 

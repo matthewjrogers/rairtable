@@ -29,7 +29,7 @@ check_airtable_obj <- function(x,
 
   if (!is_airtable_obj(x)) {
     cli_abort(
-    "{.arg airtable} must be an {.cls airtable} object, not a
+      "{.arg airtable} must be an {.cls airtable} object, not a
     {.obj_type_friendly {class(airtable)}}."
     )
   }
