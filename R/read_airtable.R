@@ -1,8 +1,11 @@
-#' Read table from Airtable
+#' Read records from an Airtable table
 #'
-#' Connect to and read values from an Airtable table.
+#' Read records from a single table in an Airtable base.
 #'
-#' @param airtable An airtable class object. Required.
+#' @param airtable An `airtable` class object. Optional for [read_airtable()] if
+#'   url is supplied. For [read_airtable_records()] and
+#'   [read_airtable_record()], support the airtable, url, or a base *and* table
+#'   parameter.
 #' @param fields Character vector with field names or field IDs to return.
 #'   Optional.
 #' @param id_to_col If `TRUE`, the airtable record IDs will be added to the
@@ -12,7 +15,10 @@
 #'   data.frame. Ignored if id_to_col is `TRUE`. Defaults to `NULL` which is set
 #'   to `getOption("rairtable.id_col", "airtable_record_id")`.
 #' @param max_rows Optional maximum number of rows to read. Defaults to `NULL`
-#' @param ... Additional parameters passed to [req_query_airtable()].
+#' @param ... For [read_airtable()], additional parameters passed to
+#'   [req_query_airtable()]. For [read_airtable_records()] and
+#'   [read_airtable_record()], additional parameters passed to
+#'   [airtable_request()].
 #' @inheritParams rlang::args_error_context
 #'
 #' @return A data.frame with the records from the Airtable base and table
@@ -27,7 +33,7 @@ read_airtable <- function(airtable = NULL,
                           fields = NULL,
                           id_to_col = TRUE,
                           airtable_id_col = NULL,
-                          max_rows = NULL,
+                          max_rows = deprecated(),
                           token = NULL,
                           ...) {
   check_airtable_obj(airtable, allow_null = TRUE)
@@ -43,7 +49,7 @@ read_airtable <- function(airtable = NULL,
     getOption("rairtable.id_col", "airtable_record_id")
 
   data <-
-    req_perform_records(
+    req_perform_offset(
       req = .req,
       record_cols = "id",
       record_nm = airtable_id_col
@@ -59,7 +65,7 @@ read_airtable <- function(airtable = NULL,
     )
   }
 
-  check_logical(id_to_col)
+  check_bool(id_to_col)
 
   if (id_to_col) {
     return(data)
@@ -92,9 +98,6 @@ read_airtable <- function(airtable = NULL,
 #' @export
 #' @importFrom httr2 req_url_path_append req_url_query
 read_airtable_records <- function(airtable = NULL,
-                                  url = NULL,
-                                  base = NULL,
-                                  table = NULL,
                                   view = NULL,
                                   sort = NULL,
                                   max_records = 100,
@@ -106,12 +109,11 @@ read_airtable_records <- function(airtable = NULL,
                                   desc = FALSE,
                                   cell_format = NULL,
                                   token = NULL,
-                                  offset = NULL) {
+                                  offset = NULL,
+                                  ...) {
   req <- airtable_request(
-    url = url,
-    base = base,
-    table = table,
-    airtable = airtable
+    airtable = airtable,
+    ...
   )
 
   if (!is.null(sort)) {
@@ -133,8 +135,10 @@ read_airtable_records <- function(airtable = NULL,
     fields_by_id <- NULL
   }
 
+  check_string(view, allow_empty = FALSE, allow_null = TRUE)
+
   req <- req_query_airtable(
-    req,
+    .req = req,
     view = view,
     sort = sort,
     cellFormat = cell_format,
@@ -147,12 +151,12 @@ read_airtable_records <- function(airtable = NULL,
   )
 
   if (!is_null(fields)) {
-    for (field in fields) {
-      req <- httr2::req_url_query(req, field = glue("[{field}]"))
+    for (f in fields) {
+      req <- httr2::req_url_query(req, field = glue("[{f}]"))
     }
   }
 
-  req_perform_records(req, offset = offset)
+  req_perform_offset(req, offset = offset)
 }
 
 #' @rdname read_airtable
@@ -161,25 +165,23 @@ read_airtable_records <- function(airtable = NULL,
 #' @export
 #' @importFrom httr2 req_url_path_append req_perform
 read_airtable_record <- function(airtable = NULL,
-                                 url = NULL,
-                                 base = NULL,
-                                 table = NULL,
                                  record,
                                  airtable_id_col = NULL,
-                                 ...,
-                                 token = NULL) {
+                                 token = NULL,
+                                 ...) {
   req <- airtable_request(
-    url = url,
-    base = base,
-    table = table,
-    airtable = airtable
+    airtable = airtable,
+    ...
   )
 
   check_string(record)
 
-  req <- httr2::req_url_path_append(req, record)
-
-  req <- req_auth_airtable(req, token = token)
+  req <- req_query_airtable(
+    .req = req,
+    template = "/{record}",
+    record = record,
+    token = token
+  )
 
   resp <- httr2::req_perform(req)
 
@@ -188,7 +190,7 @@ read_airtable_record <- function(airtable = NULL,
 
   resp_body_records(
     resp,
-    record_nm = c(airtable_id_col, "createdTime"),
+    record_nm = c(airtable_id_col, "createdTime")
   )
 }
 
@@ -204,13 +206,13 @@ read_airtable_record <- function(airtable = NULL,
 #' @export
 #' @importFrom httr2 req_url_query req_perform
 #' @importFrom tibble as_tibble
-req_perform_records <- function(req,
-                                offset = NULL,
-                                type = "combine",
-                                record_cols = c("id", "createdTime"),
-                                record_nm = record_cols,
-                                max_rows = NULL,
-                                call = caller_env()) {
+req_perform_offset <- function(req,
+                               offset = NULL,
+                               type = "combine",
+                               record_cols = c("id", "createdTime"),
+                               record_nm = record_cols,
+                               max_rows = NULL,
+                               call = caller_env()) {
   max_rows <- max_rows %||% 50000
   check_number_whole(max_rows, max = 50000, call = call)
 
@@ -232,7 +234,8 @@ req_perform_records <- function(req,
         resp,
         type = type,
         record_cols = record_cols,
-        record_nm = record_nm
+        record_nm = record_nm,
+        call = call
       )
 
     if (is_null(body_list[[i]][["offset"]])) {
@@ -250,7 +253,7 @@ req_perform_records <- function(req,
   )
 }
 
-#' @rdname req_perform_records
+#' @rdname req_perform_offset
 #' @name resp_body_records
 #' @param type "combine" (default) combines the fields and records data.frames
 #'   in the response. Additional supported options are "records" and "fields".
@@ -267,10 +270,12 @@ resp_body_records <- function(resp,
                               type = "combine",
                               record_cols = c("id", "createdTime"),
                               record_nm = NULL,
+                              call = caller_env(),
                               ...) {
   body <- httr2::resp_body_json(resp, simplifyVector = simplifyVector)
 
-  type <- match.arg(type, c("records", "fields", "combine"))
+  type <-
+    arg_match0(type, c("records", "fields", "combine"), error_call = call)
 
   if (has_name(body, "records")) {
     # Used by read_airtable and read_airtable_records
@@ -289,6 +294,14 @@ resp_body_records <- function(resp,
       "id" = body[["id"]],
       "createdTime" = body[["createdTime"]]
     )
+
+    if (is_empty(fields)) {
+      fields <- NULL
+      cli::cli_warn(
+        "The supplied {.arg record} is empty.",
+        call = call
+      )
+    }
   }
 
   record_nm <- record_nm %||% names(records)
@@ -299,7 +312,8 @@ resp_body_records <- function(resp,
     "combine" = vctrs::vec_cbind(
       set_names(records, record_nm),
       fields,
-      ...
+      ...,
+      .error_call = call
     )
   )
 }

@@ -4,23 +4,20 @@
 \alias{read_airtable}
 \alias{read_airtable_records}
 \alias{read_airtable_record}
-\title{Read table from Airtable}
+\title{Read records from an Airtable table}
 \usage{
 read_airtable(
   airtable = NULL,
   fields = NULL,
   id_to_col = TRUE,
   airtable_id_col = NULL,
-  max_rows = NULL,
+  max_rows = deprecated(),
   token = NULL,
   ...
 )
 
 read_airtable_records(
   airtable = NULL,
-  url = NULL,
-  base = NULL,
-  table = NULL,
   view = NULL,
   sort = NULL,
   max_records = 100,
@@ -32,22 +29,23 @@ read_airtable_records(
   desc = FALSE,
   cell_format = NULL,
   token = NULL,
-  offset = NULL
+  offset = NULL,
+  ...
 )
 
 read_airtable_record(
   airtable = NULL,
-  url = NULL,
-  base = NULL,
-  table = NULL,
   record,
   airtable_id_col = NULL,
-  ...,
-  token = NULL
+  token = NULL,
+  ...
 )
 }
 \arguments{
-\item{airtable}{An airtable class object. Required.}
+\item{airtable}{An \code{airtable} class object. Optional for \code{\link[=read_airtable]{read_airtable()}} if
+url is supplied. For \code{\link[=read_airtable_records]{read_airtable_records()}} and
+\code{\link[=read_airtable_record]{read_airtable_record()}}, support the airtable, url, or a base \emph{and} table
+parameter.}
 
 \item{fields}{Fields to return from Airtable base, Default: \code{NULL}}
 
@@ -65,21 +63,10 @@ to \code{getOption("rairtable.id_col", "airtable_record_id")}.}
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{Additional parameters passed to \code{\link[=req_query_airtable]{req_query_airtable()}}.}
-
-\item{url}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
-is optional if airtable \emph{or} base and table are supplied. If url is an
-Airtable view, any additional base or table values provided are ignored. If
-airtable is provided, any additional value provided to url is ignored. For
-the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
-
-\item{base}{Airtable base id starting with with "app". Optional if url or
-airtable are supplied. base and table are both required if url and airtable
-are \code{NULL}.}
-
-\item{table}{Airtable table id or name. If table is a table ID it is a string
-starting with "viw".}
+\item{...}{For \code{\link[=read_airtable]{read_airtable()}}, additional parameters passed to
+\code{\link[=req_query_airtable]{req_query_airtable()}}. For \code{\link[=read_airtable_records]{read_airtable_records()}} and
+\code{\link[=read_airtable_record]{read_airtable_record()}}, additional parameters passed to
+\code{\link[=airtable_request]{airtable_request()}}.}
 
 \item{view}{Airtable view ID, Default: \code{NULL}}
 
@@ -109,5 +96,5 @@ A data.frame with the records from the Airtable base and table
 provided by the airtable parameter.
 }
 \description{
-Connect to and read values from an Airtable table.
+Read records from a single table in an Airtable base.
 }
