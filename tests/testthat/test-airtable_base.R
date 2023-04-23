@@ -1,18 +1,19 @@
 test_that("airtable_base works", {
   skip_if_no_pat()
+  url <- get_rairtable_test_url()
+  ids <- parse_airtable_url(url)
 
-  withr::with_envvar(
-    get_rairtable_test_args(),
-    {
-      expect_error(
-        airtable_base()
-      )
-      base <- Sys.getenv("rairtable.test_base")
-      skip_if(is_null(base))
-      expect_type(
-        airtable_base(base),
-        "environment"
-      )
-    }
+  expect_error(
+    airtable_base()
+  )
+
+  expect_type(
+    airtable_base(ids$base),
+    "environment"
+  )
+
+  expect_s3_class(
+    list_airtable_bases(),
+    "data.frame"
   )
 })

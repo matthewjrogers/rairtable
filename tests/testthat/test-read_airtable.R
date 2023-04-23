@@ -1,27 +1,35 @@
 test_that("read_airtable works", {
   skip_if_no_pat()
 
-  withr::with_envvar(
-    get_rairtable_test_args(),
-    {
-      atbl <- get_rairtable_test_obj()
+  atbl <- get_rairtable_test_obj()
 
-      expect_error(
-        read_airtable()
-      )
+  expect_error(
+    read_airtable()
+  )
 
-      skip_if(is_null(atbl))
-      expect_error(
-        read_airtable(atbl, id_to_col = "")
-      )
-      expect_error(
-        read_airtable(atbl, max_rows = 50001)
-      )
+  expect_error(
+    read_airtable(atbl, id_to_col = "")
+  )
 
-      expect_s3_class(
-        read_airtable(atbl),
-        "data.frame"
-      )
-    }
+  atbl_df <- read_airtable(atbl)
+
+  expect_s3_class(
+    atbl_df,
+    "data.frame"
+  )
+
+  record_df <- read_airtable_records(atbl)
+
+  expect_s3_class(
+    record_df,
+    "data.frame"
+  )
+
+  expect_s3_class(
+  read_airtable_record(
+    atbl,
+    record = atbl_df[1,][[getOption("rairtable.id_col", "airtable_record_id")]]
+    ),
+  "data.frame"
   )
 })

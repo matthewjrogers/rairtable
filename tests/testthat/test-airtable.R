@@ -1,26 +1,30 @@
 test_that("airtable works", {
-  withr::with_envvar(
-    get_rairtable_test_args(),
-    {
-      table = Sys.getenv("rairtable.test_table")
-      base = Sys.getenv("rairtable.test_base")
-      view = Sys.getenv("rairtable.test_view")
+  url <- get_rairtable_test_url()
+  ids <- parse_airtable_url(url)
 
-      expect_error(airtable())
-      expect_error(
-        airtable(table = table)
-      )
-      expect_error(
-        airtable(table = c(table, "extra_table"), base = base)
-      )
+  expect_error(airtable())
 
-      skip_if(is_null(base) | is_null(table))
-      expect_s3_class(
-        airtable(
-          table = table,
-          base = base
-        ),
-        "airtable"
-      )
-      })
+  expect_error(
+    airtable(table = ids$table)
+  )
+  expect_error(
+    airtable(table = c(ids$table, "extra_table"), base = ids$base)
+  )
+
+  skip_if_no_pat()
+  expect_s3_class(
+    airtable(
+      table = table,
+      base = base
+    ),
+    "airtable"
+  )
+
+  expect_s3_class(
+    airtable(
+      table = url,
+      base = base
+    ),
+    "airtable"
+  )
 })
