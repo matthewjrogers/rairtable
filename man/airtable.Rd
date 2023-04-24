@@ -9,6 +9,8 @@ airtable(
   base = NULL,
   view = NULL,
   fields = list(),
+  name = NULL,
+  description = NULL,
   api_url = NULL,
   api_version = NULL,
   token = NULL,
@@ -19,7 +21,10 @@ airtable(
 \item{table}{Airtable table ID or name. Table ID values start with "tbl". If
 table is an Airtable URL matching the pattern
 "https://airtable.com/{baseID}/{tableIdOrName}/{viewId}" the URL is parsed
-to supply the values for base and table.}
+to supply the values for base and table. If table is a named list with the
+names "id", "name", and "description", the value for id is used as the
+value of table and name and description are passed to the respective
+parameters.}
 
 \item{base}{Airtable base ID. Base ID values start with "app". Optional if
 table is a URL containing a base ID or required otherwise.}
@@ -28,6 +33,11 @@ table is a URL containing a base ID or required otherwise.}
 
 \item{fields}{An optional \code{airtable_fields_schema} object. Automatically
 populated in tables created by \code{airtable_base()}.}
+
+\item{name, description}{Airtable table name and base name/description.
+Optional. Base name is set by \code{\link[=list_airtable_bases]{list_airtable_bases()}} but name remains
+blank if not supplied. These parameters are only used when printing
+airtable objects.}
 
 \item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
 \code{getOption("rairtable.api_url", "https://api.airtable.com")}.}

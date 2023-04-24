@@ -24,7 +24,7 @@ NULL
 #'   "https://api.airtable.com/v0/{baseId}/{tableIdOrName}" or
 #'   "https://airtable.com/{baseID}/{tableIdOrName}/{viewId}"
 #' @param base_url Base URL for an Airtable base or view. Defaults `NULL` and
-#'   set to `getOption("rairtable.base_url", "https://airtable.com/")`.
+#'   set to `getOption("rairtable.base_url", "https://airtable.com")`.
 #' @export
 is_airtable_url <- function(url, base_url = NULL) {
   if (is_null(url)) {
@@ -32,7 +32,7 @@ is_airtable_url <- function(url, base_url = NULL) {
   }
 
   base_url <- base_url %||%
-    getOption("rairtable.base_url", "https://airtable.com/")
+    getOption("rairtable.base_url", "https://airtable.com")
 
   is_url(url) & grepl(glue("^{base_url}"), url)
 }
@@ -152,18 +152,18 @@ parse_airtable_url <- function(url,
                                view_name = NULL,
                                call = caller_env()) {
   base_url <- base_url %||%
-    getOption("rairtable.base_url", "https://airtable.com/")
+    getOption("rairtable.base_url", "https://airtable.com")
 
-  base_pattern <- glue("(?<={base_url})app[[:alnum:]]+(?=/)")
+  base_pattern <- glue("(?<={base_url}/)app[[:alnum:]]+(?=/)")
 
   if (!is_airtable_url(url, base_url)) {
     api_url <- api_url %||%
-      getOption("rairtable.api_url", "https://api.airtable.com/")
+      getOption("rairtable.api_url", "https://api.airtable.com")
     api_version <- api_version %||%
       getOption("rairtable.api_version", "0")
 
     base_pattern <- glue(
-      "(?<={api_url}v{api_version}/)",
+      "(?<={api_url}/v{api_version}/)",
       "app[[:alnum:]]+(?=/)"
     )
   }

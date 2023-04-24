@@ -22,6 +22,9 @@ The rairtable package uses [httr2::req_user_agent()] to pass a User-Agent header
 
 The default value for `rairtable.safely` (`TRUE`) requires user confirmation every time the user deletes, modifies, or creates records for Airtable. This can be modified using the `rairtable.safely` option.
 
+### `rairtable.fields-trunc`
+
+This option is passed to the style parameter of [cli::cli_vec()] to determine the number of fields printed for `airtable` and `airtable_table_schema` objects. Option defaults to 6.
 
 ## API-specific environment variables
 

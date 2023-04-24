@@ -40,6 +40,19 @@ split_list <- function(x,
   )
 }
 
+#' Set list names optionally using an attribute from each item in the list
+#'
+#' @noRd
+set_list_names <- function(x, nm = NULL, at = "name") {
+  nm <- nm %||% names_at(x, at)
+  set_names(x, nm)
+}
+
+#' @noRd
+names_at <- function(x, at = "name") {
+  vapply(x, function(x) {x[[at]]}, NA_character_)
+}
+
 #' Check if object is a list
 #'
 #' @noRd

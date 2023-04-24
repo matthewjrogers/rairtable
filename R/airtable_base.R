@@ -52,28 +52,83 @@ airtable_base <- function(base = NULL,
     return(tibble::as_tibble(body[["tables"]]))
   }
 
+  base <- get_airtable_base(
+    base = base,
+    ...,
+    call = call
+  )
+
+
   body <- httr2::resp_body_json(resp)
-  schema <- body[[1]]
+  base_schema <- body[["tables"]]
 
-  class(schema) <- "airtable_base_schema"
+  base_schema <- vctrs::new_vctr(
+    .data = set_list_names(base_schema, at = "name"),
+    class = "airtable_base_schema"
+  )
 
-  for (i in seq_along(schema)) {
-    class(schema[[i]]) <- "airtable_table_schema"
-    class(schema[[i]]$fields) <- "airtable_fields_schema"
+  for (tbl in seq_along(base_schema)) {
+    base_schema[[tbl]] <-
+      vctrs::new_vctr(
+        .data = base_schema[[tbl]],
+        class = "airtable_table_schema"
+      )
+
+    base_schema[[tbl]][["fields"]] <-
+      vctrs::new_vctr(
+        .data = set_list_names(base_schema[[tbl]][["fields"]], at = "name"),
+        class = "airtable_fields_schema"
+      )
   }
 
-  base_meta <- new.env()
-  base_meta[["schema"]] <- schema
-  for (table in schema) {
-    base_meta[[table$name]] <- airtable(
-      table = table[["name"]],
-      base = base,
-      fields = table[["fields"]],
-      require_url = FALSE
+  list(
+    "base" = base,
+    "schema" = base_schema,
+    "tables" = map(
+      base_schema,
+      function(tbl) {
+        airtable(
+          table = list(
+            "id" = tbl[["id"]],
+            "name" = tbl[["name"]],
+            "description" = tbl[["description"]]
+          ),
+          fields = as.list(names(tbl[["fields"]])),
+          base = base
+        )
+      }
     )
-  }
+  )
+}
 
-  base_meta
+#' @export
+format.airtable_base_schema <- function(x, ...) {
+  formatC(vctrs::vec_data(x))
+}
+
+#' @export
+vec_ptype_full.airtable_base_schema <- function(x, ...) {
+  "airtable_base_schema"
+}
+
+#' @export
+format.airtable_table_schema <- function(x, ...) {
+  formatC(vctrs::vec_data(x))
+}
+
+#' @export
+vec_ptype_full.airtable_table_schema <- function(x, ...) {
+  "airtable_table_schema"
+}
+
+#' @export
+format.airtable_fields_schema <- function(x, ...) {
+  formatC(vctrs::vec_data(x))
+}
+
+#' @export
+vec_ptype_full.airtable_fields_schema <- function(x, ...) {
+  "airtable_fields_schema"
 }
 
 #' @rdname airtable_base
@@ -105,4 +160,22 @@ list_airtable_bases <- function(...,
   check_string(base, allow_empty = FALSE)
 
   bases[base == bases[["id"]], ]
+}
+
+#' @export
+print.airtable_table_schema <- function(x, ...) {
+  fields <- cli::cli_vec(
+    names_at(x$fields),
+    list("vec-trunc" = getOption("rairtable.fields-trunc", 6))
+  )
+
+  cli::cli_bullets(
+    c(
+      "*" = "Table: {.val {x$name}} / {.field {x$id}}",
+      "*" = "Primary Field ID: {.field {x$primaryFieldId}}",
+      "*" = "{length(x$fields)} field{?s} including {.field {fields}}."
+    )
+  )
+
+  invisible(x)
 }

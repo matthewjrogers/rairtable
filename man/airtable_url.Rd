@@ -40,7 +40,7 @@ parse_airtable_url(
 "https://airtable.com/{baseID}/{tableIdOrName}/{viewId}"}
 
 \item{base_url}{Base URL for an Airtable base or view. Defaults \code{NULL} and
-set to \code{getOption("rairtable.base_url", "https://airtable.com/")}.}
+set to \code{getOption("rairtable.base_url", "https://airtable.com")}.}
 
 \item{api_url}{Expected base URL for an API url. Defaults to \code{NULL} and set
 to \code{getOption("rairtable.api_url", "https://api.airtable.com")}.}

@@ -26,6 +26,11 @@ The rairtable package uses \code{\link[httr2:req_user_agent]{httr2::req_user_age
 The default value for \code{rairtable.safely} (\code{TRUE}) requires user confirmation every time the user deletes, modifies, or creates records for Airtable. This can be modified using the \code{rairtable.safely} option.
 }
 
+\subsection{\code{rairtable.fields-trunc}}{
+
+This option is passed to the style parameter of \code{\link[cli:cli_vec]{cli::cli_vec()}} to determine the number of fields printed for \code{airtable} and \code{airtable_table_schema} objects. Option defaults to 6.
+}
+
 }
 
 \subsection{API-specific environment variables}{
