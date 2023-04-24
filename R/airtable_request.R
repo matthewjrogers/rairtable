@@ -74,7 +74,7 @@ airtable_request <- function(url = NULL,
 
   if (is_airtable_url(url)) {
     ids <- parse_airtable_url(url, ...)
-    if (!is_null(base) | !is_null(table)) {
+    if (!is_empty(base) || !is_empty(table)) {
       cli::cli_alert_warning(
         "Any supplied {.arg base} and {.arg table} values are ignored when
         {.arg url} is an Airtable view."
@@ -97,12 +97,12 @@ airtable_request <- function(url = NULL,
 
   req <- httr2::req_url_path_append(req, paste0("v", api_version))
 
-  if (!is_null(base)) {
+  if (!is_empty(base)) {
     check_string(base, call = call)
     req <- httr2::req_url_path_append(req, base)
   }
 
-  if (!is_null(table)) {
+  if (!is_empty(table)) {
     check_string(table, call = call)
     req <- httr2::req_url_path_append(req, table)
   }
@@ -234,7 +234,7 @@ airtable_error_body <- function(resp) {
   if (has_name(error, "message")) {
     c(
       error[["message"]],
-      "More information on API errors: <https://airtable.com/developers/web/api/errors>"
+      "More information: <https://airtable.com/developers/web/api/errors>"
     )
   } else {
     error

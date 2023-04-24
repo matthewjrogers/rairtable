@@ -77,7 +77,7 @@ req_airtable_schema <- function(url = NULL,
   }
 
   if (column_required) {
-    if (is_null(column)) {
+    if (is_empty(column)) {
       cli_abort(
         "{.arg column} must be supplied to update fields.",
         call = call
