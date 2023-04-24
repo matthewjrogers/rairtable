@@ -13,3 +13,10 @@
 #' @importFrom lifecycle deprecated
 ## usethis namespace: end
 NULL
+
+#' Internal vctrs methods
+#'
+#' @import vctrs
+#' @keywords internal
+#' @name rairtable-vctrs
+NULL

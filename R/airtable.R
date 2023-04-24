@@ -85,32 +85,72 @@ new_airtable_obj <- function(base,
 
   base_info <- list_airtable_bases(
     base = base,
-    call = call,
-    token = token
+    token = token,
+    call = call
   )
 
+  name <- base_info[["name"]]
+  permissions <- base_info[["permissionLevel"]]
+  base_url <- getOption("rairtable.base_url", "https://airtable.com/")
+  table_url <- as.character(glue("{base_url}{base}/{table}"))
+  request_url <- req[["url"]]
+
   vctrs::new_vctr(
-    .data = list(
-      "base" = base,
-      "table" = table,
-      "view" = view,
-      "fields" = fields %||% list(),
-      "name" = base_info[["name"]],
-      "permissions" = base_info[["permissionLevel"]],
-      "request_url" = req[["url"]]
+    .data = vctrs::list_drop_empty(
+      list(
+        "name" = name,
+        "base" = base,
+        "table" = table,
+        "view" = view %||% list(),
+        "fields" = fields %||% list(),
+        "permissions" = permissions,
+        "table_url" = table_url,
+        "request_url" = request_url
+      )
     ),
     class = "airtable"
   )
 }
 
-#' print method for an airtable object
-#'
-#' @keywords internal
+#' @export
+format.airtable <- function(x, ...) {
+  formatC(vctrs::vec_data(x))
+}
+
+#' @export
+vec_ptype_abbr.airtable <- function(x, ...) {
+  "atbl"
+}
+
+#' @export
+vec_ptype_full.airtable <- function(x, ...) {
+  "airtable"
+}
+
 #' @export
 print.airtable <- function(x, ...) {
-  cat("Table: ", x[["table"]], "\n", sep = "")
-  if (!is.null(x[["view"]])) {
-    cat("   View: ", x[["view"]], "\n", sep = "")
+  cli::cli_text("{.cls {class(x)}}")
+
+  if (!is_empty(x$name)) {
+    cli::cli_text("{cli::symbol$line} {.val {x$name}}")
   }
-  cat("   Base: ", x[["base"]], "\n", sep = "")
+
+  cli::cli_rule("{.url {x$table_url}}")
+
+  text <- "Base: {.field {x$base}}"
+
+  if (!is_empty(x$table)) {
+    text <- c(text, "Table: {.field {x$table}}")
+  }
+
+  if (!is_empty(x$view)) {
+    text <- c(text, "View: {.field {x$view}}")
+  }
+
+  if (!is_empty(x$fields)) {
+    text <- c(text, "Fields: {.field {x$fields}}")
+  }
+
+  cli::cli_bullets(text)
+  invisible(x)
 }
