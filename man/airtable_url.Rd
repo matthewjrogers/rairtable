@@ -13,7 +13,12 @@ is_airtable_url(url, base_url = NULL)
 
 is_airtable_api_url(url, api_url = NULL)
 
-check_airtable_url(url, base_url = NULL, call = caller_env())
+check_airtable_url(
+  url,
+  base_url = NULL,
+  allow_null = FALSE,
+  call = caller_env()
+)
 
 check_airtable_api_url(
   url,

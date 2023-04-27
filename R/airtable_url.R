@@ -60,10 +60,11 @@ is_airtable_api_url <- function(url,
 #' @export
 check_airtable_url <- function(url,
                                base_url = NULL,
+                               allow_null = FALSE,
                                call = caller_env()) {
-  check_string(url, call = call)
+  check_string(url, allow_null = allow_null, call = call)
 
-  if (is_airtable_url(url, base_url)) {
+  if (is_airtable_url(url, base_url) || (is_null(url) && allow_null)) {
     return(invisible(NULL))
   }
 
@@ -151,6 +152,8 @@ parse_airtable_url <- function(url,
                                table_name = NULL,
                                view_name = NULL,
                                call = caller_env()) {
+  check_airtable_url(url, call = call)
+
   base_url <- base_url %||%
     getOption("rairtable.base_url", "https://airtable.com")
 
