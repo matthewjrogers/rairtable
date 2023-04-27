@@ -101,36 +101,6 @@ airtable_base <- function(base = NULL,
   )
 }
 
-#' @export
-format.airtable_base_schema <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
-}
-
-#' @export
-vec_ptype_full.airtable_base_schema <- function(x, ...) {
-  "airtable_base_schema"
-}
-
-#' @export
-format.airtable_table_schema <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
-}
-
-#' @export
-vec_ptype_full.airtable_table_schema <- function(x, ...) {
-  "airtable_table_schema"
-}
-
-#' @export
-format.airtable_fields_schema <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
-}
-
-#' @export
-vec_ptype_full.airtable_fields_schema <- function(x, ...) {
-  "airtable_fields_schema"
-}
-
 #' @rdname airtable_base
 #' @name list_airtable_bases
 #' @param base A character vector of base id values. If supplied to
@@ -163,7 +133,57 @@ list_airtable_bases <- function(...,
 }
 
 #' @export
+format.airtable_base_schema <- function(x, ...) {
+  formatC(vctrs::vec_data(x))
+}
+
+#' @export
+vec_ptype_abbr.airtable_base_schema <- function(x, ...) {
+  "atbl_app"
+}
+
+#' @export
+vec_ptype_full.airtable_base_schema <- function(x, ...) {
+  "airtable_base_schema"
+}
+
+#' @export
+print.airtable_base_schema <- function(x, ...) {
+  cli::cli_text("{.cls {class(x)}}")
+
+  n_tbls <- length(x)
+  cli::cli_text("{cli::symbol$line} {n_tbls} table{?s}:")
+
+  cli::cli_bullets(
+    set_names(
+      paste0("{.value ", names_at(x, "name"), "} - {.field ", names_at(x, "id"), "}"),
+      rep_len("*", n_tbls)
+    )
+  )
+
+  invisible(x)
+}
+
+#' @export
+format.airtable_table_schema <- function(x, ...) {
+  formatC(vctrs::vec_data(x))
+}
+
+#' @export
+vec_ptype_abbr.airtable_table_schema <- function(x, ...) {
+  "atbl_tbl"
+}
+
+#' @export
+vec_ptype_full.airtable_table_schema <- function(x, ...) {
+  "airtable_table_schema"
+}
+
+
+#' @export
 print.airtable_table_schema <- function(x, ...) {
+  cli::cli_text("{.cls {class(x)}}")
+
   fields <- cli::cli_vec(
     names_at(x$fields),
     list("vec-trunc" = getOption("rairtable.fields-trunc", 6))
@@ -171,11 +191,41 @@ print.airtable_table_schema <- function(x, ...) {
 
   cli::cli_bullets(
     c(
-      "*" = "Table: {.val {x$name}} / {.field {x$id}}",
+      "*" = "Table: {.val {x$name}} - {.field {x$id}}",
       "*" = "Primary Field ID: {.field {x$primaryFieldId}}",
       "*" = "{length(x$fields)} field{?s} including {.field {fields}}."
     )
   )
 
+  invisible(x)
+}
+
+#' @export
+format.airtable_fields_schema <- function(x, ...) {
+  formatC(vctrs::vec_data(x))
+}
+
+#' @export
+vec_ptype_abbr.airtable_fields_schema <- function(x, ...) {
+  "atbl_fld"
+}
+
+#' @export
+vec_ptype_full.airtable_fields_schema <- function(x, ...) {
+  "airtable_fields_schema"
+}
+
+#' @export
+print.airtable_fields_schema <- function(x, ...) {
+  cli::cli_text("{.cls {class(x)}}")
+
+  n_fields <- length(x)
+  cli::cli_text("{cli::symbol$line} {n_fields} field{?s}:")
+  cli::cli_bullets(
+    set_names(
+      paste0("{.field ", names_at(x, "name"), "} - {.code ", names_at(x, "type"), "}"),
+      rep_len("*", n_fields)
+    )
+  )
   invisible(x)
 }

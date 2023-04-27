@@ -157,13 +157,13 @@ vec_ptype_full.airtable <- function(x, ...) {
 #' @importFrom cli cli_text cli_rule cli_bullets
 print.airtable <- function(x, ...) {
   cli::cli_text("{.cls {class(x)}}")
-  cli::cli_text("{cli::symbol$line} Base: {.val {x$description}} / {.field {x$base}}")
+  cli::cli_text("{cli::symbol$line} Base: {.val {x$description}} - {.field {x$base}}")
 
   text <- NULL
   if (!is_empty(x$table)) {
     text <- c("*" = "Table: {.field {x$table}}")
     if (!is_empty(x$name)) {
-      text <- c("*" = "Table: {.val {x$name}} / {.field {x$table}}")
+      text <- c("*" = "Table: {.val {x$name}} - {.field {x$table}}")
     }
   }
 
