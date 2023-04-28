@@ -56,6 +56,9 @@ is_airtable_api_url <- function(url,
 
 #' @rdname airtable_url
 #' @name check_airtable_url
+#' @param allow_null If `FALSE` (default) and url is `NULL`,
+#'   [check_airtable_url()] errors. If `TRUE`, a `NULL` value for url is
+#'   allowed.
 #' @inheritParams rlang::args_error_context
 #' @export
 check_airtable_url <- function(url,
