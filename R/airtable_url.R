@@ -77,6 +77,24 @@ check_airtable_url <- function(url,
   )
 }
 
+#' Check is a URL is valid
+#'
+#' @noRd
+check_url <- function(url,
+                      allow_null = FALSE,
+                      call = caller_env()) {
+  check_string(url, allow_null = allow_null, call = call)
+
+  if (is_url(url) || (is_null(url) && allow_null)) {
+    return(invisible(NULL))
+  }
+
+  cli_abort(
+    "{.arg url} must be a valid url.",
+    call = call
+  )
+}
+
 #' @rdname airtable_url
 #' @name check_airtable_api_url
 #' @param require_base If `TRUE` (default), the string "app" must be included in
