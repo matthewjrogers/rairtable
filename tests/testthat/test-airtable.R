@@ -14,8 +14,8 @@ test_that("airtable works", {
   skip_if_no_pat()
   expect_s3_class(
     airtable(
-      table = table,
-      base = base
+      table = ids$table,
+      base = ids$base
     ),
     "airtable"
   )
@@ -23,7 +23,7 @@ test_that("airtable works", {
   expect_s3_class(
     airtable(
       table = url,
-      base = base
+      base = ids$base
     ),
     "airtable"
   )
