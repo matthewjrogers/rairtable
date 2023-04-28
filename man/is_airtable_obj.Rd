@@ -35,6 +35,10 @@ for a view being present in the URL.}
 \item{require_fields}{If \code{TRUE}, check that x includes a "fields" value that
 is a list with the \code{airtable_fields_schema} class. Defaults to \code{FALSE}.}
 
+\item{allow_null}{If \code{FALSE} (default) and url is \code{NULL},
+\code{\link[=check_airtable_url]{check_airtable_url()}} errors. If \code{TRUE}, a \code{NULL} value for url is
+allowed.}
+
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
