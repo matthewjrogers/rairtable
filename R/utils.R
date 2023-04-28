@@ -19,6 +19,7 @@ map <- function(.x, .f, ...) {
 split_list <- function(x,
                        batch_size = NULL,
                        arg = caller_arg(x),
+                       parallel = FALSE,
                        call = caller_env()) {
   check_required(x, arg = arg)
 
@@ -27,7 +28,7 @@ split_list <- function(x,
 
   check_number_whole(batch_size, call = call)
 
-  mapply(
+  par_mapply(
     FUN = function(a, b) {
       x[a:b]
     },
@@ -36,7 +37,8 @@ split_list <- function(x,
       seq.int(from = 1, to = length(x), by = batch_size) + (batch_size - 1),
       length(x)
     ),
-    SIMPLIFY = FALSE
+    parallel = parallel,
+    call = call
   )
 }
 

@@ -21,7 +21,6 @@
 #' @param safely If `TRUE`, confirm number and names of columns to update and
 #'   number of rows before executing update.
 #' @param parallel If `TRUE` use parallel processing for encoding large tables.
-#'   Currently not implemented in development version.
 #' @param return_json If `TRUE`, return JSON repsponse from the Airtable web API
 #'   as a list. If `FALSE` (default), return input data.
 #' @inheritDotParams airtable_request -api_url -api_version -call
@@ -75,7 +74,8 @@ update_records <- function(data,
     airtable = airtable,
     ...,
     records = records,
-    data = update_data
+    data = update_data,
+    parallel = parallel
   )
 
   cli::cli_alert_success("{n_records} record{?s} updated.")
@@ -104,6 +104,7 @@ update_records <- function(data,
 #' @inheritParams req_query_airtable
 #' @param records,record Record ID or IDs to update as a character vector.
 #'   Required.
+#' @param parallel If `TRUE`, use parallel processing for encoding large tables.
 #' @keywords internal
 #' @export
 #' @importFrom httr2 req_body_json req_perform
@@ -114,6 +115,7 @@ req_update_records <- function(req = NULL,
                                typecast = FALSE,
                                method = NULL,
                                token = NULL,
+                               parallel = FALSE,
                                call = caller_env()) {
   method <- match.arg(method, c("PATCH", "PUT"))
 
@@ -143,7 +145,7 @@ req_update_records <- function(req = NULL,
     return(resp)
   }
 
-  data <- make_field_list(data, call = call)
+  data <- make_field_list(data, parallel = parallel, call = call)
 
   if (n_records > batch_size) {
     resp <-
@@ -153,6 +155,7 @@ req_update_records <- function(req = NULL,
         batch_size = batch_size,
         req = req,
         typecast = typecast,
+        parallel = parallel,
         call = call
       )
 
@@ -161,7 +164,10 @@ req_update_records <- function(req = NULL,
 
   req <- httr2::req_body_json(
     req,
-    data = list("fields" = make_field_list(data, 1), "typecast" = typecast)
+    data = list(
+      "fields" = make_field_list(data, 1, parallel = parallel, call = call),
+      "typecast" = typecast
+      )
   )
 
   httr2::req_perform(req)
@@ -177,6 +183,7 @@ req_update_record <- function(req = NULL,
                               data,
                               typecast = FALSE,
                               method = NULL,
+                              parallel = FALSE,
                               call = caller_env()) {
   method <- match.arg(method, c("PATCH", "PUT"))
 
@@ -184,7 +191,12 @@ req_update_record <- function(req = NULL,
 
   check_string(record, allow_empty = FALSE, call = call)
 
-  data <- list("fields" = make_field_list(data, max_rows = 1)[[1]])
+  data <- list(
+    "fields" = make_field_list(
+      data, max_rows = 1,
+      parallel = parallel, call = call
+      )[[1]]
+    )
 
   req <- req_query_airtable(
     .req = req,
@@ -208,12 +220,16 @@ batch_update_records <- function(req,
                                  batch_size = NULL,
                                  typecast = FALSE,
                                  action = "Updating records",
+                                 parallel = FALSE,
                                  call = caller_env()) {
   batch_size <- batch_size %||%
     as.integer(getOption("rairtable.batch_size", 10))
 
-  batched_records <- split_list(records, batch_size, call = call)
-  batched_data <- split_list(data, batch_size, call = call)
+  batched_records <-
+    split_list(records, batch_size, parallel = parallel, call = call)
+
+  batched_data <-
+    split_list(data, batch_size, parallel = parallel, call = call)
 
   format <-
     "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
@@ -228,6 +244,7 @@ batch_update_records <- function(req,
       records = batched_records[[.x]],
       data = batched_data[[.x]],
       typecast = typecast,
+      parallel = parallel,
       call = call
     )
   )

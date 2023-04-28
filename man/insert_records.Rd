@@ -37,8 +37,7 @@ base if possible. typecase must be set to \code{TRUE} to add new values to a
 multiselect field type.
 base. Required.}
 
-\item{parallel}{If \code{TRUE}, use parallel processing for encoding large tables.
-Not currently supported in development version.}
+\item{parallel}{If \code{TRUE}, use parallel processing for encoding large tables.}
 
 \item{batch_size}{Deprecated. Set using the \code{rairtable.batch_size} option.}
 

@@ -11,6 +11,7 @@ req_create_records(
   data,
   typecast = TRUE,
   token = NULL,
+  parallel = FALSE,
   call = caller_env()
 )
 
@@ -60,6 +61,8 @@ base. Required.}
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{parallel}{If \code{TRUE}, use parallel processing for encoding large tables.}
 
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be

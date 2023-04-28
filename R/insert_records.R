@@ -11,8 +11,6 @@
 #' @inheritParams req_create_record
 #' @param return_json If `TRUE`, return the response from the Airtable API as
 #'   list. If `FALSE` (default), return the input data.frame or list.
-#' @param parallel If `TRUE`, use parallel processing for encoding large tables.
-#'   Not currently supported in development version.
 #' @param batch_size Deprecated. Set using the `rairtable.batch_size` option.
 #' @return A data.frame (invisibly) of the input data, to be stored as an object
 #'   or piped into additional functions or, if as_json is `TRUE`, the function
@@ -26,11 +24,6 @@ insert_records <- function(data,
                            batch_size = deprecated(),
                            return_json = FALSE,
                            ...) {
-  if (parallel) {
-    cli::cli_warn(
-      "{.arg parallel} is currently not supported in this development version."
-    )
-  }
 
   check_airtable_obj(airtable, allow_null = TRUE)
   check_data_frame(data)
@@ -42,7 +35,8 @@ insert_records <- function(data,
     airtable = airtable,
     ...,
     data = data,
-    typecast = typecast
+    typecast = typecast,
+    parallel = parallel
   )
 
   cli::cli_alert_success("{n_records} record{?s} created.")
