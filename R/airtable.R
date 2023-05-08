@@ -94,7 +94,7 @@ new_airtable_obj <- function(base,
   check_string(base, call = call)
   check_character(view, allow_null = TRUE, call = call)
 
-  req <- airtable_request(
+  req <- airtable_api_url_request(
     base = base,
     table = table,
     api_url = api_url,

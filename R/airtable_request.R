@@ -57,7 +57,9 @@ airtable_request <- function(url = NULL,
                              api_url = NULL,
                              api_version = NULL,
                              call = caller_env()) {
-  if (!is_null(airtable) && is_airtable_obj(airtable)) {
+  if (!is_null(airtable)) {
+    check_airtable_obj(airtable, call = call)
+
     if (!is_null(url)) {
       cli::cli_alert_warning(
         "{.arg url} is ignored when {.arg airtable} is supplied."
@@ -87,6 +89,23 @@ airtable_request <- function(url = NULL,
     table <- ids[["table"]]
   }
 
+  airtable_api_url_request(
+    base = base,
+    table = table,
+    api_url = api_url,
+    api_version = api_version,
+    call = call
+    )
+}
+
+#' Build an Airtable API request when a base and table are supplied
+#'
+#' @noRd
+airtable_api_url_request <- function(base = NULL,
+                                     table = NULL,
+                                     api_url = NULL,
+                                     api_version = NULL,
+                                     call = caller_env()) {
   api_url <- api_url %||%
     getOption("rairtable.api_url", "https://api.airtable.com")
   check_string(api_url, call = call)
@@ -230,6 +249,8 @@ req_auth_airtable <- function(req,
   )
 }
 
+#' Format Airtable API error messages
+#'
 #' @noRd
 airtable_error_body <- function(resp) {
   error <- httr2::resp_body_json(resp)[["error"]]
