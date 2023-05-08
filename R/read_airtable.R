@@ -311,7 +311,7 @@ resp_body_records <- function(resp,
     "fields" = fields,
     "combine" = vctrs::vec_cbind(
       set_names(records, record_nm),
-      fields,
+      as.data.frame(fields),
       ...,
       .error_call = call
     )
