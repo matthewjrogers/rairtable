@@ -11,6 +11,13 @@ test_that("read_airtable works", {
     read_airtable(atbl, id_to_col = "")
   )
 
+  insert_records(
+    data.frame(
+      "Name" = "Test"
+    ),
+    atbl
+  )
+
   atbl_df <- read_airtable(atbl)
 
   expect_s3_class(
@@ -25,11 +32,19 @@ test_that("read_airtable works", {
     "data.frame"
   )
 
+  record <- atbl_df[!is.na(atbl_df$Name), ][[getOption("rairtable.id_col", "airtable_record_id")]]
+
   expect_s3_class(
-  read_airtable_record(
-    atbl,
-    record = atbl_df[1,][[getOption("rairtable.id_col", "airtable_record_id")]]
+    read_airtable_record(
+      atbl,
+      record = record
     ),
-  "data.frame"
+    "data.frame"
+  )
+
+  delete_records(
+    airtable = atbl,
+    records = record,
+    safely = FALSE
   )
 })

@@ -9,7 +9,7 @@ test_that("airtable_base works", {
 
   expect_type(
     airtable_base(ids$base),
-    "environment"
+    "list"
   )
 
   expect_s3_class(
