@@ -4,9 +4,9 @@
 \name{rairtable-package}
 \alias{rairtable}
 \alias{rairtable-package}
-\title{rairtable: Efficient Wrapper for the 'Airtable' API}
+\title{rairtable: Efficient Wrapper for the Airtable Web API}
 \description{
-Efficient CRUD interface for the 'Airtable' API \url{https://airtable.com/developers/web/api}, supporting batch requests and parallel encoding of large data sets.
+Create, read, update, and delete Airtable records or read base metadata using the Airtable Web API.
 }
 \seealso{
 Useful links:
@@ -21,7 +21,7 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Eli Pousson (\href{https://orcid.org/0000-0001-8280-1706}{ORCID}) [contributor]
+  \item Eli Pousson (\href{https://orcid.org/0000-0001-8280-1706}{ORCID})
 }
 
 }

@@ -1,16 +1,15 @@
 Type: Package
 Package: rairtable
-Title: Efficient Wrapper for the 'Airtable' API
+Title: Efficient Wrapper for the Airtable Web API
 Version: 0.1.2
 Authors@R: c(
     person("Matthew", "Rogers", , "matthew.rogers09@gmail.com", role = c("aut", "cre")),
-    person("Eli", "Pousson", role = c("aut", "ctb"),
+    person("Eli", "Pousson", role = "aut",
            comment = c(ORCID = "0000-0001-8280-1706"))
   )
 Maintainer: Matthew Rogers <matthew.rogers09@gmail.com>
-Description: Efficient CRUD interface for the 'Airtable' API
-    <https://airtable.com/developers/web/api>, supporting batch requests
-    and parallel encoding of large data sets.
+Description: Create, read, update, and delete Airtable records or read
+    base metadata using the Airtable Web API.
 License: MIT + file LICENSE
 URL: https://matthewjrogers.github.io/rairtable/
 BugReports: https://github.com/matthewjrogers/rairtable/issues
@@ -23,13 +22,12 @@ Imports:
     tibble,
     tidyselect,
     utils,
-    vctrs
+    vctrs,
+    withr
 Suggests:
     knitr,
-    parallel,
     rmarkdown,
-    testthat (>= 3.0.0),
-    withr
+    testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
