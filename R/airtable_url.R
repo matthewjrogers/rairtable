@@ -66,9 +66,9 @@ check_airtable_url <- function(url,
                                base_url = NULL,
                                allow_null = FALSE,
                                call = caller_env()) {
-  check_string(url, allow_null = allow_null, call = call)
+  check_url(url, allow_null = allow_null, call = call)
 
-  if (is_airtable_url(url, base_url) || (is_null(url) && allow_null)) {
+  if (is_airtable_url(url, base_url) || (allow_null && is_null(url))) {
     return(invisible(NULL))
   }
 
@@ -89,7 +89,7 @@ check_url <- function(url,
                       call = caller_env()) {
   check_string(url, allow_null = allow_null, call = call)
 
-  if (is_url(url) || (is_null(url) && allow_null)) {
+  if (is_url(url) || (allow_null && is_null(url))) {
     return(invisible(NULL))
   }
 
@@ -173,6 +173,8 @@ parse_airtable_url <- function(url,
                                api_version = NULL,
                                table_name = NULL,
                                view_name = NULL,
+                               require_table = FALSE,
+                               require_view = FALSE,
                                call = caller_env()) {
   check_airtable_url(url, call = call)
 
@@ -201,11 +203,54 @@ parse_airtable_url <- function(url,
   check_string(view_name, call = call)
   view_pattern <- glue("(?<=/)(({view_name}(?=/|\\?))|{view_name}$)")
 
-  list(
-    "base" = string_extract(url, base_pattern),
-    "table" = string_extract(url, table_pattern),
-    "view" = string_extract(url, view_pattern)
-  )
+  ids <-
+    list(
+      "base" = string_extract(url, base_pattern),
+      "table" = string_extract(url, table_pattern),
+      "view" = string_extract(url, view_pattern)
+    )
+
+  check_parsed_airtable_url(ids, url, require_table, require_view, call = call)
+
+  ids
+}
+
+#' Does the parsed values from a URL included required IDs?
+#'
+#' @noRd
+check_parsed_airtable_url <- function(ids,
+                                      url,
+                                      require_table = FALSE,
+                                      require_view = FALSE,
+                                      call = caller_env()) {
+  if (is_empty(ids[["base"]])) {
+    cli_abort(
+      c("{.arg url} is not valid.",
+        "i" = "{.arg base} can't be found in {.url {url}}."
+      ),
+      call = call
+    )
+  }
+
+  if (require_table && is_empty(ids[["table"]])) {
+    cli_abort(
+      c("{.arg url} is not valid.",
+        "i" = "{.arg require_table} is `TRUE` and
+        {.arg table} can't be found in {.url {url}}."
+      ),
+      call = call
+    )
+  }
+
+  if (require_view && is_empty(ids[["view"]])) {
+    cli_abort(
+      c("{.arg url} is not valid.",
+        "i" = "{.arg require_view} is `TRUE` and
+        {.arg view} can't be found in {.url {url}}."
+      ),
+      call = call
+    )
+  }
 }
 
 #' Does x match the pattern of a URL?

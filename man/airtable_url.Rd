@@ -36,6 +36,8 @@ parse_airtable_url(
   api_version = NULL,
   table_name = NULL,
   view_name = NULL,
+  require_table = FALSE,
+  require_view = FALSE,
   call = caller_env()
 )
 }

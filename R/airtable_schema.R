@@ -170,6 +170,7 @@ get_airtable_table <- function(table = NULL,
     return(parse_airtable_url(
       table,
       table_name = table_name,
+      require_table = TRUE,
       call = call
     )[["table"]])
   }

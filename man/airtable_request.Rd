@@ -12,9 +12,12 @@ airtable_request(
   table = NULL,
   view = NULL,
   airtable = NULL,
-  ...,
   api_url = NULL,
   api_version = NULL,
+  require_base = TRUE,
+  require_table = TRUE,
+  require_view = FALSE,
+  ...,
   call = caller_env()
 )
 
@@ -63,25 +66,33 @@ starting with "viw".}
 must include a request_url attribute. url is ignored if airtable is
 provided.  Optional if url or base \emph{and} table are supplied.}
 
-\item{...}{
-  Arguments passed on to \code{\link[=check_airtable_api_url]{check_airtable_api_url}}
-  \describe{
-    \item{\code{require_base}}{If \code{TRUE} (default), the string "app" must be included in
-the supplied url.}
-    \item{\code{require_table}}{If \code{TRUE}, the string "tbl" must be included in the
-supplied url. If a string with a table name is provided, the string must be
-part of the string supplied to url. If \code{FALSE} (default), there is no check
-for a table being present in the URL.}
-    \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
-string supplied to url. If \code{FALSE} (default), there is no check
-for a view being present in the URL.}
-  }}
-
 \item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
 \code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
 
 \item{api_version}{Airtable API version number, If \code{NULL} (default), the
 api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
+
+\item{require_base}{If \code{TRUE} (default), the string "app" must be included in
+the supplied url.}
+
+\item{require_table}{If \code{TRUE}, the string "tbl" must be included in the
+supplied url. If a string with a table name is provided, the string must be
+part of the string supplied to url. If \code{FALSE} (default), there is no check
+for a table being present in the URL.}
+
+\item{require_view}{If \code{TRUE}, the string "viw" must be included in the
+string supplied to url. If \code{FALSE} (default), there is no check
+for a view being present in the URL.}
+
+\item{...}{
+  Arguments passed on to \code{\link[=parse_airtable_url]{parse_airtable_url}}
+  \describe{
+    \item{\code{base_url}}{Base URL for an Airtable base or view. Defaults \code{NULL} and
+set to \code{getOption("rairtable.base_url", "https://airtable.com")}.}
+    \item{\code{table_name,view_name}}{Pattern to use when parsing a table name or view
+name. Defaults to \code{NULL} which extracts strings starting with "tbl" for
+tables IDs and "viw" for view IDs.}
+  }}
 
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be

@@ -37,10 +37,12 @@
 #' @param api_version Airtable API version number, If `NULL` (default), the
 #'   api_version is set to `getOption("rairtable.api_version", 0))`.
 #' @param ... For [airtable_request()], additional parameters passed to
-#'   [check_airtable_api_url()]. For [req_query_airtable()], additional
-#'   parameters passed to [httr2::req_template()] if template is not `NULL` or
+#'   [parse_airtable_url()] if an Airtable url is provided. For
+#'   [req_query_airtable()], additional parameters passed to
+#'   [httr2::req_template()] if template is not `NULL` or
 #'   [httr2::req_url_query()] if template is `NULL`.
-#' @inheritDotParams check_airtable_api_url
+#' @inheritParams check_airtable_api_url
+#' @inheritDotParams parse_airtable_url
 #' @inheritParams rlang::args_error_context
 #'
 #' @returns [airtable_request()] returns an HTTP response: an S3 list with class
@@ -54,12 +56,20 @@ airtable_request <- function(url = NULL,
                              table = NULL,
                              view = NULL,
                              airtable = NULL,
-                             ...,
                              api_url = NULL,
                              api_version = NULL,
+                             require_base = TRUE,
+                             require_table = TRUE,
+                             require_view = FALSE,
+                             ...,
                              call = caller_env()) {
   if (!is_null(airtable)) {
-    check_airtable_obj(airtable, call = call)
+    check_airtable_obj(
+      airtable,
+      require_table = require_table,
+      require_view = require_view,
+      call = call
+    )
 
     if (!is_null(url)) {
       cli::cli_alert_warning(
@@ -67,36 +77,42 @@ airtable_request <- function(url = NULL,
       )
     }
 
-    url <- airtable[["request_url"]]
+    return(airtable[["request_url"]])
   }
 
   if (is_airtable_api_url(url)) {
-    check_airtable_api_url(url, ..., api_url = api_url, call = call)
+    check_airtable_api_url(
+      url,
+      require_base = require_base,
+      require_table = require_table,
+      require_view = require_view,
+      api_url = api_url,
+      call = call
+    )
+
     return(httr2::request(url))
   }
 
   if (is_airtable_url(url)) {
-    ids <- parse_airtable_url(url, ...)
-    if (!is_empty(base) || !is_empty(table) || !is_empty(view)) {
+    if (!is_empty(c(base, table, view))) {
       cli::cli_alert_warning(
         "Any {.arg base}, {.arg table}, or {.arg view} values supplied are
         ignored when {.arg url} is an Airtable URL."
       )
     }
 
+    ids <- parse_airtable_url(
+      url,
+      ...,
+      api_url = api_url,
+      require_table = require_table,
+      require_view = require_view,
+      call = call
+    )
+
     base <- ids[["base"]]
     table <- ids[["table"]]
     view <- ids[["view"]]
-
-    if (is_null(base)) {
-      cli_abort(
-        c("{.arg table} is not a valid url.",
-          "i" = "{.arg base} can't be found in {.url {url}}."
-        ),
-        call = call
-      )
-    }
-
     url <- NULL
   }
 
@@ -146,15 +162,15 @@ airtable_api_url_request <- function(base = NULL,
 
   req <- httr2::req_url_path_append(req, paste0("v", api_version))
 
-  req <-
-    req_url_append_if(
-      req, base,
-      allow_empty = FALSE,
-      allow_null = FALSE,
-      call = call
-    )
+  if (!is_empty(base)) {
+    check_string(base, call = call)
+    req <- httr2::req_url_path_append(req, base)
+  }
 
-  req <- req_url_append_if(req, table, call = call)
+  if (!is_empty(table)) {
+    check_string(table, call = call)
+    req <- httr2::req_url_path_append(req, table)
+  }
 
   req_airtable_view(req, view = view, call = call)
 }
@@ -217,36 +233,6 @@ req_query_airtable <- function(.req = NULL,
     string = string,
     allow_key = allow_key
   )
-}
-
-
-#' Conditionally append string to request URL
-#'
-#' @noRd
-#' @importFrom httr2 req_url_path_append
-req_url_append_if <- function(req,
-                              append = NULL,
-                              allow_empty = TRUE,
-                              allow_null = TRUE,
-                              arg = caller_arg(append),
-                              call = caller_env()) {
-  if (allow_null && is_null(append)) {
-    return(req)
-  }
-
-  if (allow_empty && is_empty(append)) {
-    return(req)
-  }
-
-  check_string(
-    append,
-    allow_empty = allow_empty,
-    allow_null = allow_null,
-    arg = arg,
-    call = call
-  )
-
-  httr2::req_url_path_append(req, append)
 }
 
 #' Add view query to URL if view is not already part of the request URL
@@ -332,7 +318,7 @@ airtable_error_body <- function(resp) {
       error[["message"]],
       "More information: <https://airtable.com/developers/web/api/errors>"
     )
-  } else {
-    error
+  } else if (has_name(error, "type")) {
+    error[["type"]]
   }
 }

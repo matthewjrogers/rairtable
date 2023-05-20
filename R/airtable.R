@@ -75,6 +75,7 @@ new_airtable_obj <- function(base,
                              description = NULL,
                              name = NULL,
                              token = NULL,
+                             require_table = TRUE,
                              call = caller_env()) {
   if (is_list(table)) {
     description <- description %||% table[["description"]]
@@ -83,19 +84,16 @@ new_airtable_obj <- function(base,
   }
 
   if (is_airtable_url(table)) {
-    ids <- parse_airtable_url(table, call = call)
+    ids <- parse_airtable_url(
+      table,
+      require_table = require_table,
+      require_view = FALSE,
+      call = call
+      )
+
     base <- ids[["base"]]
     table <- ids[["table"]]
     view <- ids[["view"]]
-
-    if (is_null(base) || is_null(table)) {
-      cli_abort(
-        c("{.arg table} is not a valid url.",
-          "i" = "{.arg base} or {.arg table} can't be found in {.url {url}}"
-        ),
-        call = call
-      )
-    }
   }
 
   check_string(base, call = call)
