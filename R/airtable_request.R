@@ -77,7 +77,7 @@ airtable_request <- function(url = NULL,
       )
     }
 
-    return(airtable[["request_url"]])
+    return(httr2::request(airtable[["request_url"]]))
   }
 
   if (is_airtable_api_url(url)) {
