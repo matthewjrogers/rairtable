@@ -10,6 +10,7 @@ airtable_request(
   url = NULL,
   base = NULL,
   table = NULL,
+  view = NULL,
   airtable = NULL,
   ...,
   api_url = NULL,

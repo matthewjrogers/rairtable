@@ -34,12 +34,20 @@ req_create_records <- function(req = NULL,
   batch_size <- as.integer(getOption("rairtable.batch_size", 10))
 
   if (n_records > batch_size) {
-    resp <- batch_create_records(
-      req = req,
-      data = data,
-      batch_size = batch_size,
-      call = call
-    )
+    batched_data <- split_list(data, call = call)
+
+    resp <-
+      map_action_along(
+        batched_data,
+        function(i) {
+          req_create_records(
+            req = req,
+            data = batched_data[[i]],
+            call = call
+          )
+        },
+        action = "Creating records"
+      )
 
     return(resp)
   }
@@ -54,54 +62,4 @@ req_create_records <- function(req = NULL,
   )
 
   httr2::req_perform(req)
-}
-
-#' @rdname req_create_records
-#' @name req_create_record
-#' @export
-req_create_record <- function(req = NULL,
-                              data,
-                              ...,
-                              typecast = TRUE,
-                              call = caller_env(),
-                              token = NULL) {
-  check_bool(typecast, call = call)
-
-  req <- req_query_airtable(
-    .req = req %||% airtable_request(..., call = call),
-    data = list(
-      "fields" = make_field_list(data, call = call),
-      "typecast" = typecast
-    ),
-    token = token,
-    call = call
-  )
-
-  httr2::req_perform(req)
-}
-
-#' Create records in an Airtable table in batches
-#'
-#' @noRd
-batch_create_records <- function(req,
-                                 data,
-                                 batch_size = NULL,
-                                 action = "Creating records",
-                                 call = caller_env()) {
-  batch_size <- batch_size %||%
-    as.integer(getOption("rairtable.batch_size", 10))
-
-  batched_data <- split_list(data, call = call)
-
-  format <-
-    "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
-
-  map(
-    cli::cli_progress_along(batched_data, format = format),
-    ~ req_create_records(
-      req = req,
-      data = batched_data[[.x]],
-      call = call
-    )
-  )
 }

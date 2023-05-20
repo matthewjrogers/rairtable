@@ -28,8 +28,6 @@
 #'
 #' @export
 #' @importFrom tidyselect everything
-#' @importFrom cli cli_alert_success
-#' @importFrom httr2 resp_body_json
 update_records <- function(data,
                            airtable = NULL,
                            airtable_id_col = NULL,
@@ -38,7 +36,6 @@ update_records <- function(data,
                            safely = TRUE,
                            return_json = FALSE,
                            ...) {
-  check_data_frame(data)
   check_airtable_obj(airtable, allow_null = TRUE)
 
   if (is_null(records)) {
@@ -48,6 +45,8 @@ update_records <- function(data,
   }
 
   check_character(records)
+  n_records <- length(records)
+  check_data_frame_rows(data, rows = n_records)
 
   update_data <- get_data_columns(
     data = data,
@@ -57,7 +56,6 @@ update_records <- function(data,
 
   update_col_names <- get_data_colnames(columns, data = update_data)
 
-  n_records <- nrow(update_data)
 
   safety_check(
     safely = safely,
@@ -75,7 +73,11 @@ update_records <- function(data,
     data = update_data
   )
 
-  cli::cli_alert_success("{n_records} record{?s} updated.")
+  cli::cli_progress_step(
+    "{n_records} record{?s} updated.",
+    msg_failed = "Can't update records."
+  )
+
 
   if (return_json) {
     if (!inherits(resp, "httr2_response")) {
@@ -143,14 +145,23 @@ req_update_records <- function(req = NULL,
   data <- make_field_list(data, call = call)
 
   if (n_records > batch_size) {
+    batched_records <- split_list(records, batch_size, call = call)
+
+    batched_data <- split_list(data, batch_size, call = call)
+
     resp <-
-      batch_update_records(
-        data = data,
-        records = records,
-        batch_size = batch_size,
-        req = req,
-        typecast = typecast,
-        call = call
+      map_action_along(
+        batched_records,
+        function(i) {
+          req_update_records(
+            req = req,
+            records = batched_records[[i]],
+            data = batched_data[[i]],
+            typecast = typecast,
+            call = call
+          )
+        },
+        action = "Updating records"
       )
 
     return(resp)
@@ -161,7 +172,7 @@ req_update_records <- function(req = NULL,
     data = list(
       "fields" = make_field_list(data, 1, call = call),
       "typecast" = typecast
-      )
+    )
   )
 
   httr2::req_perform(req)
@@ -202,45 +213,6 @@ req_update_record <- function(req = NULL,
 
   httr2::req_perform(req)
 }
-
-#' Call req_update_records for each batch in multiple batches of records
-#'
-#' @noRd
-#' @importFrom cli cli_progress_along
-batch_update_records <- function(req,
-                                 data,
-                                 records,
-                                 batch_size = NULL,
-                                 typecast = FALSE,
-                                 action = "Updating records",
-                                 call = caller_env()) {
-  batch_size <- batch_size %||%
-    as.integer(getOption("rairtable.batch_size", 10))
-
-  batched_records <-
-    split_list(records, batch_size, call = call)
-
-  batched_data <-
-    split_list(data, batch_size, call = call)
-
-  format <-
-    "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
-
-  map(
-    cli::cli_progress_along(
-      batched_records,
-      format = format
-    ),
-    ~ req_update_records(
-      req = req,
-      records = batched_records[[.x]],
-      data = batched_data[[.x]],
-      typecast = typecast,
-      call = call
-    )
-  )
-}
-
 
 #' Get record ID column (or rownames) from data
 #'

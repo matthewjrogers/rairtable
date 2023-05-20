@@ -22,8 +22,7 @@
 #' @returns A vector of deleted record IDs returned invisibly.
 #'
 #' @export
-#' @importFrom cli cli_alert_warning cli_alert_success
-#' @importFrom httr2 resp_body_json
+#' @importFrom cli cli_alert_warning
 delete_records <- function(data = NULL,
                            airtable = NULL,
                            airtable_id_col = NULL,
@@ -37,7 +36,9 @@ delete_records <- function(data = NULL,
     cli_abort(
       "{.arg data} or {.arg records} must be supplied."
     )
-  } else if (!is_null(data)) {
+  }
+
+  if (!is_null(data)) {
     if (!is_null(records)) {
       cli::cli_alert_warning(
         "Existing {.arg records} values are ignored when {.arg data} is supplied."
@@ -70,7 +71,10 @@ delete_records <- function(data = NULL,
     token = token
   )
 
-  cli::cli_alert_success("{n_records} record{?s} deleted.")
+  cli::cli_progress_step(
+    "{n_records} record{?s} deleted.",
+    msg_failed = "Can't create records."
+  )
 
   if (return_json) {
     if (!inherits(resp, "httr2_response")) {
@@ -140,12 +144,20 @@ req_delete_records <- function(req = NULL,
   )
 
   if (n_records > batch_size) {
-    resp <- batch_delete_records(
-      req = req,
-      records = records,
-      batch_size = batch_size,
-      call = call
-    )
+    batched_records <- split_list(records, batch_size)
+
+    resp <-
+      map_action_along(
+        batched_records,
+        function(i) {
+          req_delete_records(
+            records = batched_records[[i]],
+            req = req,
+            call = call
+          )
+        },
+        action = "Deleting records"
+      )
 
     return(resp)
   }
@@ -179,31 +191,4 @@ req_delete_record <- function(req = NULL,
   )
 
   httr2::req_perform(req)
-}
-
-#' Batch delete records
-#'
-#' @noRd
-#' @importFrom cli cli_progress_along
-batch_delete_records <- function(req,
-                                 records,
-                                 batch_size = NULL,
-                                 action = "Deleting records",
-                                 call = caller_env()) {
-  batch_size <- batch_size %||%
-    as.integer(getOption("rairtable.batch_size", 10))
-
-  batched_records <- split_list(records, batch_size)
-
-  format <-
-    "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
-
-  map(
-    cli::cli_progress_along(batched_records, format = format),
-    ~ req_delete_records(
-      records = batched_records[[.x]],
-      req = req,
-      call = call
-    )
-  )
 }

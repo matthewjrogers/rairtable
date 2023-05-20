@@ -8,9 +8,9 @@
 #'   parameter.
 #' @param fields Character vector with field names or field IDs to return.
 #'   Optional.
-#' @param id_to_col If `TRUE`, the airtable record IDs will be added to the
-#'   returned data.frame column. If `FALSE`, the row names will be set to the
-#'   airtable record IDs.
+#' @param id_to_col If `TRUE` (default), the airtable record IDs will be added
+#'   to the returned data frame as a new column. If `FALSE`, the airtable record
+#'   IDs are used as row names.
 #' @param airtable_id_col Airtable record ID column name assigned to returned
 #'   data.frame. Ignored if id_to_col is `TRUE`. Defaults to `NULL` which is set
 #'   to `getOption("rairtable.id_col", "airtable_record_id")`.
@@ -113,6 +113,7 @@ read_airtable_records <- function(airtable = NULL,
                                   ...) {
   req <- airtable_request(
     airtable = airtable,
+    view = view,
     ...
   )
 
@@ -124,7 +125,8 @@ read_airtable_records <- function(airtable = NULL,
     sort <- glue("[{{sort}}]")
   }
 
-  cell_format <- match.arg(cell_format, c("json", "string"))
+  cell_format <- cell_format %||% "json"
+  cell_format <- arg_match0(cell_format, c("json", "string"))
 
   if (cell_format == "string") {
     tz <- Sys.timezone()
@@ -135,11 +137,8 @@ read_airtable_records <- function(airtable = NULL,
     fields_by_id <- NULL
   }
 
-  check_string(view, allow_empty = FALSE, allow_null = TRUE)
-
   req <- req_query_airtable(
     .req = req,
-    view = view,
     sort = sort,
     cellFormat = cell_format,
     timeZone = tz,

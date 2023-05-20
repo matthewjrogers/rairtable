@@ -82,21 +82,30 @@ new_airtable_obj <- function(base,
     table <- table[["id"]]
   }
 
-  check_string(table, call = call)
-
   if (is_airtable_url(table)) {
     ids <- parse_airtable_url(table, call = call)
     base <- ids[["base"]]
     table <- ids[["table"]]
     view <- ids[["view"]]
+
+    if (is_null(base) || is_null(table)) {
+      cli_abort(
+        c("{.arg table} is not a valid url.",
+          "i" = "{.arg base} or {.arg table} can't be found in {.url {url}}"
+        ),
+        call = call
+      )
+    }
   }
 
   check_string(base, call = call)
+  check_string(table, call = call)
   check_character(view, allow_null = TRUE, call = call)
 
   req <- airtable_api_url_request(
     base = base,
     table = table,
+    view = view,
     api_url = api_url,
     api_version = api_version,
     call = call

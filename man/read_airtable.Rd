@@ -49,9 +49,9 @@ parameter.}
 
 \item{fields}{Fields to return from Airtable base, Default: \code{NULL}}
 
-\item{id_to_col}{If \code{TRUE}, the airtable record IDs will be added to the
-returned data.frame column. If \code{FALSE}, the row names will be set to the
-airtable record IDs.}
+\item{id_to_col}{If \code{TRUE} (default), the airtable record IDs will be added
+to the returned data frame as a new column. If \code{FALSE}, the airtable record
+IDs are used as row names.}
 
 \item{airtable_id_col}{Airtable record ID column name assigned to returned
 data.frame. Ignored if id_to_col is \code{TRUE}. Defaults to \code{NULL} which is set

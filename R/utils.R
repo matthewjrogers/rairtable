@@ -13,6 +13,28 @@ map <- function(.x, .f, ...) {
   lapply(.x, .f, ...)
 }
 
+#' Wrapper for cli::cli_progress_along
+#'
+#' @noRd
+#' @importFrom cli symbol pb_bar pb_percent cli_progress_along
+map_action_along <- function(x,
+                             .f,
+                             ...,
+                             action = NULL,
+                             format = NULL) {
+  format <- format %||%
+    "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
+
+  withr::with_options(
+    list("cli.progress_show_after" = 0.75),
+    map(
+      cli::cli_progress_along(x, format = format),
+      .f = .f,
+      ...
+    )
+  )
+}
+
 #' Split list or vector into equal size pieces
 #'
 #' @noRd
@@ -51,6 +73,39 @@ set_list_names <- function(x, nm = NULL, at = "name") {
 #' @noRd
 names_at <- function(x, at = "name") {
   vapply(x, function(x) {x[[at]]}, NA_character_)
+}
+
+#' Check if object is a data.frame with a specified number of rows
+#'
+#' @noRd
+check_data_frame_rows <- function(x,
+                                  min = 1,
+                                  rows = NULL,
+                                  arg = caller_arg(x),
+                                  call = caller_env()) {
+  check_data_frame(
+    x,
+    arg = arg,
+    call = call
+  )
+
+  x_rows <- nrow(x)
+
+  if (!is_null(rows) && (x_rows != rows)) {
+    cli_abort(
+      "{.arg {arg}} must be a data frame with {rows} row{?s}.",
+      call = call
+    )
+
+    return(invisible())
+  }
+
+  if (x_rows < min) {
+    cli_abort(
+      "{.arg {arg}} must be a data frame with {min} or more rows.",
+      call = call
+    )
+  }
 }
 
 #' Check if object is a list

@@ -8,7 +8,7 @@
 #'
 #' @param data A data.frame with records to insert.
 #' @inheritParams airtable_request
-#' @inheritParams req_create_record
+#' @inheritParams req_create_records
 #' @param return_json If `TRUE`, return the response from the Airtable API as
 #'   list. If `FALSE` (default), return the input data.frame or list.
 #' @param batch_size Deprecated. Set using the `rairtable.batch_size` option.
@@ -25,10 +25,8 @@ insert_records <- function(data,
                            ...) {
 
   check_airtable_obj(airtable, allow_null = TRUE)
-  check_data_frame(data)
+  check_data_frame_rows(data)
   n_records <- nrow(data)
-
-  cli::cli_alert_info("Creating {n_records} record{?s}.")
 
   resp <- req_create_records(
     airtable = airtable,
@@ -37,7 +35,10 @@ insert_records <- function(data,
     typecast = typecast
   )
 
-  cli::cli_alert_success("{n_records} record{?s} created.")
+  cli::cli_progress_step(
+    "{n_records} record{?s} created.",
+    msg_failed = "Can't create records."
+    )
 
   if (return_json) {
     if (!inherits(resp, "httr2_response")) {

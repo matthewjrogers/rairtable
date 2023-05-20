@@ -2,7 +2,6 @@
 % Please edit documentation in R/create_records.R
 \name{req_create_records}
 \alias{req_create_records}
-\alias{req_create_record}
 \title{Use httr2 to make a POST request to create records in an Airtable table}
 \usage{
 req_create_records(
@@ -12,15 +11,6 @@ req_create_records(
   typecast = TRUE,
   token = NULL,
   call = caller_env()
-)
-
-req_create_record(
-  req = NULL,
-  data,
-  ...,
-  typecast = TRUE,
-  call = caller_env(),
-  token = NULL
 )
 }
 \arguments{

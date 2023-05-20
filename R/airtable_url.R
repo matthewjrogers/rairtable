@@ -51,6 +51,7 @@ is_airtable_api_url <- function(url,
 
   api_url <- api_url %||%
     getOption("rairtable.api_url", "https://api.airtable.com")
+
   is_url(url) & grepl(paste0("^", api_url), url)
 }
 
@@ -194,11 +195,11 @@ parse_airtable_url <- function(url,
 
   table_name <- table_name %||% "tbl[[:alnum:]]+"
   check_string(table_name, call = call)
-  table_pattern <- glue("(?<=/){table_name}(?=/)")
+  table_pattern <- glue("(?<=/)(({table_name}(?=/))|{table_name}$)")
 
   view_name <- view_name %||% "viw[[:alnum:]]+"
   check_string(view_name, call = call)
-  view_pattern <- glue("(?<=/){view_name}(?=/|\\?)")
+  view_pattern <- glue("(?<=/)(({view_name}(?=/|\\?))|{view_name}$)")
 
   list(
     "base" = string_extract(url, base_pattern),

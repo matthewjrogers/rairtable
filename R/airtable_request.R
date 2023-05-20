@@ -52,6 +52,7 @@
 airtable_request <- function(url = NULL,
                              base = NULL,
                              table = NULL,
+                             view = NULL,
                              airtable = NULL,
                              ...,
                              api_url = NULL,
@@ -69,8 +70,6 @@ airtable_request <- function(url = NULL,
     url <- airtable[["request_url"]]
   }
 
-  check_url(url, allow_null = TRUE)
-
   if (is_airtable_api_url(url)) {
     check_airtable_api_url(url, ..., api_url = api_url, call = call)
     return(httr2::request(url))
@@ -78,24 +77,52 @@ airtable_request <- function(url = NULL,
 
   if (is_airtable_url(url)) {
     ids <- parse_airtable_url(url, ...)
-    if (!is_empty(base) || !is_empty(table)) {
+    if (!is_empty(base) || !is_empty(table) || !is_empty(view)) {
       cli::cli_alert_warning(
-        "Any supplied {.arg base} and {.arg table} values are ignored when
-        {.arg url} is an Airtable view."
+        "Any {.arg base}, {.arg table}, or {.arg view} values supplied are
+        ignored when {.arg url} is an Airtable URL."
       )
     }
 
     base <- ids[["base"]]
     table <- ids[["table"]]
+    view <- ids[["view"]]
+
+    if (is_null(base)) {
+      cli_abort(
+        c("{.arg table} is not a valid url.",
+          "i" = "{.arg base} can't be found in {.url {url}}."
+        ),
+        call = call
+      )
+    }
+
+    url <- NULL
+  }
+
+  if (!is_null(url)) {
+    check_url(url, call = call)
+
+    api_url <- api_url %||%
+      getOption("rairtable.api_url", "https://api.airtable.com")
+    base_url <-
+      getOption("rairtable.base_url", "https://airtable.com")
+
+    cli_abort(
+      "{.arg url} must be a valid url starting with
+      {.url {base_url}} or {.url {api_url}}",
+      call = call
+    )
   }
 
   airtable_api_url_request(
     base = base,
     table = table,
+    view = view,
     api_url = api_url,
     api_version = api_version,
     call = call
-    )
+  )
 }
 
 #' Build an Airtable API request when a base and table are supplied
@@ -103,6 +130,7 @@ airtable_request <- function(url = NULL,
 #' @noRd
 airtable_api_url_request <- function(base = NULL,
                                      table = NULL,
+                                     view = NULL,
                                      api_url = NULL,
                                      api_version = NULL,
                                      call = caller_env()) {
@@ -118,17 +146,17 @@ airtable_api_url_request <- function(base = NULL,
 
   req <- httr2::req_url_path_append(req, paste0("v", api_version))
 
-  if (!is_empty(base)) {
-    check_string(base, call = call)
-    req <- httr2::req_url_path_append(req, base)
-  }
+  req <-
+    req_url_append_if(
+      req, base,
+      allow_empty = FALSE,
+      allow_null = FALSE,
+      call = call
+    )
 
-  if (!is_empty(table)) {
-    check_string(table, call = call)
-    req <- httr2::req_url_path_append(req, table)
-  }
+  req <- req_url_append_if(req, table, call = call)
 
-  req
+  req_airtable_view(req, view = view, call = call)
 }
 
 #' @rdname airtable_request
@@ -191,6 +219,51 @@ req_query_airtable <- function(.req = NULL,
   )
 }
 
+
+#' Conditionally append string to request URL
+#'
+#' @noRd
+#' @importFrom httr2 req_url_path_append
+req_url_append_if <- function(req,
+                              append = NULL,
+                              allow_empty = TRUE,
+                              allow_null = TRUE,
+                              arg = caller_arg(append),
+                              call = caller_env()) {
+  if (allow_null && is_null(append)) {
+    return(req)
+  }
+
+  if (allow_empty && is_empty(append)) {
+    return(req)
+  }
+
+  check_string(
+    append,
+    allow_empty = allow_empty,
+    allow_null = allow_null,
+    arg = arg,
+    call = call
+  )
+
+  httr2::req_url_path_append(req, append)
+}
+
+#' Add view query to URL if view is not already part of the request URL
+#'
+#' @noRd
+req_airtable_view <- function(req,
+                              view = NULL,
+                              allow_empty = TRUE,
+                              allow_null = TRUE,
+                              call = caller_env()) {
+  if ((allow_empty && is_empty(view)) || grepl("?view=viw", req[["url"]])) {
+    return(req)
+  }
+
+  check_string(view, allow_empty = FALSE, allow_null = allow_null, call = call)
+  httr2::req_url_query(req, view = view)
+}
 
 #' @rdname airtable_request
 #' @name req_auth_airtable
