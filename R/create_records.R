@@ -10,7 +10,6 @@
 #'   base if possible. typecase must be set to `TRUE` to add new values to a
 #'   multiselect field type.
 #'   base. Required.
-#' @param parallel If `TRUE`, use parallel processing for encoding large tables.
 #' @inheritParams req_query_airtable
 #' @inheritParams rlang::args_error_context
 #' @keywords internal
@@ -23,7 +22,6 @@ req_create_records <- function(req = NULL,
                                data,
                                typecast = TRUE,
                                token = NULL,
-                               parallel = FALSE,
                                call = caller_env()) {
   req <- req %||%
     req_auth_airtable(
@@ -31,7 +29,7 @@ req_create_records <- function(req = NULL,
       token = token
     )
 
-  data <- make_field_list(data, parallel = parallel, call = call)
+  data <- make_field_list(data, call = call)
   n_records <- length(data)
   batch_size <- as.integer(getOption("rairtable.batch_size", 10))
 
@@ -40,7 +38,6 @@ req_create_records <- function(req = NULL,
       req = req,
       data = data,
       batch_size = batch_size,
-      parallel = parallel,
       call = call
     )
 
@@ -90,12 +87,11 @@ batch_create_records <- function(req,
                                  data,
                                  batch_size = NULL,
                                  action = "Creating records",
-                                 parallel = FALSE,
                                  call = caller_env()) {
   batch_size <- batch_size %||%
     as.integer(getOption("rairtable.batch_size", 10))
 
-  batched_data <- split_list(data, parallel = parallel, call = call)
+  batched_data <- split_list(data, call = call)
 
   format <-
     "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
@@ -105,7 +101,6 @@ batch_create_records <- function(req,
     ~ req_create_records(
       req = req,
       data = batched_data[[.x]],
-      parallel = parallel,
       call = call
     )
   )

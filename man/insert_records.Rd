@@ -9,7 +9,6 @@ insert_records(
   data,
   airtable = NULL,
   typecast = FALSE,
-  parallel = FALSE,
   batch_size = deprecated(),
   return_json = FALSE,
   ...
@@ -19,7 +18,6 @@ create_records(
   data,
   airtable = NULL,
   typecast = FALSE,
-  parallel = FALSE,
   batch_size = deprecated(),
   return_json = FALSE,
   ...
@@ -36,8 +34,6 @@ provided.  Optional if url or base \emph{and} table are supplied.}
 base if possible. typecase must be set to \code{TRUE} to add new values to a
 multiselect field type.
 base. Required.}
-
-\item{parallel}{If \code{TRUE}, use parallel processing for encoding large tables.}
 
 \item{batch_size}{Deprecated. Set using the \code{rairtable.batch_size} option.}
 

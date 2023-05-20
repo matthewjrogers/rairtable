@@ -19,16 +19,15 @@ map <- function(.x, .f, ...) {
 split_list <- function(x,
                        batch_size = NULL,
                        arg = caller_arg(x),
-                       parallel = FALSE,
                        call = caller_env()) {
-  check_required(x, arg = arg)
+  check_required(x, arg = arg, call = call)
 
   batch_size <- batch_size %||%
     as.integer(getOption("rairtable.batch_size", 10))
 
   check_number_whole(batch_size, call = call)
 
-  par_mapply(
+  mapply(
     FUN = function(a, b) {
       x[a:b]
     },
@@ -37,8 +36,7 @@ split_list <- function(x,
       seq.int(from = 1, to = length(x), by = batch_size) + (batch_size - 1),
       length(x)
     ),
-    parallel = parallel,
-    call = call
+    SIMPLIFY = FALSE
   )
 }
 

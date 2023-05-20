@@ -20,7 +20,6 @@
 insert_records <- function(data,
                            airtable = NULL,
                            typecast = FALSE,
-                           parallel = FALSE,
                            batch_size = deprecated(),
                            return_json = FALSE,
                            ...) {
@@ -35,8 +34,7 @@ insert_records <- function(data,
     airtable = airtable,
     ...,
     data = data,
-    typecast = typecast,
-    parallel = parallel
+    typecast = typecast
   )
 
   cli::cli_alert_success("{n_records} record{?s} created.")
@@ -59,7 +57,6 @@ insert_records <- function(data,
 create_records <- function(data,
                            airtable = NULL,
                            typecast = FALSE,
-                           parallel = FALSE,
                            batch_size = deprecated(),
                            return_json = FALSE,
                            ...) {
@@ -67,7 +64,6 @@ create_records <- function(data,
     data = data,
     airtable = airtable,
     typecast = typecast,
-    parallel = parallel,
     batch_size = batch_size,
     return_json = return_json,
     ...

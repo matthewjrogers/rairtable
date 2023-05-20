@@ -12,7 +12,6 @@ update_records(
   records = NULL,
   safely = TRUE,
   return_json = FALSE,
-  parallel = FALSE,
   ...
 )
 }
@@ -43,8 +42,6 @@ number of rows before executing update.}
 
 \item{return_json}{If \code{TRUE}, return JSON repsponse from the Airtable web API
 as a list. If \code{FALSE} (default), return input data.}
-
-\item{parallel}{If \code{TRUE} use parallel processing for encoding large tables.}
 
 \item{...}{
   Arguments passed on to \code{\link[=airtable_request]{airtable_request}}

@@ -73,63 +73,12 @@ field_types <-
     "lastModifiedBy", "externalSyncSource"
   )
 
-
-#' Optionally use parallel::parLapply
-#'
-#' @noRd
-par_lapply <- function(X, FUN, ..., parallel = FALSE, call = caller_env()) {
-  check_function(fun, call = call)
-
-  if (!parallel) {
-    return(lapply(X, FUN = FUN, ...))
-  }
-
-  check_installed("parallel")
-
-  cl <- parallel::makeCluster(parallel::detectCores(), type = 'SOCK')
-
-  x <- parallel::parLapply(cl = cl, X = X, fun = FUN, ...)
-
-  parallel::stopCluster(cl)
-
-  x
-}
-
-#' Optionally use parallel::mcmapply
-#'
-#' @noRd
-par_mapply <- function(...,
-                          FUN,
-                          SIMPLIFY = FALSE,
-                          USE.NAMES = FALSE,
-                          mc.silent = FALSE,
-                          parallel = FALSE,
-                          call = caller_env()) {
-  check_function(FUN, call = call)
-
-  if (!parallel) {
-    return(mapply(FUN = FUN, ..., SIMPLIFY = SIMPLIFY, USE.NAMES = USE.NAMES))
-  }
-
-  check_installed("parallel")
-
-  parallel::mcmapply(
-    FUN = FUN,
-    ...,
-    SIMPLIFY = SIMPLIFY,
-    USE.NAMES = USE.NAMES,
-    mc.silent = mc.silent,
-    mc.cores = parallel::detectCores()
-  )
-}
-
 #' Convert a data.frame into a list of lists
 #'
 #' @noRd
 make_field_list <- function(data,
                             arg = caller_arg(data),
                             max_rows = NULL,
-                            parallel = FALSE,
                             call = caller_env()) {
   check_required(data, call = call)
 
@@ -147,13 +96,12 @@ make_field_list <- function(data,
   }
 
   do.call(
-    "par_mapply",
+    "mapply",
     c(
       FUN = list,
       data,
       SIMPLIFY = FALSE,
-      USE.NAMES = FALSE,
-      parallel = parallel
+      USE.NAMES = FALSE
     )
   )
 }
@@ -164,14 +112,11 @@ make_field_list <- function(data,
 #' @noRd
 make_field_array <- function(fields = NULL,
                              arg = caller_arg(fields),
-                             parallel = FALSE,
                              call = caller_env()) {
   list(
-    "fields" = par_lapply(
-      X = make_field_list(fields, arg = arg, parallel = parallel, call = call),
-      FUN = make_field_config,
-      parallel = parallel,
-      call = call
+    "fields" = lapply(
+      X = make_field_list(fields, arg = arg, call = call),
+      FUN = make_field_config
     )
   )
 }
@@ -187,13 +132,11 @@ make_field_config <- function(field = NULL,
                               type = NULL,
                               existing_names = NULL,
                               ...,
-                              parallel = FALSE,
                               call = caller_env()) {
   if (is.data.frame(field)) {
     field <- make_field_list(
       field,
       max_rows = 1,
-      parallel = parallel,
       call = call
     )
   }
