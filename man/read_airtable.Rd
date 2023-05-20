@@ -2,8 +2,8 @@
 % Please edit documentation in R/read_airtable.R
 \name{read_airtable}
 \alias{read_airtable}
-\alias{read_airtable_records}
-\alias{read_airtable_record}
+\alias{list_records}
+\alias{get_record}
 \title{Read records from an Airtable table}
 \usage{
 read_airtable(
@@ -16,7 +16,7 @@ read_airtable(
   ...
 )
 
-read_airtable_records(
+list_records(
   airtable = NULL,
   view = NULL,
   sort = NULL,
@@ -33,18 +33,12 @@ read_airtable_records(
   ...
 )
 
-read_airtable_record(
-  airtable = NULL,
-  record,
-  airtable_id_col = NULL,
-  token = NULL,
-  ...
-)
+get_record(airtable = NULL, record, airtable_id_col = NULL, token = NULL, ...)
 }
 \arguments{
 \item{airtable}{An \code{airtable} class object. Optional for \code{\link[=read_airtable]{read_airtable()}} if
-url is supplied. For \code{\link[=read_airtable_records]{read_airtable_records()}} and
-\code{\link[=read_airtable_record]{read_airtable_record()}}, support the airtable, url, or a base \emph{and} table
+url is supplied. For \code{\link[=list_records]{list_records()}} and
+\code{\link[=get_record]{get_record()}}, support the airtable, url, or a base \emph{and} table
 parameter.}
 
 \item{fields}{Fields to return from Airtable base, Default: \code{NULL}}
@@ -63,12 +57,14 @@ to \code{getOption("rairtable.id_col", "airtable_record_id")}.}
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{For \code{\link[=read_airtable]{read_airtable()}}, additional parameters passed to
-\code{\link[=req_query_airtable]{req_query_airtable()}}. For \code{\link[=read_airtable_records]{read_airtable_records()}} and
-\code{\link[=read_airtable_record]{read_airtable_record()}}, additional parameters passed to
-\code{\link[=airtable_request]{airtable_request()}}.}
+\item{...}{For \code{\link[=read_airtable]{read_airtable()}}, additional query parameters can be passed
+to \code{\link[=req_query_airtable]{req_query_airtable()}}. For \code{\link[=list_records]{list_records()}} and
+\code{\link[=get_record]{get_record()}}, additional parameters, such as url, can be passed
+to \code{\link[=airtable_request]{airtable_request()}}.}
 
-\item{view}{Airtable view ID, Default: \code{NULL}}
+\item{view}{Airtable view ID or name, Default: \code{NULL}. If the supplied url or
+airtable object includes a view, the view provided to this parameter is
+ignored.}
 
 \item{sort}{Field to sort by, Default: \code{NULL}}
 
@@ -77,24 +73,34 @@ be 100 or less.}
 
 \item{page_size}{Max records to return per page, Default: \code{NULL}}
 
-\item{tz, locale}{Time zone and locale, Defaults: \code{NULL}}
+\item{tz, locale}{Time zone and locale, Defaults to \code{NULL}. If cell_format is
+"string", tz defaults to \code{Sys.timezone()} and locale defaults to
+\code{Sys.getlocale("LC_TIME")}.}
 
 \item{fields_by_id}{If \code{TRUE}, return fields by id, Default: \code{FALSE}}
 
 \item{desc}{If \code{TRUE}, sort in descending order, Default: \code{FALSE}}
 
-\item{cell_format}{Cell format for "Link to another record" fields (either
-"json" (unique ID) or "string" (displayed character string)), Default:
-"json"}
+\item{cell_format}{Cell format for "Link to another record" fields. Defaults
+to "json" which returns a unique record ID. A "string" cell_format returns
+the displayed character string.}
 
-\item{offset}{Offset value}
+\item{offset}{Offset value. Primarily intended for internal use.}
 
-\item{record}{Record ID number. Required for \code{\link[=read_airtable_record]{read_airtable_record()}}.}
+\item{record}{Record ID number. Required for \code{\link[=get_record]{get_record()}}.}
 }
 \value{
 A data.frame with the records from the Airtable base and table
 provided by the airtable parameter.
 }
 \description{
-Read records from a single table in an Airtable base.
+Read records from a table in an Airtable base. \code{\link[=read_airtable]{read_airtable()}} supports
+basic access to data based on an airtable object. \code{\link[=list_records]{list_records()}}
+and \code{\link[=get_record]{get_record()}} allows you to pass url or base and table directly
+and supports more options from the Airtable API.
+}
+\details{
+Find more information on the list records API method:
+\url{https://airtable.com/developers/web/api/list-records} or get record API
+method: \url{https://airtable.com/developers/web/api/get-record}
 }

@@ -1,10 +1,17 @@
 #' Read records from an Airtable table
 #'
-#' Read records from a single table in an Airtable base.
+#' Read records from a table in an Airtable base. [read_airtable()] supports
+#' basic access to data based on an airtable object. [list_records()]
+#' and [get_record()] allows you to pass url or base and table directly
+#' and supports more options from the Airtable API.
+#'
+#' Find more information on the list records API method:
+#' <https://airtable.com/developers/web/api/list-records> or get record API
+#' method: <https://airtable.com/developers/web/api/get-record>
 #'
 #' @param airtable An `airtable` class object. Optional for [read_airtable()] if
-#'   url is supplied. For [read_airtable_records()] and
-#'   [read_airtable_record()], support the airtable, url, or a base *and* table
+#'   url is supplied. For [list_records()] and
+#'   [get_record()], support the airtable, url, or a base *and* table
 #'   parameter.
 #' @param fields Character vector with field names or field IDs to return.
 #'   Optional.
@@ -15,10 +22,10 @@
 #'   data.frame. Ignored if id_to_col is `TRUE`. Defaults to `NULL` which is set
 #'   to `getOption("rairtable.id_col", "airtable_record_id")`.
 #' @param max_rows Optional maximum number of rows to read. Defaults to `NULL`
-#' @param ... For [read_airtable()], additional parameters passed to
-#'   [req_query_airtable()]. For [read_airtable_records()] and
-#'   [read_airtable_record()], additional parameters passed to
-#'   [airtable_request()].
+#' @param ... For [read_airtable()], additional query parameters can be passed
+#'   to [req_query_airtable()]. For [list_records()] and
+#'   [get_record()], additional parameters, such as url, can be passed
+#'   to [airtable_request()].
 #' @inheritParams rlang::args_error_context
 #'
 #' @return A data.frame with the records from the Airtable base and table
@@ -80,41 +87,83 @@ read_airtable <- function(airtable = NULL,
 
 
 #' @rdname read_airtable
-#' @name read_airtable_records
+#' @name list_records
 #' @inheritParams airtable_request
-#' @param view Airtable view ID, Default: `NULL`
+#' @param view Airtable view ID or name, Default: `NULL`. If the supplied url or
+#'   airtable object includes a view, the view provided to this parameter is
+#'   ignored.
 #' @param fields Fields to return from Airtable base, Default: `NULL`
 #' @param sort Field to sort by, Default: `NULL`
 #' @param desc If `TRUE`, sort in descending order, Default: `FALSE`
 #' @param max_records Maximum number of records to return, Default: `NULL`. Must
 #'   be 100 or less.
 #' @param page_size Max records to return per page, Default: `NULL`
-#' @param cell_format Cell format for "Link to another record" fields (either
-#'   "json" (unique ID) or "string" (displayed character string)), Default:
-#'   "json"
-#' @param tz,locale Time zone and locale, Defaults: `NULL`
+#' @param cell_format Cell format for "Link to another record" fields. Defaults
+#'   to "json" which returns a unique record ID. A "string" cell_format returns
+#'   the displayed character string.
+#' @param tz,locale Time zone and locale, Defaults to `NULL`. If cell_format is
+#'   "string", tz defaults to `Sys.timezone()` and locale defaults to
+#'   `Sys.getlocale("LC_TIME")`.
 #' @param fields_by_id If `TRUE`, return fields by id, Default: `FALSE`
-#' @param offset Offset value
+#' @param offset Offset value. Primarily intended for internal use.
 #' @export
 #' @importFrom httr2 req_url_path_append req_url_query
-read_airtable_records <- function(airtable = NULL,
-                                  view = NULL,
-                                  sort = NULL,
-                                  max_records = 100,
-                                  page_size = NULL,
-                                  tz = NULL,
-                                  locale = NULL,
-                                  fields_by_id = FALSE,
-                                  fields = NULL,
-                                  desc = FALSE,
-                                  cell_format = NULL,
-                                  token = NULL,
-                                  offset = NULL,
-                                  ...) {
-  req <- airtable_request(
+list_records <- function(airtable = NULL,
+                         view = NULL,
+                         sort = NULL,
+                         max_records = 100,
+                         page_size = NULL,
+                         tz = NULL,
+                         locale = NULL,
+                         fields_by_id = FALSE,
+                         fields = NULL,
+                         desc = FALSE,
+                         cell_format = NULL,
+                         token = NULL,
+                         offset = NULL,
+                         ...) {
+  req <- req_airtable_list_records(
     airtable = airtable,
     view = view,
-    ...
+    ...,
+    sort = sort,
+    max_records = max_records,
+    page_size = page_size,
+    tz = tz,
+    locale = locale,
+    fields_by_id = fields_by_id,
+    fields = fields,
+    desc = desc,
+    cell_format = cell_format,
+    token = token
+  )
+
+  req_perform_offset(req, offset = offset)
+}
+
+#' Build a request for the Airtable list records API method
+#'
+#' @noRd
+req_airtable_list_records <- function(req = NULL,
+                                      airtable = NULL,
+                                      view = NULL,
+                                      sort = NULL,
+                                      max_records = 100,
+                                      page_size = NULL,
+                                      tz = NULL,
+                                      locale = NULL,
+                                      fields_by_id = FALSE,
+                                      fields = NULL,
+                                      desc = FALSE,
+                                      cell_format = NULL,
+                                      token = NULL,
+                                      ...,
+                                      call = caller_env()) {
+  req <- req %||% airtable_request(
+    airtable = airtable,
+    view = view,
+    ...,
+    call = call
   )
 
   if (!is.null(sort)) {
@@ -126,11 +175,11 @@ read_airtable_records <- function(airtable = NULL,
   }
 
   cell_format <- cell_format %||% "json"
-  cell_format <- arg_match0(cell_format, c("json", "string"))
+  cell_format <- arg_match0(cell_format, c("json", "string"), error_call = call)
 
   if (cell_format == "string") {
-    tz <- Sys.timezone()
-    locale <- Sys.getlocale("LC_TIME")
+    tz <- tz %||% Sys.timezone()
+    locale <- locale %||% Sys.getlocale("LC_TIME")
   }
 
   if (!fields_by_id) {
@@ -146,7 +195,8 @@ read_airtable_records <- function(airtable = NULL,
     maxRecords = max_records,
     pageSize = page_size,
     returnFieldsByFieldId = fields_by_id,
-    token = token
+    token = token,
+    call = call
   )
 
   if (!is_null(fields)) {
@@ -155,19 +205,19 @@ read_airtable_records <- function(airtable = NULL,
     }
   }
 
-  req_perform_offset(req, offset = offset)
+  req
 }
 
 #' @rdname read_airtable
-#' @name read_airtable_record
-#' @param record Record ID number. Required for [read_airtable_record()].
+#' @name get_record
+#' @param record Record ID number. Required for [get_record()].
 #' @export
 #' @importFrom httr2 req_url_path_append req_perform
-read_airtable_record <- function(airtable = NULL,
-                                 record,
-                                 airtable_id_col = NULL,
-                                 token = NULL,
-                                 ...) {
+get_record <- function(airtable = NULL,
+                       record,
+                       airtable_id_col = NULL,
+                       token = NULL,
+                       ...) {
   req <- airtable_request(
     airtable = airtable,
     ...
@@ -277,7 +327,7 @@ resp_body_records <- function(resp,
     arg_match0(type, c("records", "fields", "combine"), error_call = call)
 
   if (has_name(body, "records")) {
-    # Used by read_airtable and read_airtable_records
+    # Used by read_airtable and list_records
     records <- body[["records"]]
     fields <- records[["fields"]]
 
@@ -287,7 +337,7 @@ resp_body_records <- function(resp,
       records <- records[, record_cols]
     }
   } else if (has_name(body, c("fields"))) {
-    # Used by read_airtable_record
+    # Used by get_record
     fields <- body[["fields"]]
     records <- data.frame(
       "id" = body[["id"]],

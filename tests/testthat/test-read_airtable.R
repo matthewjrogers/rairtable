@@ -25,7 +25,7 @@ test_that("read_airtable works", {
     "data.frame"
   )
 
-  record_df <- read_airtable_records(atbl)
+  record_df <- list_records(atbl)
 
   expect_s3_class(
     record_df,
@@ -35,9 +35,9 @@ test_that("read_airtable works", {
   record <- atbl_df[!is.na(atbl_df$Name), ][[getOption("rairtable.id_col", "airtable_record_id")]]
 
   expect_s3_class(
-    read_airtable_record(
+    get_record(
       atbl,
-      record = record
+      record = record[[1]]
     ),
     "data.frame"
   )
