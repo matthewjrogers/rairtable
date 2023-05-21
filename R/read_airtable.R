@@ -278,6 +278,8 @@ req_perform_offset <- function(req,
 
     resp <- httr2::req_perform(req)
 
+    offset <- httr2::resp_body_json(resp)[["offset"]]
+
     body_list[[i]] <-
       resp_body_records(
         resp,
@@ -287,12 +289,10 @@ req_perform_offset <- function(req,
         call = call
       )
 
-    if (is_null(body_list[[i]][["offset"]])) {
+    if (is_null(offset)) {
       # End loop if no offset returned
       break
     }
-
-    offset <- body_list[[i]][["offset"]]
   }
 
   tibble::as_tibble(
