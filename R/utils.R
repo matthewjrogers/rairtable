@@ -124,6 +124,14 @@ check_list <- function(x,
                        allow_null = FALSE,
                        arg = caller_arg(x),
                        call = caller_env()) {
+  if (allow_na && is.na(x)) {
+    return(invisible(NULL))
+  }
+
+  if (allow_null && is_null(x)) {
+    return(invisible(NULL))
+  }
+
   if (!is_list(x)) {
     stop_input_type(
       x,
