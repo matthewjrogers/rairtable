@@ -40,10 +40,12 @@ Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For
 the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
     \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
-airtable are supplied. base and table are both required if url and airtable
-are \code{NULL}.}
-    \item{\code{table}}{Airtable table id or name. If table is a table ID it is a string
-starting with "viw".}
+airtable are supplied or if require_base is \code{FALSE}. base and table are
+both required if url and airtable are \code{NULL} and require_base is \code{TRUE}.}
+    \item{\code{table}}{Airtable table id or name. Table ID values are strings starting
+with "tbl". Optional if require_table is \code{FALSE}.}
+    \item{\code{view}}{Airtable view ID. View ID values starts with "viw". Optional if
+require_view is \code{FALSE}.}
     \item{\code{airtable}}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
 must include a request_url attribute. url is ignored if airtable is
 provided.  Optional if url or base \emph{and} table are supplied.}
@@ -75,8 +77,6 @@ mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
-For more information on the Airtable API, see
-\url{https://airtable.com/developers/web/api/update-record} or
-\url{https://airtable.com/developers/web/api/update-multiple-records}.
+Update one or more records in an Airtable base
 }
 \keyword{internal}

@@ -1,7 +1,8 @@
 #' Set or get an Airtable personal access token
 #'
-#' Set Airtable personal access token as an environment variable, and optionally
-#' install the personal access token to your .Renviron file for future use.
+#' Set an Airtable personal access token as an environment variable, and
+#' optionally install the personal access token to your .Renviron file for
+#' future use.
 #'
 #' @param pat A valid Airtable personal access token. Setup a token at
 #'   <https://airtable.com/create/tokens>

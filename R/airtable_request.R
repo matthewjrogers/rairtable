@@ -25,10 +25,12 @@
 #'   the metadata API (where only a base ID is required) include `require_base =
 #'   TRUE` to pass to [check_airtable_api_url()] when creating a request.
 #' @param base Airtable base id starting with with "app". Optional if url or
-#'   airtable are supplied. base and table are both required if url and airtable
-#'   are `NULL`.
-#' @param table Airtable table id or name. If table is a table ID it is a string
-#'   starting with "viw".
+#'   airtable are supplied or if require_base is `FALSE`. base and table are
+#'   both required if url and airtable are `NULL` and require_base is `TRUE`.
+#' @param table Airtable table id or name. Table ID values are strings starting
+#'   with "tbl". Optional if require_table is `FALSE`.
+#' @param view Airtable view ID. View ID values starts with "viw". Optional if
+#'   require_view is `FALSE`.
 #' @param airtable An airtable class object created with [airtable()]. airtable
 #'   must include a request_url attribute. url is ignored if airtable is
 #'   provided.  Optional if url or base *and* table are supplied.
@@ -320,5 +322,7 @@ airtable_error_body <- function(resp) {
     )
   } else if (has_name(error, "type")) {
     error[["type"]]
+  } else {
+    as.character(error)
   }
 }

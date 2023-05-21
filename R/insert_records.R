@@ -1,10 +1,10 @@
 #' Insert records into an Airtable table
 #'
-#' Create new records in an Airtable table from a data.frame or list. The column
-#' names and types for the input data must exactly match the column names and
-#' types in the Airtable table. Fields are not validated before calling
-#' the API so supplying any other names or types returns an error.
-#' [create_records()] and [insert_records()] are identical.
+#' Insert or create new records in an existing Airtable table from a data frame
+#' input. The column names and types for the input data must match the column
+#' names and types in the Airtable table. Fields are not validated before
+#' calling the API so supplying any other names or types returns an error.
+#' [insert_records()] and [create_records()] are identical.
 #'
 #' @param data A data.frame with records to insert.
 #' @inheritParams airtable_request
@@ -41,9 +41,8 @@ insert_records <- function(data,
     )
 
   if (return_json) {
-    if (!inherits(resp, "httr2_response")) {
-      # FIXME: The body from the batched requests should be combined if possible
-      return(lapply(resp, httr2::resp_body_json))
+    if (!is_httr2_resp(resp)) {
+      return(c(lapply(resp, httr2::resp_body_json)))
     }
 
     return(httr2::resp_body_json(resp))

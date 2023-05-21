@@ -1,6 +1,11 @@
 #' Delete records from an Airtable table
 #'
-#' Delete records in an Airtable table based on their Airtable record ID.
+#' Delete records in an Airtable table based on their Airtable record ID. Set
+#' `safely = FALSE` to delete records outside of an interactive session.
+#'
+#' Find more information on the Airtable API methods to delete a record
+#' <https://airtable.com/developers/web/api/delete-record> or multiple records
+#' <https://airtable.com/developers/web/api/delete-multiple-records>.
 #'
 #' @param data A data.frame with a record ID column matching the value of
 #'   airtable_id_col or rownames with record ID values.
@@ -38,10 +43,16 @@ delete_records <- function(data = NULL,
     )
   }
 
-  if (!is_null(data)) {
+  airtable_id_col <- airtable_id_col %||%
+    getOption("rairtable.id_col", "airtable_record_id")
+
+  data_records <- !is_null(data) &&
+    (has_name(data, airtable_id_col) || tibble::has_rownames(data))
+
+  if (data_records) {
     if (!is_null(records)) {
       cli::cli_alert_warning(
-        "Existing {.arg records} values are ignored when {.arg data} is supplied."
+        "{.arg records} is ignored when {.arg data} is supplied."
       )
     }
 
@@ -73,13 +84,12 @@ delete_records <- function(data = NULL,
 
   cli::cli_progress_step(
     "{n_records} record{?s} deleted.",
-    msg_failed = "Can't create records."
+    msg_failed = "Can't delete records."
   )
 
   if (return_json) {
-    if (!inherits(resp, "httr2_response")) {
-      # FIXME: body from the batched requests should be combined not returned as a list
-      return(map(lapply, httr2::resp_body_json))
+    if (!is_httr2_resp(resp)) {
+      return(c(map(lapply, httr2::resp_body_json)))
     }
 
     return(httr2::resp_body_json(resp))
@@ -93,10 +103,6 @@ delete_records <- function(data = NULL,
 #'
 #' Delete one record from an Airtable table with [req_delete_record()] or delete
 #' multiple records with [req_delete_records()].
-#'
-#' More information on the Airtable API:
-#' - <https://airtable.com/developers/web/api/delete-record>
-#' - <https://airtable.com/developers/web/api/delete-multiple-records>
 #'
 #' @inheritParams airtable_request
 #' @param req If req is supplied, url or any additional parameters passed to ...

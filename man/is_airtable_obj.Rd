@@ -45,6 +45,11 @@ mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
-Test or check if an object is an airtable object
+\code{\link[=is_airtable_obj]{is_airtable_obj()}} returns TRUE for airtable class objects or FALSE
+otherwise. \code{\link[=check_airtable_obj]{check_airtable_obj()}} errors if the input is not an airtable
+object with the option to ignore \code{NULL} inputs. This check can also
+optionally require an airtable object to include a request URL, a table, and
+a view. Note that this is an internal function primarily intended for
+developer use.
 }
 \keyword{internal}

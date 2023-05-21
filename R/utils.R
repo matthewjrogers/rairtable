@@ -13,6 +13,14 @@ map <- function(.x, .f, ...) {
   lapply(.x, .f, ...)
 }
 
+
+#' Does x have the class httr2_response?
+#'
+#' @noRd
+is_httr2_resp <- function(x) {
+  inherits(x, "httr2_response")
+}
+
 #' Wrapper for cli::cli_progress_along
 #'
 #' @noRd
@@ -89,20 +97,20 @@ check_data_frame_rows <- function(x,
     call = call
   )
 
-  x_rows <- nrow(x)
+  n_rows <- nrow(x)
 
-  if (!is_null(rows) && (x_rows != rows)) {
+  if (!is_null(rows) && (n_rows != rows)) {
     cli_abort(
-      "{.arg {arg}} must be a data frame with {rows} row{?s}.",
+      "{.arg {arg}} must be a data frame with {rows} row{?s}, not {n_rows}.",
       call = call
     )
 
     return(invisible())
   }
 
-  if (x_rows < min) {
+  if (n_rows < min) {
     cli_abort(
-      "{.arg {arg}} must be a data frame with {min} or more rows.",
+      "{.arg {arg}} must be a data frame with {min} or more rows, not {n_rows}.",
       call = call
     )
   }

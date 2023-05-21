@@ -52,9 +52,9 @@ or piped into additional functions or, if as_json is \code{TRUE}, the function
 returns the parsed API response from \code{\link[httr2:resp_body_raw]{httr2::resp_body_json()}}.
 }
 \description{
-Create new records in an Airtable table from a data.frame or list. The column
-names and types for the input data must exactly match the column names and
-types in the Airtable table. Fields are not validated before calling
-the API so supplying any other names or types returns an error.
-\code{\link[=create_records]{create_records()}} and \code{\link[=insert_records]{insert_records()}} are identical.
+Insert or create new records in an existing Airtable table from a data frame
+input. The column names and types for the input data must match the column
+names and types in the Airtable table. Fields are not validated before
+calling the API so supplying any other names or types returns an error.
+\code{\link[=insert_records]{insert_records()}} and \code{\link[=create_records]{create_records()}} are identical.
 }

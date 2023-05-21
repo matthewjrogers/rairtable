@@ -101,6 +101,27 @@ airtable_base <- function(base = NULL,
   )
 }
 
+#' Is x have an airtable_base_schema class?
+#'
+#' @noRd
+is_airtable_base_schema <- function(x) {
+  inherits(x, "airtable_base_schema")
+}
+
+#' Is x have an airtable_table_schema class?
+#'
+#' @noRd
+is_airtable_table_schema <- function(x) {
+  inherits(x, "airtable_table_schema")
+}
+
+#' Is x have an airtable_fields_schema class?
+#'
+#' @noRd
+is_airtable_fields_schema <- function(x) {
+  inherits(x, "airtable_fields_schema")
+}
+
 #' @rdname airtable_base
 #' @name list_airtable_bases
 #' @param base A character vector of base id values. If supplied to

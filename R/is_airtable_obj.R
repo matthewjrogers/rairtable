@@ -1,5 +1,12 @@
 #' Test or check if an object is an airtable object
 #'
+#' [is_airtable_obj()] returns TRUE for airtable class objects or FALSE
+#' otherwise. [check_airtable_obj()] errors if the input is not an airtable
+#' object with the option to ignore `NULL` inputs. This check can also
+#' optionally require an airtable object to include a request URL, a table, and
+#' a view. Note that this is an internal function primarily intended for
+#' developer use.
+#'
 #' @param x Object to test or check.
 #' @keywords internal
 #' @export
@@ -62,7 +69,7 @@ check_airtable_obj <- function(x,
       cli_abort("{.arg airtable} must include a list of fields.")
     }
 
-    if (!inherits(fields, "airtable_fields_schema")) {
+    if (!is_airtable_fields_schema(fields)) {
       cli_abort(
         "{.arg airtable} fields must have the
         {.cls airtable_fields_schema} class."

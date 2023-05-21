@@ -37,8 +37,9 @@ mentioned in error messages as the source of the error. See the
 Invisibly return personal access token value
 }
 \description{
-Set Airtable personal access token as an environment variable, and optionally
-install the personal access token to your .Renviron file for future use.
+Set an Airtable personal access token as an environment variable, and
+optionally install the personal access token to your .Renviron file for
+future use.
 }
 \examples{
 \dontrun{

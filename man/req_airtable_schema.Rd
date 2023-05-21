@@ -26,11 +26,11 @@ airtable is provided, any additional value provided to url is ignored. For
 the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
 
 \item{base}{Airtable base id starting with with "app". Optional if url or
-airtable are supplied. base and table are both required if url and airtable
-are \code{NULL}.}
+airtable are supplied or if require_base is \code{FALSE}. base and table are
+both required if url and airtable are \code{NULL} and require_base is \code{TRUE}.}
 
-\item{table}{Airtable table id or name. If table is a table ID it is a string
-starting with "viw".}
+\item{table}{Airtable table id or name. Table ID values are strings starting
+with "tbl". Optional if require_table is \code{FALSE}.}
 
 \item{column}{Column ID, Defaults to \code{NULL}. Only required when type =
 "update" and from = "field".}

@@ -1,6 +1,11 @@
 #' Update records in an Airtable table
 #'
-#' Update one or more fields in an Airtable table.
+#' Update one or more fields in an Airtable table based on a data.frame. Set
+#' `safely = FALSE` to delete records outside of an interactive session.
+#'
+#' Find more information on the Airtable API methods for updating a record
+#' <https://airtable.com/developers/web/api/update-record> or multiple records
+#' <https://airtable.com/developers/web/api/update-multiple-records>.
 #'
 #' @param data A `data.frame` containing the fields to update. If records is
 #'   `NULL`, data must include a column of record IDs (named by airtable_id_col)
@@ -80,7 +85,7 @@ update_records <- function(data,
 
 
   if (return_json) {
-    if (!inherits(resp, "httr2_response")) {
+    if (!is_httr2_resp(resp)) {
       # FIXME: The body from the batched requests should be combined if possible
       return(lapply(resp, httr2::resp_body_json))
     }
@@ -92,10 +97,6 @@ update_records <- function(data,
 }
 
 #' Update one or more records in an Airtable base
-#'
-#' For more information on the Airtable API, see
-#' <https://airtable.com/developers/web/api/update-record> or
-#' <https://airtable.com/developers/web/api/update-multiple-records>.
 #'
 #' @param req A HTTP response created by [req_query_airtable()]. Optional if
 #'   airttable, url, *or* base and table are passed to [airtable_request()].
