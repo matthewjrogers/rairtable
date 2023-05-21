@@ -75,10 +75,11 @@ A \code{data.frame} (invisibly) of the input data, to be stored as an object
 or piped into further additional functions.
 }
 \description{
-Update one or more fields in an Airtable table.
+Update one or more fields in an Airtable table based on a data.frame. Set
+\code{safely = FALSE} to delete records outside of an interactive session.
 }
 \details{
-For more information on the Airtable API, see
-\url{https://airtable.com/developers/web/api/update-record} or
+Find more information on the Airtable API methods for updating a record
+\url{https://airtable.com/developers/web/api/update-record} or multiple records
 \url{https://airtable.com/developers/web/api/update-multiple-records}.
 }

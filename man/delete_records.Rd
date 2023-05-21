@@ -76,5 +76,11 @@ for a view being present in the URL.}
 A vector of deleted record IDs returned invisibly.
 }
 \description{
-Delete records in an Airtable table based on their Airtable record ID.
+Delete records in an Airtable table based on their Airtable record ID. Set
+\code{safely = FALSE} to delete records outside of an interactive session.
+}
+\details{
+Find more information on the Airtable API methods to delete a record
+\url{https://airtable.com/developers/web/api/delete-record} or multiple records
+\url{https://airtable.com/developers/web/api/delete-multiple-records}.
 }

@@ -70,11 +70,4 @@ the API limit is modified in the future.}
 Delete one record from an Airtable table with \code{\link[=req_delete_record]{req_delete_record()}} or delete
 multiple records with \code{\link[=req_delete_records]{req_delete_records()}}.
 }
-\details{
-More information on the Airtable API:
-\itemize{
-\item \url{https://airtable.com/developers/web/api/delete-record}
-\item \url{https://airtable.com/developers/web/api/delete-multiple-records}
-}
-}
 \keyword{internal}
