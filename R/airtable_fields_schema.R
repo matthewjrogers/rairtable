@@ -56,23 +56,6 @@ modify_fields <- function(fields, drop = NULL) {
   })
 }
 
-#' Vector of field types as of 2023-04-18
-#'
-#' https://airtable.com/developers/web/api/model/field-type
-#' https://airtable.com/developers/web/api/field-model
-#'
-#' @noRd
-field_types <-
-  c(
-    "singleLineText", "email", "url", "multilineText", "number", "percent",
-    "currency", "singleSelect", "multipleSelects", "singleCollaborator",
-    "multipleCollaborators", "multipleRecordLinks", "date", "dateTime",
-    "phoneNumber", "multipleAttachments", "checkbox", "formula", "createdTime",
-    "rollup", "count", "lookup", "multipleLookupValues", "autoNumber", "barcode",
-    "rating", "richText", "duration", "lastModifiedTime", "button", "createdBy",
-    "lastModifiedBy", "externalSyncSource"
-  )
-
 #' Convert a data.frame into a list of lists
 #'
 #' @noRd
@@ -144,7 +127,6 @@ make_field_config <- function(field = NULL,
   field <- field %||% list(name = name, type = type, ...)
   check_list(field, call = call)
 
-
   if (!all(has_name(field, c("name", "type")))) {
     cli_abort(
       "{.arg field} must have the names {.val name} and {.val type}.",
@@ -154,8 +136,7 @@ make_field_config <- function(field = NULL,
 
   check_name(field[["name"]], arg = "name", call = call)
 
-  type <- field[["type"]]
-  field[["type"]] <- arg_match(type, field_types, error_call = call)
+  field[["type"]] <- field_type_match(field[["type"]], error_arg = "type")
 
   if (!is_null(existing_names) && (field[["name"]] %in% existing_names)) {
     cli_abort(
