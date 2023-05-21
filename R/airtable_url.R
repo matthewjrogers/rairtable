@@ -176,16 +176,14 @@ parse_airtable_url <- function(url,
                                require_table = FALSE,
                                require_view = FALSE,
                                call = caller_env()) {
-  check_airtable_url(url, call = call)
-
   base_url <- base_url %||%
     getOption("rairtable.base_url", "https://airtable.com")
+  api_url <- api_url %||%
+    getOption("rairtable.api_url", "https://api.airtable.com")
 
   base_pattern <- glue("(?<={base_url}/)app[[:alnum:]]+(?=/)")
 
-  if (!is_airtable_url(url, base_url)) {
-    api_url <- api_url %||%
-      getOption("rairtable.api_url", "https://api.airtable.com")
+  if (is_airtable_api_url(url, api_url)) {
     api_version <- api_version %||%
       getOption("rairtable.api_version", "0")
 
@@ -193,6 +191,8 @@ parse_airtable_url <- function(url,
       "(?<={api_url}/v{api_version}/)",
       "app[[:alnum:]]+(?=/)"
     )
+  } else {
+    check_airtable_url(url, base_url, call = call)
   }
 
   table_name <- table_name %||% "tbl[[:alnum:]]+"
