@@ -123,8 +123,7 @@ get_airtable_base <- function(base = NULL,
                               url = NULL,
                               airtable = NULL,
                               call = caller_env()) {
-  base <- base %||%
-    airtable_request(
+  base <- base %||% airtable_request(
       url = url,
       airtable = airtable,
       call = call
@@ -141,6 +140,12 @@ get_airtable_base <- function(base = NULL,
   if (is_url(base)) {
     return(parse_airtable_url(base)[["base"]])
   }
+
+  cli_abort(
+    "{.arg base} must be an {.cls airtable} object, an Airtable URL,
+    or a string with a base ID, not {.obj_type_friendly {table}}.",
+    call = call
+  )
 }
 
 
@@ -167,15 +172,24 @@ get_airtable_table <- function(table = NULL,
   }
 
   if (is_url(table)) {
-    return(parse_airtable_url(
-      table,
-      table_name = table_name,
-      require_table = TRUE,
-      call = call
-    )[["table"]])
+    table <-
+      parse_airtable_url(
+        table,
+        table_name = table_name,
+        require_table = TRUE,
+        call = call
+      )[["table"]]
+
+    return(table)
   }
 
   if (is_string(table)) {
     return(table)
   }
+
+  cli_abort(
+    "{.arg table} must be an {.cls airtable} object, an Airtable URL,
+    or a string with a view ID or name, not {.obj_type_friendly {table}}.",
+    call = call
+  )
 }
