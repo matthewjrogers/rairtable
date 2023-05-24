@@ -155,3 +155,4 @@ object. The function also calls \code{\link[=req_auth_airtable]{req_auth_airtabl
 request. Most of the other data access functions in this package wrap
 \code{\link[=req_auth_airtable]{req_auth_airtable()}}.
 }
+\keyword{internal}

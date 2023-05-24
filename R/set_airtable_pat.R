@@ -66,7 +66,6 @@ get_airtable_pat_or_key <- function(token = NULL,
 #'   token.
 #' @inheritParams rlang::args_error_context
 #' @keywords internal
-#' @export
 #' @importFrom rlang caller_call call_name
 #' @importFrom cli cli_bullets cli_alert_success
 #' @importFrom utils read.table write.table
@@ -141,7 +140,6 @@ set_airtable_token <- function(token,
 #' @rdname set_airtable_token
 #' @name get_airtable_token
 #' @keywords internal
-#' @export
 get_airtable_token <- function(token = NULL,
                                default = "AIRTABLE_PAT",
                                call = caller_env(),

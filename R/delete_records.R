@@ -117,7 +117,6 @@ delete_records <- function(data = NULL,
 #'   the API limit is modified in the future.
 #' @inheritDotParams airtable_request
 #' @keywords internal
-#' @export
 #' @importFrom httr2 req_url_path_append req_perform
 req_delete_records <- function(req = NULL,
                                ...,
@@ -178,7 +177,7 @@ req_delete_records <- function(req = NULL,
 
 #' @rdname req_delete_records
 #' @name req_delete_record
-#' @export
+#' @keywords internal
 #' @importFrom httr2 req_perform
 req_delete_record <- function(req = NULL,
                               ...,

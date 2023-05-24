@@ -9,7 +9,6 @@
 #'
 #' @param x Object to test or check.
 #' @keywords internal
-#' @export
 is_airtable_obj <- function(x) {
   inherits(x, "airtable")
 }
@@ -22,7 +21,6 @@ is_airtable_obj <- function(x) {
 #' @param require_fields If `TRUE`, check that x includes a "fields" value that
 #'   is a list with the `airtable_fields_schema` class. Defaults to `FALSE`.
 #' @keywords internal
-#' @export
 check_airtable_obj <- function(x,
                                require_url = TRUE,
                                require_table = TRUE,

@@ -50,7 +50,7 @@
 #' @returns [airtable_request()] returns an HTTP response: an S3 list with class
 #'   httr2_request. Other functions return modified modified HTTP requests.
 #'
-#' @export
+#' @keywords internal
 #' @importFrom cli cli_alert_warning
 #' @importFrom httr2 request req_url_path_append
 airtable_request <- function(url = NULL,
@@ -191,7 +191,7 @@ airtable_api_url_request <- function(base = NULL,
 #'   personal access token (PAT) to authenticate the request. The metadata API
 #'   does not support the API key so allow_key is set to `FALSE` for any
 #'   functions that call that API.
-#' @export
+#' @keywords internal
 #' @importFrom httr2 req_template req_url_query
 req_query_airtable <- function(.req = NULL,
                                ...,
@@ -264,7 +264,7 @@ req_airtable_view <- function(req,
 #'   (https://github.com/matthewjrogers/rairtable)")`)
 #' @param rate Rate passed to [httr2::req_throttle()]. Defaults to `5 / 1`.
 #' @param realm Passed to [httr2::req_throttle()]. Defaults to `NULL`.
-#' @export
+#' @keywords internal
 #' @importFrom httr2 req_auth_bearer_token req_user_agent req_throttle
 req_auth_airtable <- function(req,
                               token = NULL,

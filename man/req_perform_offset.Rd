@@ -40,7 +40,8 @@ in the response. Additional supported options are "records" and "fields".}
 \item{record_cols}{Column names for columns to retain from records data.frame
 when type is "records" or "combine".}
 
-\item{record_nm}{Column names to}
+\item{record_nm}{Names to use for additional columns indicated by
+record_cols. Defaults to \code{NULL}.}
 
 \item{id_col}{An alternate name to use for the id column of the response
 data.frame.}

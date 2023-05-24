@@ -61,7 +61,6 @@ update_records <- function(data,
 
   update_col_names <- get_data_colnames(columns, data = update_data)
 
-
   safety_check(
     safely = safely,
     c(
@@ -82,7 +81,6 @@ update_records <- function(data,
     "{n_records} record{?s} updated.",
     msg_failed = "Can't update records."
   )
-
 
   if (return_json) {
     if (!is_httr2_resp(resp)) {
@@ -105,7 +103,6 @@ update_records <- function(data,
 #' @param records,record Record ID or IDs to update as a character vector.
 #'   Required.
 #' @keywords internal
-#' @export
 #' @importFrom httr2 req_body_json req_perform
 req_update_records <- function(req = NULL,
                                ...,
@@ -181,7 +178,7 @@ req_update_records <- function(req = NULL,
 
 #' @rdname req_update_records
 #' @name req_update_record
-#' @export
+#' @keywords internal
 #' @importFrom httr2 req_perform
 req_update_record <- function(req = NULL,
                               ...,
@@ -198,10 +195,11 @@ req_update_record <- function(req = NULL,
 
   data <- list(
     "fields" = make_field_list(
-      data, max_rows = 1,
+      data,
+      max_rows = 1,
       call = call
-      )[[1]]
-    )
+    )[[1]]
+  )
 
   req <- req_query_airtable(
     .req = req,

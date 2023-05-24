@@ -138,7 +138,7 @@ list_records <- function(airtable = NULL,
     token = token
   )
 
-  req_perform_offset(req, offset = offset)
+  req_perform_offset(req = req, offset = offset)
 }
 
 #' Build a request for the Airtable list records API method
@@ -252,7 +252,6 @@ get_record <- function(airtable = NULL,
 #'   <https://airtable.com/developers/web/api/list-records#response-offset> for
 #'   more information on how the offset value is used by the Airtable API.
 #' @keywords internal
-#' @export
 #' @importFrom httr2 req_url_query req_perform
 #' @importFrom tibble as_tibble
 req_perform_offset <- function(req,
@@ -310,9 +309,9 @@ req_perform_offset <- function(req,
 #'   data.frame.
 #' @param record_cols Column names for columns to retain from records data.frame
 #'   when type is "records" or "combine".
-#' @param record_nm Column names to
+#' @param record_nm Names to use for additional columns indicated by
+#'   record_cols. Defaults to `NULL`.
 #' @keywords internal
-#' @export
 #' @importFrom vctrs vec_cbind
 resp_body_records <- function(resp,
                               simplifyVector = TRUE,

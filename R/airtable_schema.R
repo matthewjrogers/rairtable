@@ -17,7 +17,6 @@
 #'   only work with "update" and "create".
 #' @returns A modified HTTP request.
 #' @keywords internal
-#' @export
 req_airtable_schema <- function(url = NULL,
                                 base = NULL,
                                 table = NULL,
@@ -77,15 +76,18 @@ req_airtable_schema <- function(url = NULL,
   }
 
   if (column_required) {
+
+    if (is_url(column)) {
+      column <- parse_url_field_id(column)
+    } else if (!is_null(url)) {
+      column <- column %||% parse_url_field_id(url)
+    }
+
     if (is_empty(column)) {
       cli_abort(
         "{.arg column} must be supplied to update fields.",
         call = call
       )
-    }
-
-    if (is_url(column)) {
-      column <- parse_url_field_id(column)
     }
 
     check_string(column, allow_empty = FALSE, call = call)

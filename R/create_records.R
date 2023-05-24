@@ -12,9 +12,8 @@
 #'   base. Required.
 #' @inheritParams req_query_airtable
 #' @inheritParams rlang::args_error_context
-#' @keywords internal
 #' @returns Invisibly return response from API call.
-#' @export
+#' @keywords internal
 #' @inheritParams rlang::args_error_context
 #' @inheritParams airtable_request
 req_create_records <- function(req = NULL,
