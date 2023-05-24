@@ -8,7 +8,7 @@
 #' - [check_airtable_url()] errors if url does not start with the base_url value.
 #' - [check_airtable_api_url()] errors if url is not a valid API url.
 #' - [parse_airtable_url()] accepts a base or API url as an input and returns a
-#' named list with the base, table, and view ID values.
+#' named list with the base, table, view, and field ID values found in the URL.
 #'
 #' For more information on the expected URL format for different Airtable API
 #' end points, see the web API documentation at
@@ -167,6 +167,7 @@ check_airtable_api_url <- function(url,
 #'   name. Defaults to `NULL` which extracts strings starting with "tbl" for
 #'   tables IDs and "viw" for view IDs.
 #' @export
+#' @importFrom vctrs list_drop_empty
 parse_airtable_url <- function(url,
                                base_url = NULL,
                                api_url = NULL,
@@ -175,6 +176,7 @@ parse_airtable_url <- function(url,
                                view_name = NULL,
                                require_table = FALSE,
                                require_view = FALSE,
+                               require_field = FALSE,
                                call = caller_env()) {
   base_url <- base_url %||%
     getOption("rairtable.base_url", "https://airtable.com")
@@ -195,30 +197,67 @@ parse_airtable_url <- function(url,
     check_airtable_url(url, base_url, call = call)
   }
 
+  ids <-
+    vctrs::list_drop_empty(
+      list(
+        "base" = string_extract(url, base_pattern),
+        "table" = parse_url_table_id(url, table_name, call),
+        "view" = parse_url_view_id(url, view_name, call),
+        "field" = parse_url_field_id(url)
+      )
+    )
+
+  check_parsed_airtable_url(
+    ids,
+    url,
+    require_table,
+    require_view,
+    require_field,
+    call = call
+  )
+
+  ids
+}
+
+#' Parse table ID or name from URL
+#'
+#' @noRd
+parse_url_table_id <- function(url, table_name = NULL, call = caller_env()) {
   table_name <- table_name %||% "tbl[[:alnum:]]+"
   check_string(table_name, call = call)
   table_pattern <-
     glue(
       "((?<=/){table_name}(?=/))|((?<=/){table_name}$)|((?<=/){table_name}(?=\\?))"
-      )
+    )
 
+  string_extract(url, table_pattern)
+}
+
+#' Parse view ID or name from URL
+#'
+#' @noRd
+parse_url_view_id <- function(url, view_name = NULL, call = caller_env()) {
   view_name <- view_name %||% "viw[[:alnum:]]+"
   check_string(view_name, call = call)
   view_pattern <-
     glue(
       "((?<=/){view_name}(?=/|\\?))|((?<=/){view_name}$)|((?<=view\\=){view_name})"
-      )
-
-  ids <-
-    list(
-      "base" = string_extract(url, base_pattern),
-      "table" = string_extract(url, table_pattern),
-      "view" = string_extract(url, view_pattern)
     )
 
-  check_parsed_airtable_url(ids, url, require_table, require_view, call = call)
+  string_extract(url, view_pattern)
+}
 
-  ids
+#' Parse field ID from URL
+#'
+#' @noRd
+parse_url_field_id <- function(url) {
+  field_name <- "fld[[:alnum:]]+"
+  field_pattern <-
+    glue(
+      "((?<=/){field_name}(?=/|\\?))|((?<=/){field_name}$)"
+    )
+
+  string_extract(url, field_pattern)
 }
 
 #' Does the parsed values from a URL included required IDs?
@@ -228,6 +267,7 @@ check_parsed_airtable_url <- function(ids,
                                       url,
                                       require_table = FALSE,
                                       require_view = FALSE,
+                                      require_field = FALSE,
                                       call = caller_env()) {
   if (is_empty(ids[["base"]])) {
     cli_abort(
@@ -253,6 +293,16 @@ check_parsed_airtable_url <- function(ids,
       c("{.arg url} is not valid.",
         "i" = "{.arg require_view} is `TRUE` and
         {.arg view} can't be found in {.url {url}}."
+      ),
+      call = call
+    )
+  }
+
+  if (require_field && is_empty(ids[["field"]])) {
+    cli_abort(
+      c("{.arg url} is not valid.",
+        "i" = "{.arg require_field} is `TRUE` and
+        {.arg field} or {.arg column} can't be found in {.url {url}}."
       ),
       call = call
     )

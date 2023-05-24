@@ -38,6 +38,7 @@ parse_airtable_url(
   view_name = NULL,
   require_table = FALSE,
   require_view = FALSE,
+  require_field = FALSE,
   call = caller_env()
 )
 }
@@ -91,7 +92,7 @@ details for a description of each function.
 \item \code{\link[=check_airtable_url]{check_airtable_url()}} errors if url does not start with the base_url value.
 \item \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} errors if url is not a valid API url.
 \item \code{\link[=parse_airtable_url]{parse_airtable_url()}} accepts a base or API url as an input and returns a
-named list with the base, table, and view ID values.
+named list with the base, table, view, and field ID values found in the URL.
 }
 
 For more information on the expected URL format for different Airtable API

@@ -28,8 +28,8 @@ req_airtable_schema <- function(url = NULL,
                                 from = c("base", "table", "field"),
                                 token = NULL,
                                 call = caller_env()) {
-  type <- arg_match(type, call = call)
-  from <- arg_match(from, call = call)
+  type <- arg_match(type, error_call = call)
+  from <- arg_match(from, error_call = call)
   type <- paste0(type, "_", from)
 
   template <- "meta/bases"
@@ -84,6 +84,10 @@ req_airtable_schema <- function(url = NULL,
       )
     }
 
+    if (is_url(column)) {
+      column <- parse_url_field_id(column)
+    }
+
     check_string(column, allow_empty = FALSE, call = call)
   }
 
@@ -92,6 +96,7 @@ req_airtable_schema <- function(url = NULL,
     table = table,
     template = template,
     token = token,
+    column = column,
     ...,
     call = call,
     allow_key = FALSE
@@ -124,10 +129,10 @@ get_airtable_base <- function(base = NULL,
                               airtable = NULL,
                               call = caller_env()) {
   base <- base %||% airtable_request(
-      url = url,
-      airtable = airtable,
-      call = call
-    )[["url"]]
+    url = url,
+    airtable = airtable,
+    call = call
+  )[["url"]]
 
   if (is_base_id(base)) {
     return(base)
