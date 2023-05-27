@@ -36,21 +36,11 @@ Default: \code{NULL}}
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{
-  Arguments passed on to \code{\link[=req_airtable_schema]{req_airtable_schema}}
-  \describe{
-    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
-is optional if airtable \emph{or} base and table are supplied. If url is an
-Airtable view, any additional base or table values provided are ignored. If
-airtable is provided, any additional value provided to url is ignored. For
-the metadata API (where only a base ID is required) include \code{require_base = TRUE} to pass to \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} when creating a request.}
-    \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
-airtable are supplied or if require_base is \code{FALSE}. base and table are
-both required if url and airtable are \code{NULL} and require_base is \code{TRUE}.}
-    \item{\code{table}}{Airtable table id or name. Table ID values are strings starting
-with "tbl". Optional if require_table is \code{FALSE}.}
-  }}
+\item{...}{For \code{\link[=request_airtable]{request_airtable()}}, additional parameters passed to
+\code{\link[=parse_airtable_url]{parse_airtable_url()}} if an Airtable url is provided. For
+\code{\link[=req_airtable]{req_airtable()}}, additional parameters passed to
+\code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
+\code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
 }
 \value{
 A list with the created field name, field ID, description (if

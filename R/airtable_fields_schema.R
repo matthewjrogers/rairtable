@@ -5,7 +5,7 @@
 #'
 #' @param field_schema A list of lists. Each child list should have a `name`,
 #'   `type`, and `id` as well as an optional `options`
-#' @return An `airtable_fields_schema`object
+#' @return An `airtable_fields_schema` object
 #' @export
 airtable_fields_schema <- function(field_schema) {
   new_airtable_fields_schema(field_schema)
@@ -19,14 +19,23 @@ new_airtable_fields_schema <- function(fields, call = caller_env()) {
   fields
 }
 
+#' Is x have an airtable_fields_schema class?
+#'
+#' @noRd
+is_airtable_fields_schema <- function(x) {
+  inherits(x, "airtable_fields_schema")
+}
+
+#' Error if fields does not meet the requirements for an airtable_fields_schema
+#' object
+#'
 #' @noRd
 check_airtable_fields_schema <- function(fields, call = caller_env()) {
   if (any(vapply(fields, length, NA_integer_)) < 3) {
     cli_abort(
-      c("Every item in {.arg fields} must be length 3 or longer with
+      "Every item in {.arg fields} must be length 3 or longer with
         names {.val {c('name', 'id', 'data')}}.",
-        call = call
-      )
+      call = call
     )
   }
 

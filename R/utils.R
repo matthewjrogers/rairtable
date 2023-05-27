@@ -14,6 +14,13 @@ map <- function(.x, .f, ...) {
 }
 
 
+#' Does x have the class httr2_request?
+#'
+#' @noRd
+is_httr2_req <- function(x) {
+  inherits(x, "httr2_request")
+}
+
 #' Does x have the class httr2_response?
 #'
 #' @noRd

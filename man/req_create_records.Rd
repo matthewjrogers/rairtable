@@ -15,15 +15,14 @@ req_create_records(
 }
 \arguments{
 \item{req}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
-\code{\link[=airtable_request]{airtable_request()}}. If .req is provided to \code{\link[=req_query_airtable]{req_query_airtable()}}, url,
-api_url, api_version, and airtable parameters are ignored. req is required
-for \code{\link[=req_auth_airtable]{req_auth_airtable()}}.}
+\code{\link[=request_airtable]{request_airtable()}}. If .req is provided, any supplied url, api_url,
+api_version, or airtable parameters are ignored.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
+  Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
   \describe{
     \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
+is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For

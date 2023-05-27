@@ -27,14 +27,14 @@ req_update_record(
 )
 }
 \arguments{
-\item{req}{A HTTP response created by \code{\link[=req_query_airtable]{req_query_airtable()}}. Optional if
-airttable, url, \emph{or} base and table are passed to \code{\link[=airtable_request]{airtable_request()}}.}
+\item{req}{A HTTP response created by \code{\link[=req_airtable]{req_airtable()}}. Optional if
+airttable, url, \emph{or} base and table are passed to \code{\link[=request_airtable]{request_airtable()}}.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
+  Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
   \describe{
     \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
+is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For

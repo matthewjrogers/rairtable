@@ -9,7 +9,7 @@ test_that("is_airtable_url works", {
     is_airtable_url(
       "https://custom.airtable.com",
       "https://custom.airtable.com"
-      )
+    )
   )
 })
 
@@ -43,8 +43,10 @@ test_that("check_airtable_url works", {
     check_airtable_url("https://api.airtable.com")
   )
   expect_null(
-    check_airtable_url("https://custom.airtable.com",
-                       "https://custom.airtable.com")
+    check_airtable_url(
+      "https://custom.airtable.com",
+      "https://custom.airtable.com"
+    )
   )
 })
 

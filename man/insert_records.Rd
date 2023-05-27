@@ -40,9 +40,9 @@ base. Required.}
 \item{return_json}{If \code{TRUE}, return the response from the Airtable API as
 list. If \code{FALSE} (default), return the input data.frame or list.}
 
-\item{...}{For \code{\link[=airtable_request]{airtable_request()}}, additional parameters passed to
+\item{...}{For \code{\link[=request_airtable]{request_airtable()}}, additional parameters passed to
 \code{\link[=parse_airtable_url]{parse_airtable_url()}} if an Airtable url is provided. For
-\code{\link[=req_query_airtable]{req_query_airtable()}}, additional parameters passed to
+\code{\link[=req_airtable]{req_airtable()}}, additional parameters passed to
 \code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
 \code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
 }

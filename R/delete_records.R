@@ -20,10 +20,10 @@
 #'   records and abort if confirmation is not provided.
 #' @param batch_size Deprecated. Number of records to delete in a single batch.
 #'   batch_size can now be set using the "rairtable.batch_size" option.
-#' @inheritParams airtable_request
+#' @inheritParams request_airtable
 #' @param return_json If `TRUE`, return the JSON response from the Airtable API.
 #'   If `FALSE` (default), return a vector of deleted record IDs.
-#' @inheritDotParams airtable_request -api_url -api_version -call
+#' @inheritDotParams request_airtable -api_url -api_version -call
 #' @returns A vector of deleted record IDs returned invisibly.
 #'
 #' @export
@@ -46,17 +46,22 @@ delete_records <- function(data = NULL,
   airtable_id_col <- airtable_id_col %||%
     getOption("rairtable.id_col", "airtable_record_id")
 
-  data_records <- !is_null(data) &&
-    (has_name(data, airtable_id_col) || tibble::has_rownames(data))
-
-  if (data_records) {
+  if (!is_null(data)) {
     if (!is_null(records)) {
       cli::cli_alert_warning(
         "{.arg records} is ignored when {.arg data} is supplied."
       )
     }
 
-    records <- get_record_id_col(data, id_col = airtable_id_col)
+    if (has_name(data, airtable_id_col) || tibble::has_rownames(data)) {
+      records <- get_record_id_col(data, id_col = airtable_id_col)
+    } else {
+      check_data_frame(data)
+      cli::cli_abort(
+        "{.arg data} must be a data frame with a column named {airtable_id_col}
+        or a data frame with rownames."
+      )
+    }
   }
 
   check_character(records)
@@ -71,7 +76,7 @@ delete_records <- function(data = NULL,
 
   safety_check(
     safely = safely,
-    c(">" = text),
+    text = c(">" = text),
     message = "Record deletion cancelled."
   )
 
@@ -104,7 +109,7 @@ delete_records <- function(data = NULL,
 #' Delete one record from an Airtable table with [req_delete_record()] or delete
 #' multiple records with [req_delete_records()].
 #'
-#' @inheritParams airtable_request
+#' @inheritParams request_airtable
 #' @param req If req is supplied, url or any additional parameters passed to ...
 #'   are ignored.
 #' @param records Required. Character vector with record IDs. If only one record
@@ -115,7 +120,7 @@ delete_records <- function(data = NULL,
 #'   must be length 10 or less. This default batch size is set by
 #'   "rairtable.batch_size" option. The option default is 10 may be changed if
 #'   the API limit is modified in the future.
-#' @inheritDotParams airtable_request
+#' @inheritDotParams request_airtable
 #' @keywords internal
 #' @importFrom httr2 req_url_path_append req_perform
 req_delete_records <- function(req = NULL,
@@ -139,9 +144,9 @@ req_delete_records <- function(req = NULL,
     return(resp)
   }
 
-  req <- req %||% airtable_request(..., call = call)
+  req <- req %||% request_airtable(..., call = call)
 
-  req <- req_query_airtable(
+  req <- req_airtable(
     .req = req,
     method = "DELETE",
     token = token,
@@ -184,9 +189,9 @@ req_delete_record <- function(req = NULL,
                               record,
                               token = NULL,
                               call = caller_env()) {
-  req <- req %||% airtable_request(..., call = call)
+  req <- req %||% request_airtable(..., call = call)
 
-  req <- req_query_airtable(
+  req <- req_airtable(
     .req = req,
     record = record,
     template = "/{record}",

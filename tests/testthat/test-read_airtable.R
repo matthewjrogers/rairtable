@@ -32,19 +32,19 @@ test_that("read_airtable works", {
     "data.frame"
   )
 
-  record <- atbl_df[!is.na(atbl_df$Name), ][[getOption("rairtable.id_col", "airtable_record_id")]]
+  records <- atbl_df[!is.na(atbl_df$Name), ][[getOption("rairtable.id_col", "airtable_record_id")]]
 
   expect_s3_class(
     get_record(
       atbl,
-      record = record[[1]]
+      record = records[[1]]
     ),
     "data.frame"
   )
 
   delete_records(
     airtable = atbl,
-    records = record,
+    records = records[[length(records)]],
     safely = FALSE
   )
 })

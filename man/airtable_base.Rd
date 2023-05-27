@@ -2,7 +2,7 @@
 % Please edit documentation in R/airtable_base.R
 \name{airtable_base}
 \alias{airtable_base}
-\alias{list_airtable_bases}
+\alias{list_bases}
 \title{Get metadata for an Airtable base or list bases for an account}
 \usage{
 airtable_base(
@@ -13,17 +13,17 @@ airtable_base(
   token = NULL
 )
 
-list_airtable_bases(..., base = NULL, token = NULL)
+list_bases(base = NULL, token = NULL)
 }
 \arguments{
-\item{base}{A character vector of base id values. If supplied to
-\code{\link[=list_airtable_bases]{list_airtable_bases()}}, return only those Airtable bases with matching
-IDs.}
+\item{base}{An Airtable base ID. For \code{\link[=airtable_base]{airtable_base()}}, base is optional if
+url or airtable are supplied and must be a string. For \code{\link[=list_bases]{list_bases()}}, base
+is a character vector of base id values and the function returns only those
+Airtable bases with matching IDs.}
 
-\item{...}{Additional parameters passed to \code{\link[=req_airtable_schema]{req_airtable_schema()}}. Supports
-the use of an optional url or airtable parameter instead of base for
-\code{\link[=airtable_base]{airtable_base()}}. Additional parameters are not used by
-\code{\link[=list_airtable_bases]{list_airtable_bases()}} at present.}
+\item{...}{Optional airtable or url parameter. url must be a URL for an
+Airtable API call or an Airtable base. url is optional if airtable or base
+are supplied and airtable is optional if base or url are supplied.}
 
 \item{metadata_api_url_pattern}{Metadata API URL pattern. Deprecated.}
 
@@ -39,7 +39,7 @@ the Airtable base.
 \description{
 Get an "airtable_base_schema" object, a tibble with a list of tables, or a
 tibble with a list of bases associated with the provided personal access
-token.
+token. Additional parameters are not used by \code{\link[=list_bases]{list_bases()}} at present.
 }
 \examples{
 \dontrun{

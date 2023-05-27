@@ -21,7 +21,7 @@ update_records(
 or rownames with record IDs.}
 
 \item{airtable}{An \code{airtable} object. Optional if url or base and table are
-provided with additional parameters passed to \code{\link[=airtable_request]{airtable_request()}}.}
+provided with additional parameters passed to \code{\link[=request_airtable]{request_airtable()}}.}
 
 \item{airtable_id_col}{Column containing Airtable record IDs. Not required if
 record IDs are stored in row names as returned from \code{\link[=read_airtable]{read_airtable()}}}
@@ -44,10 +44,10 @@ number of rows before executing update.}
 as a list. If \code{FALSE} (default), return input data.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
+  Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
   \describe{
     \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
+is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For

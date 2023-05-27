@@ -15,7 +15,7 @@
 #' <https://airtable.com/developers/web/api/introduction>
 #'
 #' @name airtable_url
-#' @inheritParams airtable_request
+#' @inheritParams request_airtable
 NULL
 
 #' @rdname airtable_url
@@ -25,8 +25,11 @@ NULL
 #'   "https://airtable.com/{baseID}/{tableIdOrName}/{viewId}"
 #' @param base_url Base URL for an Airtable base or view. Defaults `NULL` and
 #'   set to `getOption("rairtable.base_url", "https://airtable.com")`.
+#' @param allow_shared If `FALSE` (default), [is_airtable_url()] returns `FALSE`
+#'   for any shared base or view URL that starts with
+#'   "https://airtable.com/shr".
 #' @export
-is_airtable_url <- function(url, base_url = NULL) {
+is_airtable_url <- function(url, base_url = NULL, allow_shared = FALSE) {
   if (is_null(url)) {
     return(FALSE)
   }
@@ -34,9 +37,12 @@ is_airtable_url <- function(url, base_url = NULL) {
   base_url <- base_url %||%
     getOption("rairtable.base_url", "https://airtable.com")
 
-  is_url(url) & grepl(glue("^{base_url}"), url)
+  if (!allow_shared) {
+    is_url(url) & grepl(paste0("^", base_url, "(?!/shr)"), url, perl = TRUE)
+  } else {
+    is_url(url) & grepl(paste0("^", base_url), url)
+  }
 }
-
 
 #' @rdname airtable_url
 #' @name is_airtable_api_url
@@ -65,18 +71,25 @@ is_airtable_api_url <- function(url,
 check_airtable_url <- function(url,
                                base_url = NULL,
                                allow_null = FALSE,
+                               allow_shared = FALSE,
                                call = caller_env()) {
   check_url(url, allow_null = allow_null, call = call)
 
-  if (is_airtable_url(url, base_url) || (allow_null && is_null(url))) {
+  if (is_airtable_url(url, base_url, allow_shared) || (allow_null && is_null(url))) {
     return(invisible(NULL))
+  }
+
+  message <- "{.arg url} must start with the {.arg base_url}: {.url {base_url}}"
+
+  if (!is_null(url) && any(grepl("/shr", url))) {
+    message <- "{.arg url} can't be an Airtable shared url."
   }
 
   base_url <- base_url %||%
     getOption("rairtable.base_url", "https://airtable.com")
 
   cli_abort(
-    "{.arg url} must start with the {.arg base_url}: {.url {base_url}}",
+    message,
     call = call
   )
 }
@@ -107,6 +120,9 @@ check_url <- function(url,
 #'   supplied url. If a string with a table name is provided, the string must be
 #'   part of the string supplied to url. If `FALSE` (default), there is no check
 #'   for a table being present in the URL.
+#' @param require_view If `TRUE`, the string "viw" must be included in the
+#'   string supplied to url. If `FALSE` (default), there is no check
+#'   for a view being present in the URL.
 #' @param require_view If `TRUE`, the string "viw" must be included in the
 #'   string supplied to url. If `FALSE` (default), there is no check
 #'   for a view being present in the URL.
@@ -166,6 +182,8 @@ check_airtable_api_url <- function(url,
 #' @param table_name,view_name Pattern to use when parsing a table name or view
 #'   name. Defaults to `NULL` which extracts strings starting with "tbl" for
 #'   tables IDs and "viw" for view IDs.
+#' @param require_field If `TRUE`, the url supplied to [parse_airtable_url()]
+#'   must include a string starting with "fld" to use as the field ID .
 #' @export
 #' @importFrom vctrs list_drop_empty
 parse_airtable_url <- function(url,

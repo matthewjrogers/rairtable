@@ -11,7 +11,7 @@ airtable_fields_schema(field_schema)
 \code{type}, and \code{id} as well as an optional \code{options}}
 }
 \value{
-An \code{airtable_fields_schema}object
+An \code{airtable_fields_schema} object
 }
 \description{
 Create an \code{airtable_fields_schema} object from a list of lists to use for data

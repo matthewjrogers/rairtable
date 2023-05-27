@@ -144,7 +144,7 @@ get_airtable_token <- function(token = NULL,
                                default = "AIRTABLE_PAT",
                                call = caller_env(),
                                ...) {
-  check_string(default)
+  check_string(default, call = call)
   token <- token %||% Sys.getenv(default)
 
   if (!is.null(token) && token != "") {

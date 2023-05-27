@@ -43,14 +43,14 @@ Airtable limits the number of records that can be deleted, updated, or created i
 
 \subsection{\code{rairtable.api_url}}{
 
-The base URL for the Airtable API is "https://api.airtable.com". This default value can be modified using the \code{rairtable.api_url} option. This option is used by \code{\link[=is_airtable_api_url]{is_airtable_api_url()}}, \code{\link[=check_airtable_api_url]{check_airtable_api_url()}}, and, optionally, \code{\link[=airtable_request]{airtable_request()}}.
+The base URL for the Airtable API is "https://api.airtable.com". This default value can be modified using the \code{rairtable.api_url} option. This option is used by \code{\link[=is_airtable_api_url]{is_airtable_api_url()}}, \code{\link[=check_airtable_api_url]{check_airtable_api_url()}}, and, optionally, \code{\link[=request_airtable]{request_airtable()}}.
 }
 
 \subsection{\code{rairtable.api_version}}{
 
 The Airtable API version number is \code{0}. This default value can be modified using
 the \code{rairtable.api_version} option. This option may be used by
-\code{\link[=airtable_request]{airtable_request()}}.
+\code{\link[=request_airtable]{request_airtable()}}.
 }
 
 \subsection{\code{rairtable.base_url}}{

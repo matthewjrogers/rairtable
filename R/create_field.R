@@ -14,11 +14,9 @@
 #'   See the Airtable Web API documentation on field types and cell values for
 #'   more information: <https://airtable.com/developers/web/api/field-model>
 #'   Default: `NULL`
-#' @inheritParams req_airtable_schema
-#' @inheritDotParams req_airtable_schema -type -from -call -column
+#' @inheritParams req_airtable
 #' @return A list with the created field name, field ID, description (if
 #'   provided), and options.
-#' @rdname create_field
 #' @export
 #' @importFrom vctrs list_drop_empty
 #' @importFrom httr2 req_perform
@@ -45,10 +43,9 @@ create_field <- function(airtable = NULL,
     )
 
   req <-
-    req_airtable_schema(
+    request_airtable_meta(
       airtable = airtable,
-      type = "create",
-      from = "field",
+      meta = "create_field",
       data = data,
       token = token,
       ...

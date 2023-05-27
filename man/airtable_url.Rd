@@ -9,7 +9,7 @@
 \alias{parse_airtable_url}
 \title{Test, check, and parse Airtable URLs and API URLs}
 \usage{
-is_airtable_url(url, base_url = NULL)
+is_airtable_url(url, base_url = NULL, allow_shared = FALSE)
 
 is_airtable_api_url(url, api_url = NULL)
 
@@ -17,6 +17,7 @@ check_airtable_url(
   url,
   base_url = NULL,
   allow_null = FALSE,
+  allow_shared = FALSE,
   call = caller_env()
 )
 
@@ -50,6 +51,10 @@ parse_airtable_url(
 \item{base_url}{Base URL for an Airtable base or view. Defaults \code{NULL} and
 set to \code{getOption("rairtable.base_url", "https://airtable.com")}.}
 
+\item{allow_shared}{If \code{FALSE} (default), \code{\link[=is_airtable_url]{is_airtable_url()}} returns \code{FALSE}
+for any shared base or view URL that starts with
+"https://airtable.com/shr".}
+
 \item{api_url}{Expected base URL for an API url. Defaults to \code{NULL} and set
 to \code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
 
@@ -80,6 +85,9 @@ api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
 \item{table_name, view_name}{Pattern to use when parsing a table name or view
 name. Defaults to \code{NULL} which extracts strings starting with "tbl" for
 tables IDs and "viw" for view IDs.}
+
+\item{require_field}{If \code{TRUE}, the url supplied to \code{\link[=parse_airtable_url]{parse_airtable_url()}}
+must include a string starting with "fld" to use as the field ID .}
 }
 \description{
 Utility functions for checking and validating Airtable URLs and API URLs. See

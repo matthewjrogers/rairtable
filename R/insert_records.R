@@ -7,7 +7,7 @@
 #' [insert_records()] and [create_records()] are identical.
 #'
 #' @param data A data.frame with records to insert.
-#' @inheritParams airtable_request
+#' @inheritParams request_airtable
 #' @inheritParams req_create_records
 #' @param return_json If `TRUE`, return the response from the Airtable API as
 #'   list. If `FALSE` (default), return the input data.frame or list.
@@ -23,7 +23,6 @@ insert_records <- function(data,
                            batch_size = deprecated(),
                            return_json = FALSE,
                            ...) {
-
   check_airtable_obj(airtable, allow_null = TRUE)
   check_data_frame_rows(data)
   n_records <- nrow(data)
@@ -38,7 +37,7 @@ insert_records <- function(data,
   cli::cli_progress_step(
     "{n_records} record{?s} created.",
     msg_failed = "Can't create records."
-    )
+  )
 
   if (return_json) {
     if (!is_httr2_resp(resp)) {

@@ -9,10 +9,12 @@
 #' @param column Column ID, Defaults to `NULL`. Only required when type =
 #'   "update" and from = "field".
 #' @param ... Additional parameters passed to [req_airtable()]
-#' @param meta Option for the type of API call to use for bases, tables, or
-#'   fields. Options include "schema_base", "create_base", "list_base",
-#'   "update_table", "create_table", "update_field", or "create_field".
-#'   Required.
+#' @param meta Type of API call to use, Default: c("schema", "list", "update",
+#'   "create")
+#' @param what Is the API call for bases, tables, or fields? Default: c("base",
+#'   "table", "field"). Not all combinations of type and from are supported.
+#'   "base" works with "schema", "create", and "list", "table" and "field" both
+#'   only work with "update" and "create".
 #' @returns A modified HTTP request.
 #' @keywords internal
 request_airtable_meta <- function(url = NULL,

@@ -13,7 +13,7 @@ test_that("airtable_base works", {
   )
 
   expect_s3_class(
-    list_airtable_bases(),
+    list_bases(),
     "data.frame"
   )
 })

@@ -1,8 +1,8 @@
 #' Use httr2 to make a POST request to create records in an Airtable table
 #'
 #' @name req_create_records
-#' @inheritParams airtable_request
-#' @inheritDotParams airtable_request -api_url -api_version
+#' @inheritParams request_airtable
+#' @inheritDotParams request_airtable -api_url -api_version
 #' @param data A data.frame or list of records to create in Airtable. Column
 #'   names or the names of list values must match the field names used in the
 #'   Airtable base. Required.
@@ -10,12 +10,12 @@
 #'   base if possible. typecase must be set to `TRUE` to add new values to a
 #'   multiselect field type.
 #'   base. Required.
-#' @inheritParams req_query_airtable
+#' @inheritParams req_airtable
 #' @inheritParams rlang::args_error_context
 #' @returns Invisibly return response from API call.
 #' @keywords internal
 #' @inheritParams rlang::args_error_context
-#' @inheritParams airtable_request
+#' @inheritParams request_airtable
 req_create_records <- function(req = NULL,
                                ...,
                                data,
@@ -24,7 +24,7 @@ req_create_records <- function(req = NULL,
                                call = caller_env()) {
   req <- req %||%
     req_auth_airtable(
-      req = airtable_request(..., call = call),
+      req = request_airtable(..., call = call),
       token = token
     )
 
@@ -51,7 +51,7 @@ req_create_records <- function(req = NULL,
     return(resp)
   }
 
-  data <- set_names(data, rep_len("fields", length(data)))
+  data <- set_names(data, rep_len("fields", n_records))
 
   check_bool(typecast, call = call)
 

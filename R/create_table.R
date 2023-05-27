@@ -1,7 +1,7 @@
 #' Create or update the structure of an Airtable table
 #'
 #' @name create_table
-#' @inheritParams req_airtable_schema
+#' @inheritParams request_airtable_meta
 #' @keywords internal
 #' @noRd
 create_table <- function(airtable = NULL,
@@ -9,10 +9,10 @@ create_table <- function(airtable = NULL,
                          name = NULL,
                          description = NULL,
                          fields = NULL,
+                         token = NULL,
                          ...) {
-  model <-
+  model <- model %||%
     make_table_model(
-      model = model,
       name = name,
       description = description,
       fields = fields
@@ -20,12 +20,12 @@ create_table <- function(airtable = NULL,
 
   # check_table_model(model)
 
-  req <- req_airtable_schema(
+  req <- request_airtable_meta(
     airtable = airtable,
     ...,
+    meta = "create_table",
     data = model,
-    type = "create",
-    from = "table"
+    token = token
   )
 
   resp <- httr2::req_perform(req)
@@ -42,10 +42,9 @@ update_table <- function(airtable = NULL,
                          name = NULL,
                          description = NULL,
                          ...) {
-  req_airtable_schema(
+  request_airtable_meta(
     airtable = airtable,
-    type = "update",
-    from = "table",
+    meta = "update_table",
     ...
   )
 }
@@ -64,18 +63,14 @@ make_table_config <- function(...) {
 #' <https://airtable.com/developers/web/api/model/table-model>
 #'
 #' @noRd
-make_table_model <- function(model = NULL,
-                             name = NULL,
+make_table_model <- function(name = NULL,
                              description = NULL,
                              fields = NULL,
                              ...,
                              call = caller_env()) {
-  model <- model %||%
-    list(
-      name = name,
-      description = description,
-      fields = make_field_array(fields, arg = "fields", call = call)
-    )
-
-  model
+  list(
+    name = name,
+    description = description,
+    fields = make_field_array(fields, arg = "fields", call = call)
+  )
 }

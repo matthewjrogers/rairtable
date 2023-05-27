@@ -5,8 +5,10 @@ test_that("delete_records works", {
   initial_records <- read_airtable(atbl)
 
   test_records <-
-    data.frame("Name" = c("Record 1", "Record 2"),
-               "Notes" = c("Notes 1", "Notes 2"))
+    data.frame(
+      "Name" = c("Record 1", "Record 2"),
+      "Notes" = c("Notes 1", "Notes 2")
+    )
 
   insert_records(test_records, atbl)
 
@@ -20,7 +22,7 @@ test_that("delete_records works", {
   records_deleted <-
     records_updated[records_updated$Name %in% test_records$Name, ]
 
-  delete_records(records_deleted, atbl, safely = FALSE)
+  delete_records(records_deleted, airtable = atbl, safely = FALSE)
 
   expect_identical(
     nrow(initial_records),

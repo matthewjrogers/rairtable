@@ -11,7 +11,7 @@
 #'   `NULL`, data must include a column of record IDs (named by airtable_id_col)
 #'   or rownames with record IDs.
 #' @param airtable An `airtable` object. Optional if url or base and table are
-#'   provided with additional parameters passed to [airtable_request()].
+#'   provided with additional parameters passed to [request_airtable()].
 #' @param airtable_id_col Column containing Airtable record IDs. Not required if
 #'   record IDs are stored in row names as returned from [read_airtable()]
 #' @param columns Columns in the data to update on Airtable. Can be a vector of
@@ -27,7 +27,7 @@
 #'   number of rows before executing update.
 #' @param return_json If `TRUE`, return JSON repsponse from the Airtable web API
 #'   as a list. If `FALSE` (default), return input data.
-#' @inheritDotParams airtable_request -api_url -api_version -call
+#' @inheritDotParams request_airtable -api_url -api_version -call
 #' @return A `data.frame` (invisibly) of the input data, to be stored as an object
 #'   or piped into further additional functions.
 #'
@@ -96,10 +96,10 @@ update_records <- function(data,
 
 #' Update one or more records in an Airtable base
 #'
-#' @param req A HTTP response created by [req_query_airtable()]. Optional if
-#'   airttable, url, *or* base and table are passed to [airtable_request()].
-#' @inheritDotParams airtable_request -api_url -api_version
-#' @inheritParams req_query_airtable
+#' @param req A HTTP response created by [req_airtable()]. Optional if
+#'   airttable, url, *or* base and table are passed to [request_airtable()].
+#' @inheritDotParams request_airtable -api_url -api_version
+#' @inheritParams req_airtable
 #' @param records,record Record ID or IDs to update as a character vector.
 #'   Required.
 #' @keywords internal
@@ -115,8 +115,8 @@ req_update_records <- function(req = NULL,
   method <- match.arg(method, c("PATCH", "PUT"))
 
   if (is_null(req)) {
-    req <- req_query_airtable(
-      .req = airtable_request(..., call = call),
+    req <- req_airtable(
+      .req = request_airtable(..., call = call),
       method = method,
       token = token,
       call = call
@@ -189,7 +189,7 @@ req_update_record <- function(req = NULL,
                               call = caller_env()) {
   method <- match.arg(method, c("PATCH", "PUT"))
 
-  req <- req %||% airtable_request(..., call = call)
+  req <- req %||% request_airtable(..., call = call)
 
   check_string(record, allow_empty = FALSE, call = call)
 
@@ -201,7 +201,7 @@ req_update_record <- function(req = NULL,
     )[[1]]
   )
 
-  req <- req_query_airtable(
+  req <- req_airtable(
     .req = req,
     template = "/{record}",
     record = record,

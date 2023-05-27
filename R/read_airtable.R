@@ -23,9 +23,9 @@
 #'   to `getOption("rairtable.id_col", "airtable_record_id")`.
 #' @param max_rows Optional maximum number of rows to read. Defaults to `NULL`
 #' @param ... For [read_airtable()], additional query parameters can be passed
-#'   to [req_query_airtable()]. For [list_records()] and
+#'   to [req_airtable()]. For [list_records()] and
 #'   [get_record()], additional parameters, such as url, can be passed
-#'   to [airtable_request()].
+#'   to [request_airtable()].
 #' @inheritParams rlang::args_error_context
 #'
 #' @return A data.frame with the records from the Airtable base and table
@@ -45,10 +45,11 @@ read_airtable <- function(airtable = NULL,
                           ...) {
   check_airtable_obj(airtable, allow_null = TRUE)
 
-  .req <- req_query_airtable(
+  .req <- req_airtable(
     airtable = airtable,
     ...,
     fields = fields,
+    remove_view = FALSE,
     token = token
   )
 
@@ -88,26 +89,10 @@ read_airtable <- function(airtable = NULL,
 
 #' @rdname read_airtable
 #' @name list_records
-#' @inheritParams airtable_request
-#' @param view Airtable view ID or name, Default: `NULL`. If the supplied url or
-#'   airtable object includes a view, the view provided to this parameter is
-#'   ignored.
-#' @param fields Fields to return from Airtable base, Default: `NULL`
-#' @param sort Field to sort by, Default: `NULL`
-#' @param desc If `TRUE`, sort in descending order, Default: `FALSE`
-#' @param max_records Maximum number of records to return, Default: `NULL`. Must
-#'   be 100 or less.
-#' @param page_size Max records to return per page, Default: `NULL`
-#' @param cell_format Cell format for "Link to another record" fields. Defaults
-#'   to "json" which returns a unique record ID. A "string" cell_format returns
-#'   the displayed character string.
-#' @param tz,locale Time zone and locale, Defaults to `NULL`. If cell_format is
-#'   "string", tz defaults to `Sys.timezone()` and locale defaults to
-#'   `Sys.getlocale("LC_TIME")`.
-#' @param fields_by_id If `TRUE`, return fields by id, Default: `FALSE`
-#' @param offset Offset value. Primarily intended for internal use.
+#' @inheritParams request_airtable
+#' @inheritParams req_list_records
+#' @inheritParams req_perform_offset
 #' @export
-#' @importFrom httr2 req_url_path_append req_url_query
 list_records <- function(airtable = NULL,
                          view = NULL,
                          sort = NULL,
@@ -122,7 +107,7 @@ list_records <- function(airtable = NULL,
                          token = NULL,
                          offset = NULL,
                          ...) {
-  req <- req_airtable_list_records(
+  req <- req_list_records(
     airtable = airtable,
     view = view,
     ...,
@@ -143,23 +128,41 @@ list_records <- function(airtable = NULL,
 
 #' Build a request for the Airtable list records API method
 #'
-#' @noRd
-req_airtable_list_records <- function(req = NULL,
-                                      airtable = NULL,
-                                      view = NULL,
-                                      sort = NULL,
-                                      max_records = 100,
-                                      page_size = NULL,
-                                      tz = NULL,
-                                      locale = NULL,
-                                      fields_by_id = FALSE,
-                                      fields = NULL,
-                                      desc = FALSE,
-                                      cell_format = NULL,
-                                      token = NULL,
-                                      ...,
-                                      call = caller_env()) {
-  req <- req %||% airtable_request(
+#' @name req_list_records
+#' @param view Airtable view ID or name, Default: `NULL`. If the supplied url or
+#'   airtable object includes a view, the view provided to this parameter is
+#'   ignored.
+#' @param fields Fields to return from Airtable base, Default: `NULL`
+#' @param sort Field to sort by, Default: `NULL`
+#' @param desc If `TRUE`, sort in descending order, Default: `FALSE`
+#' @param max_records Maximum number of records to return, Default: `NULL`. Must
+#'   be 100 or less.
+#' @param page_size Max records to return per page, Default: `NULL`
+#' @param cell_format Cell format for "Link to another record" fields. Defaults
+#'   to "json" which returns a unique record ID. A "string" cell_format returns
+#'   the displayed character string.
+#' @param tz,locale Time zone and locale, Defaults to `NULL`. If cell_format is
+#'   "string", tz defaults to `Sys.timezone()` and locale defaults to
+#'   `Sys.getlocale("LC_TIME")`.
+#' @param fields_by_id If `TRUE`, return fields by id, Default: `FALSE`
+#' @keywords internal
+#' @importFrom httr2 req_url_path_append req_url_query
+req_list_records <- function(req = NULL,
+                             airtable = NULL,
+                             view = NULL,
+                             sort = NULL,
+                             max_records = 100,
+                             page_size = NULL,
+                             tz = NULL,
+                             locale = NULL,
+                             fields_by_id = FALSE,
+                             fields = NULL,
+                             desc = FALSE,
+                             cell_format = NULL,
+                             token = NULL,
+                             ...,
+                             call = caller_env()) {
+  req <- req %||% request_airtable(
     airtable = airtable,
     view = view,
     ...,
@@ -186,7 +189,7 @@ req_airtable_list_records <- function(req = NULL,
     fields_by_id <- NULL
   }
 
-  req <- req_query_airtable(
+  req <- req_airtable(
     .req = req,
     sort = sort,
     cellFormat = cell_format,
@@ -195,6 +198,7 @@ req_airtable_list_records <- function(req = NULL,
     maxRecords = max_records,
     pageSize = page_size,
     returnFieldsByFieldId = fields_by_id,
+    remove_view = FALSE,
     token = token,
     call = call
   )
@@ -218,14 +222,14 @@ get_record <- function(airtable = NULL,
                        airtable_id_col = NULL,
                        token = NULL,
                        ...) {
-  req <- airtable_request(
+  req <- request_airtable(
     airtable = airtable,
     ...
   )
 
   check_string(record)
 
-  req <- req_query_airtable(
+  req <- req_airtable(
     .req = req,
     template = "/{record}",
     record = record,
@@ -245,12 +249,13 @@ get_record <- function(airtable = NULL,
 
 #' Get the body from API requests with a series of offset values
 #'
-#' @param req A modified HTTP request from [airtable_request()] or a httr2
+#' @param req A modified HTTP request from [request_airtable()] or a httr2
 #'   function.
 #' @param offset Offset value to passed to [httr2::req_url_query()] as part of
 #'   the API call. See
 #'   <https://airtable.com/developers/web/api/list-records#response-offset> for
 #'   more information on how the offset value is used by the Airtable API.
+#'   Primarily intended for developer use only.
 #' @keywords internal
 #' @importFrom httr2 req_url_query req_perform
 #' @importFrom tibble as_tibble
@@ -318,8 +323,8 @@ resp_body_records <- function(resp,
                               type = "combine",
                               record_cols = c("id", "createdTime"),
                               record_nm = NULL,
-                              call = caller_env(),
-                              ...) {
+                              ...,
+                              call = caller_env()) {
   body <- httr2::resp_body_json(resp, simplifyVector = simplifyVector)
 
   type <-
@@ -344,9 +349,9 @@ resp_body_records <- function(resp,
     )
 
     if (is_empty(fields)) {
-      fields <- NULL
+      fields <- data.frame()
       cli::cli_warn(
-        "The supplied {.arg record} is empty.",
+        "{.arg record} is empty.",
         call = call
       )
     }

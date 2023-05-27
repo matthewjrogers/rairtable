@@ -46,10 +46,10 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
 \item{...}{
-  Arguments passed on to \code{\link[=airtable_request]{airtable_request}}
+  Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
   \describe{
     \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=airtable_request]{airtable_request()}} returns  \code{httr2::request(url)}. url
+is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
 is optional if airtable \emph{or} base and table are supplied. If url is an
 Airtable view, any additional base or table values provided are ignored. If
 airtable is provided, any additional value provided to url is ignored. For

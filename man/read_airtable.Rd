@@ -41,7 +41,8 @@ url is supplied. For \code{\link[=list_records]{list_records()}} and
 \code{\link[=get_record]{get_record()}}, support the airtable, url, or a base \emph{and} table
 parameter.}
 
-\item{fields}{Fields to return from Airtable base, Default: \code{NULL}}
+\item{fields}{Character vector with field names or field IDs to return.
+Optional.}
 
 \item{id_to_col}{If \code{TRUE} (default), the airtable record IDs will be added
 to the returned data frame as a new column. If \code{FALSE}, the airtable record
@@ -58,13 +59,12 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
 \item{...}{For \code{\link[=read_airtable]{read_airtable()}}, additional query parameters can be passed
-to \code{\link[=req_query_airtable]{req_query_airtable()}}. For \code{\link[=list_records]{list_records()}} and
+to \code{\link[=req_airtable]{req_airtable()}}. For \code{\link[=list_records]{list_records()}} and
 \code{\link[=get_record]{get_record()}}, additional parameters, such as url, can be passed
-to \code{\link[=airtable_request]{airtable_request()}}.}
+to \code{\link[=request_airtable]{request_airtable()}}.}
 
-\item{view}{Airtable view ID or name, Default: \code{NULL}. If the supplied url or
-airtable object includes a view, the view provided to this parameter is
-ignored.}
+\item{view}{Airtable view ID. View ID values starts with "viw". Optional if
+require_view is \code{FALSE}.}
 
 \item{sort}{Field to sort by, Default: \code{NULL}}
 
@@ -85,7 +85,11 @@ be 100 or less.}
 to "json" which returns a unique record ID. A "string" cell_format returns
 the displayed character string.}
 
-\item{offset}{Offset value. Primarily intended for internal use.}
+\item{offset}{Offset value to passed to \code{\link[httr2:req_url]{httr2::req_url_query()}} as part of
+the API call. See
+\url{https://airtable.com/developers/web/api/list-records#response-offset} for
+more information on how the offset value is used by the Airtable API.
+Primarily intended for developer use only.}
 
 \item{record}{Record ID number. Required for \code{\link[=get_record]{get_record()}}.}
 }

@@ -2,14 +2,15 @@
 #'
 #' Get an "airtable_base_schema" object, a tibble with a list of tables, or a
 #' tibble with a list of bases associated with the provided personal access
-#' token.
+#' token. Additional parameters are not used by [list_bases()] at present.
 #'
-#' @param base A valid Airtable base ID. Optional if url or airtable parameters
-#'   are supplied to the additional parameters.
-#' @param ... Additional parameters passed to [req_airtable_schema()]. Supports
-#'   the use of an optional url or airtable parameter instead of base for
-#'   [airtable_base()]. Additional parameters are not used by
-#'   [list_airtable_bases()] at present.
+#' @param base An Airtable base ID. For [airtable_base()], base is optional if
+#'   url or airtable are supplied and must be a string. For [list_bases()], base
+#'   is a character vector of base id values and the function returns only those
+#'   Airtable bases with matching IDs.
+#' @param ... Optional airtable or url parameter. url must be a URL for an
+#'   Airtable API call or an Airtable base. url is optional if airtable or base
+#'   are supplied and airtable is optional if base or url are supplied.
 #' @param metadata_api_url_pattern Metadata API URL pattern. Deprecated.
 #' @param as_tibble If `TRUE`, return a tibble with a row for each table list
 #'   column of fields. Defaults to `FALSE`.
@@ -37,11 +38,16 @@ airtable_base <- function(base = NULL,
                           metadata_api_url_pattern = deprecated(),
                           as_tibble = FALSE,
                           token = NULL) {
-  req <- req_airtable_schema(
+  base <- get_airtable_base(
     base = base,
     ...,
-    type = "schema",
-    from = "base",
+    call = call
+  )
+
+  req <- request_airtable_meta(
+    base = base,
+    ...,
+    meta = "schema_base",
     token = token
   )
 
@@ -51,13 +57,6 @@ airtable_base <- function(base = NULL,
     body <- httr2::resp_body_json(resp, simplifyVector = TRUE)
     return(tibble::as_tibble(body[["tables"]]))
   }
-
-  base <- get_airtable_base(
-    base = base,
-    ...,
-    call = call
-  )
-
 
   body <- httr2::resp_body_json(resp)
   base_schema <- body[["tables"]]
@@ -115,42 +114,29 @@ is_airtable_table_schema <- function(x) {
   inherits(x, "airtable_table_schema")
 }
 
-#' Is x have an airtable_fields_schema class?
-#'
-#' @noRd
-is_airtable_fields_schema <- function(x) {
-  inherits(x, "airtable_fields_schema")
-}
-
 #' @rdname airtable_base
-#' @name list_airtable_bases
-#' @param base A character vector of base id values. If supplied to
-#'   [list_airtable_bases()], return only those Airtable bases with matching
-#'   IDs.
+#' @name list_bases
 #' @export
 #' @importFrom httr2 req_perform resp_body_json
 #' @importFrom tibble as_tibble
-list_airtable_bases <- function(...,
-                                base = NULL,
-                                token = NULL) {
-  req <- req_airtable_schema(
-    ...,
-    type = "list",
-    from = "base",
+list_bases <- function(base = NULL,
+                       token = NULL) {
+  req <- request_airtable_meta(
+    meta = "list_base",
     token = token
   )
 
   resp <- httr2::req_perform(req)
   body <- httr2::resp_body_json(resp, simplifyVector = TRUE)
-  bases <- tibble::as_tibble(body[["bases"]])
+  bases_list <- tibble::as_tibble(body[["bases"]])
 
   if (is_null(base)) {
-    return(bases)
+    return(bases_list)
   }
 
   check_string(base, allow_empty = FALSE)
 
-  bases[base == bases[["id"]], ]
+  bases_list[base == bases_list[["id"]], ]
 }
 
 #' @export

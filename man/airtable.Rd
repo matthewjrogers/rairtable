@@ -35,7 +35,7 @@ table is a URL containing a base ID or required otherwise.}
 populated in tables created by \code{airtable_base()}.}
 
 \item{name, description}{Airtable table name and base name/description.
-Optional. Base name is set by \code{\link[=list_airtable_bases]{list_airtable_bases()}} but name remains
+Optional. Base name is set by \code{\link[=list_bases]{list_bases()}} but name remains
 blank if not supplied. These parameters are only used when printing
 airtable objects.}
 

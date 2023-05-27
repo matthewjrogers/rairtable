@@ -15,9 +15,9 @@
 #' @param view Optional Airtable view ID. View ID values starts with "viw".
 #' @param fields An optional `airtable_fields_schema` object. Automatically
 #'   populated in tables created by `airtable_base()`.
-#' @inheritParams airtable_request
+#' @inheritParams request_airtable
 #' @param name,description Airtable table name and base name/description.
-#'   Optional. Base name is set by [list_airtable_bases()] but name remains
+#'   Optional. Base name is set by [list_bases()] but name remains
 #'   blank if not supplied. These parameters are only used when printing
 #'   airtable objects.
 #' @param ... Additional parameters passed to [check_airtable_obj()]. Primarily
@@ -89,7 +89,7 @@ new_airtable_obj <- function(base,
       require_table = require_table,
       require_view = FALSE,
       call = call
-      )
+    )
 
     base <- ids[["base"]]
     table <- ids[["table"]]
@@ -112,7 +112,7 @@ new_airtable_obj <- function(base,
   permissions <- list()
 
   if (is_null(description)) {
-    base_info <- list_airtable_bases(
+    base_info <- list_bases(
       base = base,
       token = token,
       call = call
@@ -164,13 +164,20 @@ vec_ptype_full.airtable <- function(x, ...) {
 #' @importFrom cli cli_text cli_rule cli_bullets
 print.airtable <- function(x, ...) {
   cli::cli_text("{.cls {class(x)}}")
-  cli::cli_text("{cli::symbol$line} Base: {.val {x$description}} - {.field {x$base}}")
 
-  text <- NULL
+  if (!is_empty(x$description)) {
+    cli::cli_rule("{.valuel {x$description}}")
+  } else {
+    cli::cli_rule()
+  }
+
+  text <- c("*" = "Base: {.field {x$base}}")
+
   if (!is_empty(x$table)) {
-    text <- c("*" = "Table: {.field {x$table}}")
-    if (!is_empty(x$name)) {
-      text <- c("*" = "Table: {.val {x$name}} - {.field {x$table}}")
+    if (is_empty(x$name)) {
+      text <- c(text, "*" = "Table: {.field {x$table}}")
+    } else {
+      text <- c(text, "*" = "Table: {.val {x$name}} - {.field {x$table}}")
     }
   }
 
@@ -182,7 +189,7 @@ print.airtable <- function(x, ...) {
     fields <- cli::cli_vec(
       x$fields,
       list("vec-trunc" = getOption("rairtable.fields-trunc", 6))
-      )
+    )
 
     text <- c(text, "*" = "{length(x$fields)} field{?s} including {.field {fields}}.")
   }

@@ -21,18 +21,19 @@ resp_body_records(
   type = "combine",
   record_cols = c("id", "createdTime"),
   record_nm = NULL,
-  call = caller_env(),
-  ...
+  ...,
+  call = caller_env()
 )
 }
 \arguments{
-\item{req}{A modified HTTP request from \code{\link[=airtable_request]{airtable_request()}} or a httr2
+\item{req}{A modified HTTP request from \code{\link[=request_airtable]{request_airtable()}} or a httr2
 function.}
 
 \item{offset}{Offset value to passed to \code{\link[httr2:req_url]{httr2::req_url_query()}} as part of
 the API call. See
 \url{https://airtable.com/developers/web/api/list-records#response-offset} for
-more information on how the offset value is used by the Airtable API.}
+more information on how the offset value is used by the Airtable API.
+Primarily intended for developer use only.}
 
 \item{type}{"combine" (default) combines the fields and records data.frames
 in the response. Additional supported options are "records" and "fields".}
