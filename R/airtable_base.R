@@ -37,7 +37,8 @@ airtable_base <- function(base = NULL,
                           ...,
                           metadata_api_url_pattern = deprecated(),
                           as_tibble = FALSE,
-                          token = NULL) {
+                          token = NULL,
+                          call = caller_env()) {
   base <- get_airtable_base(
     base = base,
     ...,
@@ -48,7 +49,8 @@ airtable_base <- function(base = NULL,
     base = base,
     ...,
     meta = "schema_base",
-    token = token
+    token = token,
+    call = call
   )
 
   resp <- httr2::req_perform(req)
@@ -120,10 +122,12 @@ is_airtable_table_schema <- function(x) {
 #' @importFrom httr2 req_perform resp_body_json
 #' @importFrom tibble as_tibble
 list_bases <- function(base = NULL,
-                       token = NULL) {
+                       token = NULL,
+                       call = caller_env()) {
   req <- request_airtable_meta(
     meta = "list_base",
-    token = token
+    token = token,
+    call = call
   )
 
   resp <- httr2::req_perform(req)
@@ -134,7 +138,7 @@ list_bases <- function(base = NULL,
     return(bases_list)
   }
 
-  check_string(base, allow_empty = FALSE)
+  check_string(base, allow_empty = FALSE, call = call)
 
   bases_list[base == bases_list[["id"]], ]
 }

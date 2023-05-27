@@ -10,10 +10,11 @@ airtable_base(
   ...,
   metadata_api_url_pattern = deprecated(),
   as_tibble = FALSE,
-  token = NULL
+  token = NULL,
+  call = caller_env()
 )
 
-list_bases(base = NULL, token = NULL)
+list_bases(base = NULL, token = NULL, call = caller_env())
 }
 \arguments{
 \item{base}{An Airtable base ID. For \code{\link[=airtable_base]{airtable_base()}}, base is optional if
@@ -31,6 +32,11 @@ are supplied and airtable is optional if base or url are supplied.}
 column of fields. Defaults to \code{FALSE}.}
 
 \item{token}{Airtable personal access token or API key.}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
 An \code{airtable_base_schema} object or a tibble listing the tables from
