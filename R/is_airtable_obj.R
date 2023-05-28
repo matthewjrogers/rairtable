@@ -20,6 +20,8 @@ is_airtable_obj <- function(x) {
 #' @inheritParams check_airtable_api_url
 #' @param require_fields If `TRUE`, check that x includes a "fields" value that
 #'   is a list with the `airtable_fields_schema` class. Defaults to `FALSE`.
+#' @param allow_null If `FALSE` and x is `NULL`, returns an error. If `TRUE`,
+#'   invisibly returns NULL.
 #' @keywords internal
 check_airtable_obj <- function(x,
                                require_url = TRUE,

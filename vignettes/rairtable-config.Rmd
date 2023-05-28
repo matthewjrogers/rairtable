@@ -36,7 +36,7 @@ Airtable limits the number of records that can be deleted, updated, or created i
 
 ### `rairtable.api_url`
 
-The base URL for the Airtable API is "https://api.airtable.com". This default value can be modified using the `rairtable.api_url` option. This option is used by [is_airtable_api_url()], [check_airtable_api_url()], and, optionally, [request_airtable()].
+The base URL for the Airtable API is "https://api.airtable.com". This default value can be modified using the `rairtable.api_url` option. This option is used by internal functions for checking Airtable API urls and, optionally, [request_airtable()].
 
 ### `rairtable.api_version`
 

@@ -3,32 +3,10 @@
 \name{airtable_url}
 \alias{airtable_url}
 \alias{is_airtable_url}
-\alias{is_airtable_api_url}
-\alias{check_airtable_url}
-\alias{check_airtable_api_url}
 \alias{parse_airtable_url}
-\title{Test, check, and parse Airtable URLs and API URLs}
+\title{Test and parse Airtable URLs}
 \usage{
 is_airtable_url(url, base_url = NULL, allow_shared = FALSE)
-
-is_airtable_api_url(url, api_url = NULL)
-
-check_airtable_url(
-  url,
-  base_url = NULL,
-  allow_null = FALSE,
-  allow_shared = FALSE,
-  call = caller_env()
-)
-
-check_airtable_api_url(
-  url,
-  require_base = TRUE,
-  require_table = FALSE,
-  require_view = FALSE,
-  api_url = NULL,
-  call = caller_env()
-)
 
 parse_airtable_url(
   url,
@@ -44,9 +22,11 @@ parse_airtable_url(
 )
 }
 \arguments{
-\item{url}{Airtable API or view URL, typically in the form
-"https://api.airtable.com/v0/{baseId}/{tableIdOrName}" or
-"https://airtable.com/{baseID}/{tableIdOrName}/{viewId}"}
+\item{url}{Airtable URL or API URL, typically in the form
+"https://airtable.com/{baseID}/{tableIdOrName}/{viewId}" or
+"https://api.airtable.com/v0/{baseId}/{tableIdOrName}". Note that, by
+default, shared URLs of the form "https://airtable.com/shr..." are not
+supported.}
 
 \item{base_url}{Base URL for an Airtable base or view. Defaults \code{NULL} and
 set to \code{getOption("rairtable.base_url", "https://airtable.com")}.}
@@ -55,20 +35,15 @@ set to \code{getOption("rairtable.base_url", "https://airtable.com")}.}
 for any shared base or view URL that starts with
 "https://airtable.com/shr".}
 
-\item{api_url}{Expected base URL for an API url. Defaults to \code{NULL} and set
-to \code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
+\item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
+\code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
 
-\item{allow_null}{If \code{FALSE} (default) and url is \code{NULL},
-\code{\link[=check_airtable_url]{check_airtable_url()}} errors. If \code{TRUE}, a \code{NULL} value for url is
-allowed.}
+\item{api_version}{Airtable API version number, If \code{NULL} (default), the
+api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
 
-\item{call}{The execution environment of a currently
-running function, e.g. \code{caller_env()}. The function will be
-mentioned in error messages as the source of the error. See the
-\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
-
-\item{require_base}{If \code{TRUE} (default), the string "app" must be included in
-the supplied url.}
+\item{table_name, view_name}{Pattern to use when parsing a table name or view
+name. Defaults to \code{NULL} which extracts strings starting with "tbl" for
+tables IDs and "viw" for view IDs.}
 
 \item{require_table}{If \code{TRUE}, the string "tbl" must be included in the
 supplied url. If a string with a table name is provided, the string must be
@@ -79,31 +54,22 @@ for a table being present in the URL.}
 string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the URL.}
 
-\item{api_version}{Airtable API version number, If \code{NULL} (default), the
-api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
-
-\item{table_name, view_name}{Pattern to use when parsing a table name or view
-name. Defaults to \code{NULL} which extracts strings starting with "tbl" for
-tables IDs and "viw" for view IDs.}
-
 \item{require_field}{If \code{TRUE}, the url supplied to \code{\link[=parse_airtable_url]{parse_airtable_url()}}
 must include a string starting with "fld" to use as the field ID .}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
-Utility functions for checking and validating Airtable URLs and API URLs.
-These functions are primarily intended for use by developers. See details for
-a description of each function.
+Utility functions primarily intended for use by developers for checking and
+validating Airtable URLs, \code{\link[=is_airtable_url]{is_airtable_url()}} returns \code{TRUE} if a url starts
+with the base_url value. \code{\link[=parse_airtable_url]{parse_airtable_url()}} accepts a base or API url as
+an input and returns a named list with the base, table, view, and field ID
+values found in the URL.
 }
 \details{
-\itemize{
-\item \code{\link[=is_airtable_url]{is_airtable_url()}} returns \code{TRUE} if a url starts with the base_url value.
-\item \code{\link[=is_airtable_api_url]{is_airtable_api_url()}} returns \code{TRUE} if a url starts with the api_url value.
-\item \code{\link[=check_airtable_url]{check_airtable_url()}} errors if url does not start with the base_url value.
-\item \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} errors if url is not a valid API url.
-\item \code{\link[=parse_airtable_url]{parse_airtable_url()}} accepts a base or API url as an input and returns a
-named list with the base, table, view, and field ID values found in the URL.
-}
-
 For more information on the expected URL format for different Airtable API
 end points, see the web API documentation at
 \url{https://airtable.com/developers/web/api/introduction}

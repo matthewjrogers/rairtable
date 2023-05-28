@@ -28,7 +28,7 @@ create_records(
 
 \item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
 must include a request_url attribute. url is ignored if airtable is
-provided.  Optional if url or base \emph{and} table are supplied.}
+provided. Optional if url or base \emph{and} table are supplied.}
 
 \item{typecast}{If \code{TRUE} (default), values will be converted to match the
 base if possible. typecase must be set to \code{TRUE} to add new values to a

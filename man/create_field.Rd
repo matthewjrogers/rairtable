@@ -28,7 +28,7 @@ update_field(
 \arguments{
 \item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
 must include a request_url attribute. url is ignored if airtable is
-provided.  Optional if url or base \emph{and} table are supplied.}
+provided. Optional if url or base \emph{and} table are supplied.}
 
 \item{name}{Name for the field or column to create.}
 

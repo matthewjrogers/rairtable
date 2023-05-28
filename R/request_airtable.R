@@ -13,13 +13,14 @@
 #' function also set the rate limit, user agent, and authenticate an Airtable
 #' API request.
 #'
+#' @param airtable An airtable class object created with [airtable()]. airtable
+#'   must include a request_url attribute. url is ignored if airtable is
+#'   provided. Optional if url or base *and* table are supplied.
 #' @param url A URL for an API call or an Airtable view. If url is provided and
 #'   is a valid URL, [request_airtable()] returns  `httr2::request(url)`. url
 #'   is optional if airtable *or* base and table are supplied. If url is an
 #'   Airtable view, any additional base or table values provided are ignored. If
-#'   airtable is provided, any additional value provided to url is ignored. For
-#'   the metadata API (where only a base ID is required) include `require_base =
-#'   TRUE` to pass to [check_airtable_api_url()] when creating a request.
+#'   airtable is provided, any supplied url is ignored.
 #' @param base Airtable base id starting with with "app". Optional if url or
 #'   airtable are supplied or if require_base is `FALSE`. base and table are
 #'   both required if url and airtable are `NULL` and require_base is `TRUE`.
@@ -27,9 +28,6 @@
 #'   with "tbl". Optional if require_table is `FALSE`.
 #' @param view Airtable view ID. View ID values starts with "viw". Optional if
 #'   require_view is `FALSE`.
-#' @param airtable An airtable class object created with [airtable()]. airtable
-#'   must include a request_url attribute. url is ignored if airtable is
-#'   provided.  Optional if url or base *and* table are supplied.
 #' @param api_url Airtable API URL, If `NULL` (default), the api_url is set to
 #'   `getOption("rairtable.api_url", "https://api.airtable.com")`.
 #' @param api_version Airtable API version number, If `NULL` (default), the
@@ -50,11 +48,11 @@
 #' @export
 #' @importFrom cli cli_alert_warning
 #' @importFrom httr2 request req_url_path_append
-request_airtable <- function(url = NULL,
+request_airtable <- function(airtable = NULL,
+                             url = NULL,
                              base = NULL,
                              table = NULL,
                              view = NULL,
-                             airtable = NULL,
                              api_url = NULL,
                              api_version = NULL,
                              require_base = TRUE,
@@ -184,8 +182,8 @@ airtable_api_url_request <- function(base = NULL,
 #' @param remove_view If `TRUE` (default), remove view from request (only using
 #'   view if it is explicitly passed as a query or template parameter). If
 #'   `FALSE`, the request url for the supplied .req or created .req object may
-#'   contain a view query parameter parsed from the url or explicitly provided
-#'   to [airtable()].
+#'   contain a view query parameter parsed from the url or view supplied to
+#'   [airtable()] when creating an airtable object.
 #' @inheritParams httr2::req_method
 #' @inheritParams httr2::req_body_json
 #' @inheritParams req_auth_airtable
@@ -193,10 +191,10 @@ airtable_api_url_request <- function(base = NULL,
 #' @export
 #' @importFrom httr2 req_template req_url_query
 req_airtable <- function(.req = NULL,
+                         airtable = NULL,
                          url = NULL,
                          api_url = NULL,
                          api_version = NULL,
-                         airtable = NULL,
                          ...,
                          template = NULL,
                          method = NULL,
@@ -208,10 +206,10 @@ req_airtable <- function(.req = NULL,
                          call = caller_env()) {
   .req <-
     .req %||% request_airtable(
+      airtable = airtable,
       url = url,
       api_url = api_url,
       api_version = api_version,
-      airtable = airtable,
       call = call
     )
 
