@@ -130,7 +130,6 @@ req_delete_records <- function(req = NULL,
                                call = caller_env()) {
   check_character(records, call = call)
   n_records <- length(records)
-  batch_size <- as.integer(getOption("rairtable.batch_size", 10))
 
   if (n_records == 1) {
     resp <- req_delete_record(
@@ -144,14 +143,14 @@ req_delete_records <- function(req = NULL,
     return(resp)
   }
 
-  req <- req %||% request_airtable(..., call = call)
-
   req <- req_airtable(
-    .req = req,
+    .req = req %||% request_airtable(..., call = call),
     method = "DELETE",
     token = token,
     call = call
   )
+
+  batch_size <- as.integer(getOption("rairtable.batch_size", 10))
 
   if (n_records > batch_size) {
     batched_records <- split_list(records, batch_size)
@@ -172,6 +171,7 @@ req_delete_records <- function(req = NULL,
     return(resp)
   }
 
+  # FIXME: There is likely a better way to do this with httr2::req_url_query()
   req <- httr2::req_url_path_append(
     req,
     paste0("?", paste0("records=", records, collapse = "&"))
@@ -189,10 +189,8 @@ req_delete_record <- function(req = NULL,
                               record,
                               token = NULL,
                               call = caller_env()) {
-  req <- req %||% request_airtable(..., call = call)
-
   req <- req_airtable(
-    .req = req,
+    .req = req %||% request_airtable(..., call = call),
     record = record,
     template = "/{record}",
     method = "DELETE",

@@ -84,8 +84,7 @@ update_records <- function(data,
 
   if (return_json) {
     if (!is_httr2_resp(resp)) {
-      # FIXME: The body from the batched requests should be combined if possible
-      return(lapply(resp, httr2::resp_body_json))
+      return(c(lapply(resp, httr2::resp_body_json)))
     }
 
     return(httr2::resp_body_json(resp))
@@ -189,8 +188,6 @@ req_update_record <- function(req = NULL,
                               call = caller_env()) {
   method <- match.arg(method, c("PATCH", "PUT"))
 
-  req <- req %||% request_airtable(..., call = call)
-
   check_string(record, allow_empty = FALSE, call = call)
 
   data <- list(
@@ -202,7 +199,7 @@ req_update_record <- function(req = NULL,
   )
 
   req <- req_airtable(
-    .req = req,
+    .req = req %||% request_airtable(..., call = call),
     template = "/{record}",
     record = record,
     method = method,
