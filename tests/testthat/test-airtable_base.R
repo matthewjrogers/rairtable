@@ -1,7 +1,7 @@
 test_that("airtable_base works", {
   skip_if_no_pat()
   url <- get_rairtable_test_url()
-  ids <- parse_airtable_url(url)
+  ids <- parse_airtable_url(as.character(url))
 
   expect_error(
     airtable_base()
@@ -12,8 +12,15 @@ test_that("airtable_base works", {
     "list"
   )
 
+  base_list <- list_bases()
+
   expect_s3_class(
-    list_bases(),
+    base_list,
     "data.frame"
+  )
+
+  expect_identical(
+    nrow(list_bases(base_list[["id"]][1])),
+    1L
   )
 })
