@@ -113,7 +113,7 @@ new_airtable_obj <- function(base,
 
   if (is_null(description)) {
     base_info <- list_bases(
-      base = base,
+      bases = base,
       token = token,
       call = call
     )

@@ -1,4 +1,3 @@
-
 #' Check is a URL is valid
 #'
 #' @noRd
@@ -66,9 +65,9 @@ check_airtable_url <- function(url,
 #' @param require_base If `TRUE` (default), the string "app" must be included in
 #'   the supplied url.
 #' @param require_table If `TRUE`, the string "tbl" must be included in the
-#'   supplied url. If a string with a table name is provided, the string must be
-#'   part of the string supplied to url. If `FALSE` (default), there is no check
-#'   for a table being present in the URL.
+#'   supplied url. If require_table is a string, it is treated as the required
+#'   table name which must be part of url. If `FALSE` (default), there is no
+#'   check for a table being present in the URL.
 #' @param require_view If `TRUE`, the string "viw" must be included in the
 #'   string supplied to url. If `FALSE` (default), there is no check
 #'   for a view being present in the URL.

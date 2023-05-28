@@ -4,24 +4,20 @@
 #' tibble with a list of bases associated with the provided personal access
 #' token. Additional parameters are not used by [list_bases()] at present.
 #'
-#' @param base An Airtable base ID. For [airtable_base()], base is optional if
-#'   url or airtable are supplied and must be a string. For [list_bases()], base
-#'   is a character vector of base id values and the function returns only those
-#'   Airtable bases with matching IDs.
-#' @param ... Optional airtable or url parameter. url must be a URL for an
-#'   Airtable API call or an Airtable base. url is optional if airtable or base
-#'   are supplied and airtable is optional if base or url are supplied.
-#' @param metadata_api_url_pattern Metadata API URL pattern. Deprecated.
-#' @param as_tibble If `TRUE`, return a tibble with a row for each table list
-#'   column of fields. Defaults to `FALSE`.
-#' @inheritParams set_airtable_token
+#' @param base An Airtable base ID, an airtable object containing a base ID, or
+#'   a URL that can be parsed for a base ID. Optional if url or airtable are
+#'   supplied to the additional parameters passed to [req_airtable()].
+#' @inheritParams req_airtable
+#' @param ... Additional parameters passed to [req_airtable()].
 #'
-#' @returns An `airtable_base_schema` object or a tibble listing the tables from
-#'   the Airtable base.
+#' @returns
+#'  - [airtable_base()] returns an `airtable_base_schema` object.
+#'  - [get_base_schema()] returns the response from the Airtable get base schema
+#'  API method or [list_base_table()] returns a tibble with the list of tables
+#'  from the schema response.
+#'  - [list_bases()] returns a tibble of base IDs, names, and permission levels.
 #' @export
-#'
-#' @importFrom httr2 req_perform resp_body_json
-#' @importFrom tibble as_tibble
+#' @importFrom vctrs new_vctr
 #'
 #' @examples
 #' \dontrun{
@@ -34,34 +30,17 @@
 #' print(base$schema)
 #' }
 airtable_base <- function(base = NULL,
-                          ...,
-                          metadata_api_url_pattern = deprecated(),
-                          as_tibble = FALSE,
                           token = NULL,
-                          call = caller_env()) {
-  base <- get_base_id(
-    base = base,
-    ...,
-    call = call
-  )
+                          ...) {
+  base_schema <-
+    get_base_schema(
+      base = base,
+      ...,
+      token = token,
+      simplifyVector = FALSE
+    )
 
-  req <- request_airtable_meta(
-    base = base,
-    ...,
-    meta = "schema_base",
-    token = token,
-    call = call
-  )
-
-  resp <- httr2::req_perform(req)
-
-  if (as_tibble) {
-    body <- httr2::resp_body_json(resp, simplifyVector = TRUE)
-    return(tibble::as_tibble(body[["tables"]]))
-  }
-
-  body <- httr2::resp_body_json(resp)
-  base_schema <- body[["tables"]]
+  base_schema <- base_schema[["tables"]]
 
   base_schema <- vctrs::new_vctr(
     .data = set_list_names(base_schema, at = "name"),
@@ -102,6 +81,70 @@ airtable_base <- function(base = NULL,
   )
 }
 
+#' @rdname airtable_base
+#' @name get_base_schema
+#' @inheritParams httr2::resp_body_json
+#' @export
+#' @importFrom httr2 req_perform resp_body_json
+get_base_schema <- function(base = NULL,
+                            token = NULL,
+                            simplifyVector = TRUE,
+                            ...) {
+  req <- request_airtable_meta(
+    base = base,
+    ...,
+    meta = "schema_base",
+    token = token
+  )
+
+  resp <- httr2::req_perform(req)
+
+  httr2::resp_body_json(resp, simplifyVector = simplifyVector)
+}
+
+#' @rdname airtable_base
+#' @name list_base_tables
+#' @export
+#' @importFrom tibble as_tibble
+list_base_tables <- function(base = NULL,
+                             token = NULL,
+                             ...) {
+  body <- get_base_schema(base = base, token = token, ...)
+
+  tibble::as_tibble(body[["tables"]])
+}
+
+#' @rdname airtable_base
+#' @name list_bases
+#' @param bases A character vectors of base ID or name values. If provided, the
+#'   results of list_bases are filtered to matching bases only. Defaults to
+#'   `NULL` which returns all bases associated with the personal access token or
+#'   API key.
+#' @export
+#' @importFrom httr2 req_perform resp_body_json
+#' @importFrom tibble as_tibble
+list_bases <- function(bases = NULL,
+                       token = NULL,
+                       ...) {
+  req <- request_airtable_meta(
+    meta = "list_base",
+    token = token,
+    ...
+  )
+
+  resp <- httr2::req_perform(req)
+  body <- httr2::resp_body_json(resp, simplifyVector = TRUE)
+  base_list <- tibble::as_tibble(body[["bases"]])
+
+  if (is_null(bases)) {
+    return(base_list)
+  }
+
+  check_character(bases, call = call)
+
+  base_list[(base_list[["id"]] %in% bases) | (base_list[["name"]] %in% bases), ]
+}
+
 #' Is x have an airtable_base_schema class?
 #'
 #' @noRd
@@ -114,33 +157,6 @@ is_airtable_base_schema <- function(x) {
 #' @noRd
 is_airtable_table_schema <- function(x) {
   inherits(x, "airtable_table_schema")
-}
-
-#' @rdname airtable_base
-#' @name list_bases
-#' @export
-#' @importFrom httr2 req_perform resp_body_json
-#' @importFrom tibble as_tibble
-list_bases <- function(base = NULL,
-                       token = NULL,
-                       call = caller_env()) {
-  req <- request_airtable_meta(
-    meta = "list_base",
-    token = token,
-    call = call
-  )
-
-  resp <- httr2::req_perform(req)
-  body <- httr2::resp_body_json(resp, simplifyVector = TRUE)
-  bases_list <- tibble::as_tibble(body[["bases"]])
-
-  if (is_null(base)) {
-    return(bases_list)
-  }
-
-  check_string(base, allow_empty = FALSE, call = call)
-
-  bases_list[base == bases_list[["id"]], ]
 }
 
 #' @export

@@ -25,7 +25,8 @@ is_table_id <- function(x, table_name = NULL) {
   }
 
   if (is_null(table_name)) {
-    # FIXME: This may create an issue if x is a table name
+    # FIXME: table_name is not exposed so there is no option to pass a table
+    # name to is_table_id from get_table_id
     return(grepl("^tbl[[:alnum:]]+$", x))
   }
 
@@ -71,8 +72,8 @@ get_base_id <- function(base = NULL,
   }
 
   cli_abort(
-    "{.arg base} must be an {.cls airtable} object, an Airtable URL,
-    or a string with a base ID, not {.obj_type_friendly {table}}.",
+    "{.arg base} must be a base ID string, an {.cls airtable} object,
+    or an Airtable URL, not {.obj_type_friendly {base}}.",
     call = call
   )
 }
@@ -104,8 +105,8 @@ get_table_id <- function(table = NULL,
   }
 
   cli_abort(
-    "{.arg table} must be an {.cls airtable} object, an Airtable URL,
-    or a string with a table ID or name, not {.obj_type_friendly {table}}.",
+    "{.arg table} must be a table ID string, an {.cls airtable} object,
+    or an Airtable URL, not {.obj_type_friendly {table}}.",
     call = call
   )
 }
@@ -129,7 +130,7 @@ get_field_id <- function(column = NULL,
   }
 
   cli_abort(
-    "{.arg column} must be an Airtable URL with a field ID or a field ID string,
+    "{.arg column} must be a field ID string or an Airtable URL with a field ID,
     not {.obj_type_friendly {column}}.",
     call = call
   )

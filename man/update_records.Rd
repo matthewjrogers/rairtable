@@ -61,9 +61,9 @@ require_view is \code{FALSE}.}
     \item{\code{require_base}}{If \code{TRUE} (default), the string "app" must be included in
 the supplied url.}
     \item{\code{require_table}}{If \code{TRUE}, the string "tbl" must be included in the
-supplied url. If a string with a table name is provided, the string must be
-part of the string supplied to url. If \code{FALSE} (default), there is no check
-for a table being present in the URL.}
+supplied url. If require_table is a string, it is treated as the required
+table name which must be part of url. If \code{FALSE} (default), there is no
+check for a table being present in the URL.}
     \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
 string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the URL.}

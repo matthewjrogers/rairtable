@@ -2,45 +2,46 @@
 % Please edit documentation in R/airtable_base.R
 \name{airtable_base}
 \alias{airtable_base}
+\alias{get_base_schema}
+\alias{list_base_tables}
 \alias{list_bases}
 \title{Get metadata for an Airtable base or list bases for an account}
 \usage{
-airtable_base(
-  base = NULL,
-  ...,
-  metadata_api_url_pattern = deprecated(),
-  as_tibble = FALSE,
-  token = NULL,
-  call = caller_env()
-)
+airtable_base(base = NULL, token = NULL, ...)
 
-list_bases(base = NULL, token = NULL, call = caller_env())
+get_base_schema(base = NULL, token = NULL, simplifyVector = TRUE, ...)
+
+list_base_tables(base = NULL, token = NULL, ...)
+
+list_bases(bases = NULL, token = NULL, ...)
 }
 \arguments{
-\item{base}{An Airtable base ID. For \code{\link[=airtable_base]{airtable_base()}}, base is optional if
-url or airtable are supplied and must be a string. For \code{\link[=list_bases]{list_bases()}}, base
-is a character vector of base id values and the function returns only those
-Airtable bases with matching IDs.}
+\item{base}{An Airtable base ID, an airtable object containing a base ID, or
+a URL that can be parsed for a base ID. Optional if url or airtable are
+supplied to the additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}.}
 
-\item{...}{Optional airtable or url parameter. url must be a URL for an
-Airtable API call or an Airtable base. url is optional if airtable or base
-are supplied and airtable is optional if base or url are supplied.}
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{metadata_api_url_pattern}{Metadata API URL pattern. Deprecated.}
+\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}.}
 
-\item{as_tibble}{If \code{TRUE}, return a tibble with a row for each table list
-column of fields. Defaults to \code{FALSE}.}
+\item{simplifyVector}{Should JSON arrays containing only primitives (i.e.
+booleans, numbers, and strings) be caused to atomic vectors?}
 
-\item{token}{Airtable personal access token or API key.}
-
-\item{call}{The execution environment of a currently
-running function, e.g. \code{caller_env()}. The function will be
-mentioned in error messages as the source of the error. See the
-\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+\item{bases}{A character vectors of base ID or name values. If provided, the
+results of list_bases are filtered to matching bases only. Defaults to
+\code{NULL} which returns all bases associated with the personal access token or
+API key.}
 }
 \value{
-An \code{airtable_base_schema} object or a tibble listing the tables from
-the Airtable base.
+\itemize{
+\item \code{\link[=airtable_base]{airtable_base()}} returns an \code{airtable_base_schema} object.
+\item \code{\link[=get_base_schema]{get_base_schema()}} returns the response from the Airtable get base schema
+API method or \code{\link[=list_base_table]{list_base_table()}} returns a tibble with the list of tables
+from the schema response.
+\item \code{\link[=list_bases]{list_bases()}} returns a tibble of base IDs, names, and permission levels.
+}
 }
 \description{
 Get an "airtable_base_schema" object, a tibble with a list of tables, or a
