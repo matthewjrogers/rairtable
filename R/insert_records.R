@@ -6,13 +6,13 @@
 #' calling the API so supplying any other names or types returns an error.
 #' [insert_records()] and [create_records()] are identical.
 #'
-#' @param data A data.frame with records to insert.
+#' @param data A data frame with records to insert or create.
 #' @inheritParams request_airtable
 #' @inheritParams req_create_records
 #' @param return_json If `TRUE`, return the response from the Airtable API as
-#'   list. If `FALSE` (default), return the input data.frame or list.
+#'   list. If `FALSE` (default), return the input data frame or list.
 #' @param batch_size Deprecated. Set using the `rairtable.batch_size` option.
-#' @return A data.frame (invisibly) of the input data, to be stored as an object
+#' @return A data frame (invisibly) of the input data, to be stored as an object
 #'   or piped into additional functions or, if as_json is `TRUE`, the function
 #'   returns the parsed API response from [httr2::resp_body_json()].
 #'

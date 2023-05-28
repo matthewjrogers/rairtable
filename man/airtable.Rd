@@ -58,7 +58,7 @@ list and the base, view, and request_url stored as attributes.
 }
 \description{
 Creates an S3 airtable object, which serves as a pointer for rairtable
-functions
+functions.
 }
 \examples{
 \dontrun{

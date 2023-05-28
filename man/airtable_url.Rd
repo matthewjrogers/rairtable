@@ -90,8 +90,9 @@ tables IDs and "viw" for view IDs.}
 must include a string starting with "fld" to use as the field ID .}
 }
 \description{
-Utility functions for checking and validating Airtable URLs and API URLs. See
-details for a description of each function.
+Utility functions for checking and validating Airtable URLs and API URLs.
+These functions are primarily intended for use by developers. See details for
+a description of each function.
 }
 \details{
 \itemize{

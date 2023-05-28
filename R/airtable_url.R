@@ -1,7 +1,10 @@
 #' Test, check, and parse Airtable URLs and API URLs
 #'
-#' Utility functions for checking and validating Airtable URLs and API URLs. See
-#' details for a description of each function.
+#' Utility functions for checking and validating Airtable URLs and API URLs.
+#' These functions are primarily intended for use by developers. See details for
+#' a description of each function.
+#'
+#' @details
 #'
 #' - [is_airtable_url()] returns `TRUE` if a url starts with the base_url value.
 #' - [is_airtable_api_url()] returns `TRUE` if a url starts with the api_url value.
@@ -140,12 +143,12 @@ check_airtable_api_url <- function(url,
     missing <- c(missing, "a {.arg base} name starting with {.val app}")
   }
 
-  if (is_logical(require_table) && require_table && !grepl("tbl", url)) {
+  if (is_true(require_table) && !grepl("tbl", url)) {
     missing <- c(missing, "a {.arg table} name starting with {.val tbl}")
   }
 
-  if (is_character(require_table) && !grepl(require_table, url)) {
-    check_string(require_table)
+  if (!is_logical(require_table) && !grepl(require_table, url)) {
+    check_string(require_table, call = call)
     missing <- c(missing, "a {.arg table} named {.val {require_table}}")
   }
 
@@ -196,29 +199,10 @@ parse_airtable_url <- function(url,
                                require_view = FALSE,
                                require_field = FALSE,
                                call = caller_env()) {
-  base_url <- base_url %||%
-    getOption("rairtable.base_url", "https://airtable.com")
-  api_url <- api_url %||%
-    getOption("rairtable.api_url", "https://api.airtable.com")
-
-  base_pattern <- glue("(?<={base_url}/)app[[:alnum:]]+(?=/)")
-
-  if (is_airtable_api_url(url, api_url)) {
-    api_version <- api_version %||%
-      getOption("rairtable.api_version", "0")
-
-    base_pattern <- glue(
-      "(?<={api_url}/v{api_version}/)",
-      "app[[:alnum:]]+(?=/)"
-    )
-  } else {
-    check_airtable_url(url, base_url, call = call)
-  }
-
   ids <-
     vctrs::list_drop_empty(
       list(
-        "base" = string_extract(url, base_pattern),
+        "base" = parse_url_base_id(url, base_url, api_url, api_version, call),
         "table" = parse_url_table_id(url, table_name, call),
         "view" = parse_url_view_id(url, view_name, call),
         "field" = parse_url_field_id(url)
@@ -235,6 +219,39 @@ parse_airtable_url <- function(url,
   )
 
   ids
+}
+
+#' Parse base ID from URL and error if URL is not valid
+#'
+#' Parse url and checks the input url for parse_airtable_url.
+#'
+#' @noRd
+parse_url_base_id <- function(url,
+                              base_url = NULL,
+                              api_url = NULL,
+                              api_version = NULL,
+                              call = caller_env()) {
+  api_url <- api_url %||%
+    getOption("rairtable.api_url", "https://api.airtable.com")
+
+  if (is_airtable_api_url(url, api_url)) {
+    api_version <- api_version %||%
+      getOption("rairtable.api_version", "0")
+
+    base_pattern <- glue(
+      "(?<={api_url}/v{api_version}/)",
+      "app[[:alnum:]]+(?=/)"
+    )
+  } else {
+    base_url <- base_url %||%
+      getOption("rairtable.base_url", "https://airtable.com")
+
+    base_pattern <- glue("(?<={base_url}/)app[[:alnum:]]+(?=/)")
+
+    check_airtable_url(url, base_url, call = call)
+  }
+
+  string_extract(url, base_pattern)
 }
 
 #' Parse table ID or name from URL
@@ -276,6 +293,33 @@ parse_url_field_id <- function(url) {
     )
 
   string_extract(url, field_pattern)
+}
+
+#' Extract pattern from a length 1 string
+#'
+#' @param string Passed to x parameter of [regmatches()]
+#' @inheritParams base::regexpr
+#' @noRd
+string_extract <- function(string, pattern, perl = TRUE) {
+  if (is.na(string)) {
+    return(NA_character_)
+  }
+
+  match <-
+    regmatches(
+      x = string,
+      m = regexpr(
+        pattern = pattern,
+        text = string,
+        perl = perl
+      )
+    )
+
+  if (is_empty(match)) {
+    return(NULL)
+  }
+
+  match
 }
 
 #' Does the parsed values from a URL included required IDs?

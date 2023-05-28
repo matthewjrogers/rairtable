@@ -16,7 +16,7 @@ update_records(
 )
 }
 \arguments{
-\item{data}{A \code{data.frame} containing the fields to update. If records is
+\item{data}{A data frame containing the fields to update. If records is
 \code{NULL}, data must include a column of record IDs (named by airtable_id_col)
 or rownames with record IDs.}
 
@@ -40,7 +40,7 @@ Defaults to \code{NULL}.}
 \item{safely}{If \code{TRUE}, confirm number and names of columns to update and
 number of rows before executing update.}
 
-\item{return_json}{If \code{TRUE}, return JSON repsponse from the Airtable web API
+\item{return_json}{If \code{TRUE}, return JSON response from the Airtable web API
 as a list. If \code{FALSE} (default), return input data.}
 
 \item{...}{
@@ -71,11 +71,11 @@ for a view being present in the URL.}
   }}
 }
 \value{
-A \code{data.frame} (invisibly) of the input data, to be stored as an object
-or piped into further additional functions.
+A data frame of the input data, to be stored as an object or piped
+into further additional functions. The data frame is returned invisibly.
 }
 \description{
-Update one or more fields in an Airtable table based on a data.frame. Set
+Update one or more fields in an Airtable table based on a data frame. Set
 \code{safely = FALSE} to delete records outside of an interactive session.
 }
 \details{

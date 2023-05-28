@@ -19,7 +19,7 @@
 #'   to the returned data frame as a new column. If `FALSE`, the airtable record
 #'   IDs are used as row names.
 #' @param airtable_id_col Airtable record ID column name assigned to returned
-#'   data.frame. Ignored if id_to_col is `TRUE`. Defaults to `NULL` which is set
+#'   data frame. Ignored if id_to_col is `TRUE`. Defaults to `NULL` which is set
 #'   to `getOption("rairtable.id_col", "airtable_record_id")`.
 #' @param max_rows Optional maximum number of rows to read. Defaults to `NULL`
 #' @param ... For [read_airtable()], additional query parameters can be passed
@@ -28,7 +28,7 @@
 #'   to [request_airtable()].
 #' @inheritParams rlang::args_error_context
 #'
-#' @return A data.frame with the records from the Airtable base and table
+#' @return A data frame with the records from the Airtable base and table
 #'   provided by the airtable parameter.
 #'
 #' @export
@@ -308,11 +308,12 @@ req_perform_offset <- function(req,
 
 #' @rdname req_perform_offset
 #' @name resp_body_records
-#' @param type "combine" (default) combines the fields and records data.frames
-#'   in the response. Additional supported options are "records" and "fields".
+#' @param type "combine" (default) combines the data frames with fields and
+#'   records from the API response. Additional supported options are "records"
+#'   and "fields".
 #' @param id_col An alternate name to use for the id column of the response
-#'   data.frame.
-#' @param record_cols Column names for columns to retain from records data.frame
+#'   data frame.
+#' @param record_cols Column names for columns to retain from records data frame
 #'   when type is "records" or "combine".
 #' @param record_nm Names to use for additional columns indicated by
 #'   record_cols. Defaults to `NULL`.

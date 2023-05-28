@@ -1,13 +1,13 @@
 #' Update records in an Airtable table
 #'
-#' Update one or more fields in an Airtable table based on a data.frame. Set
+#' Update one or more fields in an Airtable table based on a data frame. Set
 #' `safely = FALSE` to delete records outside of an interactive session.
 #'
 #' Find more information on the Airtable API methods for updating a record
 #' <https://airtable.com/developers/web/api/update-record> or multiple records
 #' <https://airtable.com/developers/web/api/update-multiple-records>.
 #'
-#' @param data A `data.frame` containing the fields to update. If records is
+#' @param data A data frame containing the fields to update. If records is
 #'   `NULL`, data must include a column of record IDs (named by airtable_id_col)
 #'   or rownames with record IDs.
 #' @param airtable An `airtable` object. Optional if url or base and table are
@@ -25,11 +25,11 @@
 #'   Defaults to `NULL`.
 #' @param safely If `TRUE`, confirm number and names of columns to update and
 #'   number of rows before executing update.
-#' @param return_json If `TRUE`, return JSON repsponse from the Airtable web API
+#' @param return_json If `TRUE`, return JSON response from the Airtable web API
 #'   as a list. If `FALSE` (default), return input data.
 #' @inheritDotParams request_airtable -api_url -api_version -call
-#' @return A `data.frame` (invisibly) of the input data, to be stored as an object
-#'   or piped into further additional functions.
+#' @return A data frame of the input data, to be stored as an object or piped
+#'   into further additional functions. The data frame is returned invisibly.
 #'
 #' @export
 #' @importFrom tidyselect everything
@@ -148,7 +148,7 @@ req_update_records <- function(req = NULL,
     batched_data <- split_list(data, batch_size, call = call)
 
     resp <-
-      map_action_along(
+      map_along(
         batched_records,
         function(i) {
           req_update_records(
@@ -275,7 +275,7 @@ get_data_colnames <- function(..., data) {
   names(select_cols(..., data = data))
 }
 
-#' Use tidyselect to pull a column from a data.frame object
+#' Use tidyselect to pull a column from a data frame
 #'
 #' @noRd
 #' @importFrom tidyselect eval_select

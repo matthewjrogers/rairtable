@@ -13,30 +13,16 @@ map <- function(.x, .f, ...) {
   lapply(.x, .f, ...)
 }
 
-
-#' Does x have the class httr2_request?
-#'
-#' @noRd
-is_httr2_req <- function(x) {
-  inherits(x, "httr2_request")
-}
-
-#' Does x have the class httr2_response?
-#'
-#' @noRd
-is_httr2_resp <- function(x) {
-  inherits(x, "httr2_response")
-}
-
 #' Wrapper for cli::cli_progress_along
 #'
+#' @param action String with the action to display in the progress message.
 #' @noRd
 #' @importFrom cli symbol pb_bar pb_percent cli_progress_along
-map_action_along <- function(x,
-                             .f,
-                             ...,
-                             action = NULL,
-                             format = NULL) {
+map_along <- function(x,
+                      .f,
+                      ...,
+                      action = NULL,
+                      format = NULL) {
   format <- format %||%
     "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
 
@@ -77,20 +63,7 @@ split_list <- function(x,
   )
 }
 
-#' Set list names optionally using an attribute from each item in the list
-#'
-#' @noRd
-set_list_names <- function(x, nm = NULL, at = "name") {
-  nm <- nm %||% names_at(x, at)
-  set_names(x, nm)
-}
-
-#' @noRd
-names_at <- function(x, at = "name") {
-  vapply(x, function(x) {x[[at]]}, NA_character_)
-}
-
-#' Check if object is a data.frame with a specified number of rows
+#' Check if object is a data frame with a specified number of rows
 #'
 #' @noRd
 check_data_frame_rows <- function(x,
@@ -217,31 +190,4 @@ list_rbind <- function(x, names_to = zap(), ptype = NULL) {
     .ptype = ptype,
     .error_call = current_env()
   )
-}
-
-#' Extract pattern from a length 1 string
-#'
-#' @param string Passed to x parameter of [regmatches()]
-#' @inheritParams base::regexpr
-#' @noRd
-string_extract <- function(string, pattern, perl = TRUE) {
-  if (is.na(string)) {
-    return(NA_character_)
-  }
-
-  match <-
-    regmatches(
-      x = string,
-      m = regexpr(
-        pattern = pattern,
-        text = string,
-        perl = perl
-      )
-    )
-
-  if (is_empty(match)) {
-    return(NULL)
-  }
-
-  match
 }

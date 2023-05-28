@@ -2,14 +2,25 @@
 % Please edit documentation in R/create_field.R
 \name{create_field}
 \alias{create_field}
+\alias{update_field}
 \title{Create a field or column in an Airtable table}
 \usage{
 create_field(
   airtable = NULL,
-  name,
+  name = NULL,
   type = "singleLineText",
   description = NULL,
   options = NULL,
+  field = NULL,
+  token = NULL,
+  ...
+)
+
+update_field(
+  airtable = NULL,
+  column = NULL,
+  name = NULL,
+  description = NULL,
   token = NULL,
   ...
 )
@@ -19,18 +30,24 @@ create_field(
 must include a request_url attribute. url is ignored if airtable is
 provided.  Optional if url or base \emph{and} table are supplied.}
 
-\item{name}{Name for the field or column to create. Required.}
+\item{name}{Name for the field or column to create.}
 
-\item{type}{Field type, defaults to 'singleLineText'. Required. See
-field_types for list of supported field types.}
+\item{type}{Field type, defaults to 'singleLineText'. See
+\code{field_types} for list of supported field types.}
 
-\item{description}{Optional. Description for the field or column to create.
-Default: \code{NULL}}
+\item{description}{Optional. Description for the field or column to create or
+description to add to updated field. Description must be no longer than
+20,000 characters.}
 
 \item{options}{Named list of field options. Required for some field types.
 See the Airtable Web API documentation on field types and cell values for
 more information: \url{https://airtable.com/developers/web/api/field-model}
-Default: \code{NULL}}
+Default: \code{NULL}.}
+
+\item{field}{A named list that can be used to set the name, type,
+description, or options of a field to create. If field is supplied with a
+type, any type value is ignored. Any supplied name, description, or options
+are used if provided.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
@@ -50,5 +67,6 @@ provided), and options.
 Create a field or column in the table of an Airtable base. Find more
 information on the create field API method and field types and options in the
 Airtable Web API documentation:
-\url{https://airtable.com/developers/web/api/create-field}
+\url{https://airtable.com/developers/web/api/create-field} Both name and type are
+required unless field is provided.
 }

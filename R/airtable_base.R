@@ -39,7 +39,7 @@ airtable_base <- function(base = NULL,
                           as_tibble = FALSE,
                           token = NULL,
                           call = caller_env()) {
-  base <- get_airtable_base(
+  base <- get_base_id(
     base = base,
     ...,
     call = call
@@ -239,4 +239,19 @@ print.airtable_fields_schema <- function(x, ...) {
     )
   )
   invisible(x)
+}
+
+#' Set list names optionally using an attribute from each item in the list
+#'
+#' @noRd
+set_list_names <- function(x, nm = NULL, at = "name") {
+  nm <- nm %||% names_at(x, at)
+  set_names(x, nm)
+}
+
+#' @noRd
+names_at <- function(x, at = "name") {
+  vapply(x, function(x) {
+    x[[at]]
+  }, NA_character_)
 }

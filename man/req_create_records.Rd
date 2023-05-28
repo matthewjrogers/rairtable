@@ -48,7 +48,7 @@ string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the URL.}
   }}
 
-\item{data}{A data.frame or list of records to create in Airtable. Column
+\item{data}{A data frame or list of records to create in Airtable. Column
 names or the names of list values must match the field names used in the
 Airtable base. Required.}
 

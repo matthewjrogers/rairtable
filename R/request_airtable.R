@@ -347,3 +347,17 @@ req_airtable_view <- function(req,
   check_string(view, allow_empty = FALSE, allow_null = allow_null, call = call)
   httr2::req_url_query(req, view = view)
 }
+
+#' Does x have the class httr2_request?
+#'
+#' @noRd
+is_httr2_req <- function(x) {
+  inherits(x, "httr2_request")
+}
+
+#' Does x have the class httr2_response?
+#'
+#' @noRd
+is_httr2_resp <- function(x) {
+  inherits(x, "httr2_response")
+}

@@ -15,7 +15,7 @@ airtable_fields_schema <- function(field_schema) {
 new_airtable_fields_schema <- function(fields, call = caller_env()) {
   check_list(fields, call = call)
   class(fields) <- "airtable_fields_schema"
-  check_airtable_fields_schema(fields)
+  check_airtable_fields_schema(fields, call = call)
   fields
 }
 
@@ -65,7 +65,7 @@ modify_fields <- function(fields, drop = NULL) {
   })
 }
 
-#' Convert a data.frame into a list of lists
+#' Convert a data frame into a list of lists
 #'
 #' @noRd
 make_field_list <- function(data,
@@ -81,7 +81,7 @@ make_field_list <- function(data,
   check_data_frame(data, arg = arg, call = call)
   if (!is_null(max_rows) && (nrow(data) > max_rows)) {
     cli_abort(
-      "{.arg {arg}} must be a list or data.frame with {max_rows} row{?s},
+      "{.arg {arg}} must be a list or data frame with {max_rows} row{?s},
         not {nrow(data)} row{?s}.",
       call = call
     )

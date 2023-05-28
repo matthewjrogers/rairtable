@@ -3,7 +3,7 @@
 #' @name req_create_records
 #' @inheritParams request_airtable
 #' @inheritDotParams request_airtable -api_url -api_version
-#' @param data A data.frame or list of records to create in Airtable. Column
+#' @param data A data frame or list of records to create in Airtable. Column
 #'   names or the names of list values must match the field names used in the
 #'   Airtable base. Required.
 #' @param typecast If `TRUE` (default), values will be converted to match the
@@ -36,7 +36,7 @@ req_create_records <- function(req = NULL,
     batched_data <- split_list(data, call = call)
 
     resp <-
-      map_action_along(
+      map_along(
         batched_data,
         function(i) {
           req_create_records(

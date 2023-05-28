@@ -49,7 +49,7 @@ to the returned data frame as a new column. If \code{FALSE}, the airtable record
 IDs are used as row names.}
 
 \item{airtable_id_col}{Airtable record ID column name assigned to returned
-data.frame. Ignored if id_to_col is \code{TRUE}. Defaults to \code{NULL} which is set
+data frame. Ignored if id_to_col is \code{TRUE}. Defaults to \code{NULL} which is set
 to \code{getOption("rairtable.id_col", "airtable_record_id")}.}
 
 \item{max_rows}{Optional maximum number of rows to read. Defaults to \code{NULL}}
@@ -94,7 +94,7 @@ Primarily intended for developer use only.}
 \item{record}{Record ID number. Required for \code{\link[=get_record]{get_record()}}.}
 }
 \value{
-A data.frame with the records from the Airtable base and table
+A data frame with the records from the Airtable base and table
 provided by the airtable parameter.
 }
 \description{

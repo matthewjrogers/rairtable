@@ -7,7 +7,7 @@
 #' <https://airtable.com/developers/web/api/delete-record> or multiple records
 #' <https://airtable.com/developers/web/api/delete-multiple-records>.
 #'
-#' @param data A data.frame with a record ID column matching the value of
+#' @param data A data frame with a record ID column matching the value of
 #'   airtable_id_col or rownames with record ID values.
 #' @param airtable_id_col Column name or tidyselect function identifying column
 #'   containing Airtable record IDs. Optional if records is supplied or if
@@ -157,7 +157,7 @@ req_delete_records <- function(req = NULL,
     batched_records <- split_list(records, batch_size)
 
     resp <-
-      map_action_along(
+      map_along(
         batched_records,
         function(i) {
           req_delete_records(

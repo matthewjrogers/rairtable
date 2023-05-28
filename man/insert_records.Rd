@@ -24,7 +24,7 @@ create_records(
 )
 }
 \arguments{
-\item{data}{A data.frame with records to insert.}
+\item{data}{A data frame with records to insert or create.}
 
 \item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
 must include a request_url attribute. url is ignored if airtable is
@@ -38,7 +38,7 @@ base. Required.}
 \item{batch_size}{Deprecated. Set using the \code{rairtable.batch_size} option.}
 
 \item{return_json}{If \code{TRUE}, return the response from the Airtable API as
-list. If \code{FALSE} (default), return the input data.frame or list.}
+list. If \code{FALSE} (default), return the input data frame or list.}
 
 \item{...}{For \code{\link[=request_airtable]{request_airtable()}}, additional parameters passed to
 \code{\link[=parse_airtable_url]{parse_airtable_url()}} if an Airtable url is provided. For
@@ -47,7 +47,7 @@ list. If \code{FALSE} (default), return the input data.frame or list.}
 \code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
 }
 \value{
-A data.frame (invisibly) of the input data, to be stored as an object
+A data frame (invisibly) of the input data, to be stored as an object
 or piped into additional functions or, if as_json is \code{TRUE}, the function
 returns the parsed API response from \code{\link[httr2:resp_body_raw]{httr2::resp_body_json()}}.
 }

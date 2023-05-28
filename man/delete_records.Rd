@@ -17,7 +17,7 @@ delete_records(
 )
 }
 \arguments{
-\item{data}{A data.frame with a record ID column matching the value of
+\item{data}{A data frame with a record ID column matching the value of
 airtable_id_col or rownames with record ID values.}
 
 \item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable

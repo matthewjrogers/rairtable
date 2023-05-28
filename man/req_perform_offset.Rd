@@ -35,17 +35,18 @@ the API call. See
 more information on how the offset value is used by the Airtable API.
 Primarily intended for developer use only.}
 
-\item{type}{"combine" (default) combines the fields and records data.frames
-in the response. Additional supported options are "records" and "fields".}
+\item{type}{"combine" (default) combines the data frames with fields and
+records from the API response. Additional supported options are "records"
+and "fields".}
 
-\item{record_cols}{Column names for columns to retain from records data.frame
+\item{record_cols}{Column names for columns to retain from records data frame
 when type is "records" or "combine".}
 
 \item{record_nm}{Names to use for additional columns indicated by
 record_cols. Defaults to \code{NULL}.}
 
 \item{id_col}{An alternate name to use for the id column of the response
-data.frame.}
+data frame.}
 }
 \description{
 Get the body from API requests with a series of offset values

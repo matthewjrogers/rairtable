@@ -1,7 +1,7 @@
 #' Create a new airtable object
 #'
 #' Creates an S3 airtable object, which serves as a pointer for rairtable
-#' functions
+#' functions.
 #'
 #' @param table Airtable table ID or name. Table ID values start with "tbl". If
 #'   table is an Airtable URL matching the pattern
