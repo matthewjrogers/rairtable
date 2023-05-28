@@ -32,10 +32,14 @@
 airtable_base <- function(base = NULL,
                           token = NULL,
                           ...) {
+  base <- get_base_id(
+    base = base,
+    ...,
+  )
+
   base_schema <-
     get_base_schema(
       base = base,
-      ...,
       token = token,
       simplifyVector = FALSE
     )
