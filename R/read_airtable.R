@@ -214,7 +214,8 @@ req_list_records <- function(req = NULL,
 
 #' @rdname read_airtable
 #' @name get_record
-#' @param record Record ID number. Required for [get_record()].
+#' @param record Record ID (a string starting with "rec"). Required for
+#'   [get_record()].
 #' @export
 #' @importFrom httr2 req_url_path_append req_perform
 get_record <- function(airtable = NULL,

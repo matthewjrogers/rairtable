@@ -2,8 +2,8 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "rairtable",
-  "description": "Efficient CRUD interface for the 'Airtable' API <https://airtable.com/developers/web/api>, supporting batch requests and parallel encoding of large data sets.",
-  "name": "rairtable: Efficient Wrapper for the 'Airtable' API",
+  "description": "Create, read, update, and delete Airtable records or read base metadata using the Airtable Web API.",
+  "name": "rairtable: Efficient Wrapper for the Airtable Web API",
   "codeRepository": "https://github.com/elipousson/rairtable",
   "issueTracker": "https://github.com/matthewjrogers/rairtable/issues",
   "license": "https://spdx.org/licenses/MIT",
@@ -13,7 +13,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.2.3 (2023-03-15)",
+  "runtimePlatform": "R version 4.3.0 (2023-04-21)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -27,14 +27,6 @@
       "familyName": "Rogers",
       "email": "matthew.rogers09@gmail.com"
     },
-    {
-      "@type": "Person",
-      "givenName": "Eli",
-      "familyName": "Pousson",
-      "@id": "https://orcid.org/0000-0001-8280-1706"
-    }
-  ],
-  "contributor": [
     {
       "@type": "Person",
       "givenName": "Eli",
@@ -65,11 +57,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "parallel",
-      "name": "parallel"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "rmarkdown",
       "name": "rmarkdown",
       "provider": {
@@ -92,18 +79,6 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=testthat"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "withr",
-      "name": "withr",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=withr"
     }
   ],
   "softwareRequirements": {
@@ -209,9 +184,21 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=vctrs"
     },
+    "10": {
+      "@type": "SoftwareApplication",
+      "identifier": "withr",
+      "name": "withr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=withr"
+    },
     "SystemRequirements": null
   },
-  "fileSize": "174.371KB",
+  "fileSize": "216.183KB",
   "relatedLink": ["https://matthewjrogers.github.io/rairtable/", "https://CRAN.R-project.org/package=rairtable"],
   "releaseNotes": "https://github.com/elipousson/rairtable/blob/master/NEWS.md",
   "readme": "https://github.com/elipousson/rairtable/blob/main/README.md",

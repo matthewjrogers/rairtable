@@ -91,7 +91,8 @@ the API call. See
 more information on how the offset value is used by the Airtable API.
 Primarily intended for developer use only.}
 
-\item{record}{Record ID number. Required for \code{\link[=get_record]{get_record()}}.}
+\item{record}{Record ID (a string starting with "rec"). Required for
+\code{\link[=get_record]{get_record()}}.}
 }
 \value{
 A data frame with the records from the Airtable base and table
