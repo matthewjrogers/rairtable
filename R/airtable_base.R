@@ -94,14 +94,12 @@ get_base_schema <- function(base = NULL,
                             token = NULL,
                             simplifyVector = TRUE,
                             ...) {
-  req <- request_airtable_meta(
+  resp <- request_airtable_meta(
     base = base,
     ...,
     meta = "schema_base",
     token = token
   )
-
-  resp <- httr2::req_perform(req)
 
   httr2::resp_body_json(resp, simplifyVector = simplifyVector)
 }
@@ -130,14 +128,14 @@ list_base_tables <- function(base = NULL,
 list_bases <- function(bases = NULL,
                        token = NULL,
                        ...) {
-  req <- request_airtable_meta(
+  resp <- request_airtable_meta(
     meta = "list_base",
     token = token,
     ...
   )
 
-  resp <- httr2::req_perform(req)
   body <- httr2::resp_body_json(resp, simplifyVector = TRUE)
+
   base_list <- tibble::as_tibble(body[["bases"]])
 
   if (is_null(bases)) {

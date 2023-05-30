@@ -1,4 +1,4 @@
-#' Create a request for the Airtable Metadata API
+#' Create and perform a request for the Airtable Metadata API
 #'
 #' Create a request to get metadata or update metadata for bases, tables, or
 #' fields using the Airtable metadata API. Note that the metadata API does *not*
@@ -87,14 +87,17 @@ request_airtable_meta <- function(url = NULL,
     check_string(column, allow_empty = FALSE, call = call)
   }
 
-  req_airtable(
-    base = base,
-    table = table,
-    column = column,
-    template = template,
-    ...,
-    token = token,
-    call = call,
-    allow_key = FALSE
-  )
+  req <-
+    req_airtable(
+      base = base,
+      table = table,
+      column = column,
+      template = template,
+      ...,
+      token = token,
+      call = call,
+      allow_key = FALSE
+    )
+
+  httr2::req_perform(req)
 }

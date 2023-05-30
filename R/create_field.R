@@ -44,7 +44,7 @@ create_field <- function(airtable = NULL,
 
   check_string(name, allow_empty = FALSE)
   type <- field_type_match(type)
-  check_string(description, allow_null = TRUE)
+  check_field_description(description, allow_null = TRUE)
   check_list(options, allow_null = TRUE)
 
   data <-
@@ -57,7 +57,7 @@ create_field <- function(airtable = NULL,
       )
     )
 
-  req <-
+  resp <-
     request_airtable_meta(
       airtable = airtable,
       meta = "create_field",
@@ -65,8 +65,6 @@ create_field <- function(airtable = NULL,
       token = token,
       ...
     )
-
-  resp <- httr2::req_perform(req)
 
   invisible(httr2::resp_body_json(resp))
 }
@@ -84,7 +82,7 @@ update_field <- function(airtable = NULL,
   check_string(name, allow_null = TRUE)
   check_field_description(description)
 
-  req <-
+  resp <-
     request_airtable_meta(
       airtable = airtable,
       meta = "update_field",
@@ -99,8 +97,6 @@ update_field <- function(airtable = NULL,
       token = token,
       ...
     )
-
-  resp <- httr2::req_perform(req)
 
   invisible(httr2::resp_body_json(resp))
 }

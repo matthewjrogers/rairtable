@@ -2,7 +2,7 @@
 % Please edit documentation in R/request_airtable_meta.R
 \name{request_airtable_meta}
 \alias{request_airtable_meta}
-\title{Create a request for the Airtable Metadata API}
+\title{Create and perform a request for the Airtable Metadata API}
 \usage{
 request_airtable_meta(
   url = NULL,
