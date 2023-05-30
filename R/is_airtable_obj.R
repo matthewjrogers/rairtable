@@ -35,9 +35,14 @@ check_airtable_obj <- function(x,
   }
 
   if (!is_airtable_obj(x)) {
+    not <- "not a {.obj_type_friendly {class(airtable)}}."
+    if (is_url(x)) {
+      not <- "not a url."
+    }
+
     cli_abort(
-      "{.arg airtable} must be an {.cls airtable} object, not a
-    {.obj_type_friendly {class(airtable)}}."
+      "{.arg airtable} must be an {.cls airtable} object, {not}",
+      call = call
     )
   }
 
@@ -66,13 +71,17 @@ check_airtable_obj <- function(x,
     fields <- x[["fields"]]
 
     if (!is.list(fields)) {
-      cli_abort("{.arg airtable} must include a list of fields.")
+      cli_abort(
+        "{.arg airtable} must include a list of fields.",
+        call = call
+        )
     }
 
     if (!is_airtable_fields_schema(fields)) {
       cli_abort(
         "{.arg airtable} fields must have the
-        {.cls airtable_fields_schema} class."
+        {.cls airtable_fields_schema} class.",
+        call = call
       )
     }
   }

@@ -153,7 +153,7 @@ req_delete_records <- function(req = NULL,
   batch_size <- as.integer(getOption("rairtable.batch_size", 10))
 
   if (n_records > batch_size) {
-    batched_records <- split_list(records, batch_size)
+    batched_records <- split_list(records, batch_size, call = call)
 
     resp <-
       map_along(

@@ -103,14 +103,48 @@ make_field_list <- function(data,
 #'
 #' @noRd
 make_field_array <- function(fields = NULL,
+                             table = NULL,
+                             values = NULL,
+                             ...,
                              arg = caller_arg(fields),
+                             token = NULL,
                              call = caller_env()) {
-  list(
+  if (is_string(table)) {
+    tables <- list_base_tables(..., token = token, call = call)
+    table <- tables[tables[["name"]] %in% table | tables[["id"]] %in% table, ]
+  }
+
+  field_array <- list(
     "fields" = lapply(
       X = make_field_list(fields, arg = arg, call = call),
       FUN = make_field_config
     )
   )
+
+  if (has_name(table, "fields")) {
+    values <- table[["fields"]][[1]][["name"]]
+  }
+
+  if (is_null(values)) {
+    return(field_array)
+  }
+
+  if (is_character(values)) {
+    field_array_nm <- names_at(field_array[[1]])
+    nm_in_values <- field_array_nm %in% values
+
+    if (any(nm_in_values)) {
+      cli_abort(
+        c("{.arg fields} must not include any existing field names.",
+          "*" = "Rename field{?s} {.val {field_array_nm[nm_in_values]}}
+          in {.arg fields} or target {.arg table}."
+        ),
+        call = call
+      )
+    }
+  }
+
+  field_array
 }
 
 
@@ -122,9 +156,10 @@ make_field_array <- function(fields = NULL,
 make_field_config <- function(field = NULL,
                               name = NULL,
                               type = NULL,
-                              existing_names = NULL,
                               ...,
                               call = caller_env()) {
+  field <- field %||% list(name = name, type = type, ...)
+
   if (is.data.frame(field)) {
     field <- make_field_list(
       field,
@@ -133,7 +168,6 @@ make_field_config <- function(field = NULL,
     )
   }
 
-  field <- field %||% list(name = name, type = type, ...)
   check_list(field, call = call)
 
   if (!all(has_name(field, c("name", "type")))) {
@@ -146,15 +180,6 @@ make_field_config <- function(field = NULL,
   check_name(field[["name"]], arg = "name", call = call)
 
   field[["type"]] <- field_type_match(field[["type"]], error_arg = "type")
-
-  if (!is_null(existing_names) && (field[["name"]] %in% existing_names)) {
-    cli_abort(
-      c("A {.arg field} {.val name} value can't repeat any existing name.",
-        "i" = "Existing table name values are {.val {existing_names}}"
-      ),
-      call = call
-    )
-  }
 
   field
 }

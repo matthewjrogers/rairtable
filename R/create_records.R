@@ -33,7 +33,7 @@ req_create_records <- function(req = NULL,
   batch_size <- as.integer(getOption("rairtable.batch_size", 10))
 
   if (n_records > batch_size) {
-    batched_data <- split_list(data, call = call)
+    batched_data <- split_list(data, batch_size, call = call)
 
     resp <-
       map_along(
