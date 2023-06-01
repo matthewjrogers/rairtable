@@ -172,7 +172,7 @@ req_update_records <- function(req = NULL,
     )
   )
 
-  httr2::req_perform(req)
+  httr2::req_perform(req, error_call = call)
 }
 
 #' @rdname req_update_records
@@ -207,7 +207,7 @@ req_update_record <- function(req = NULL,
     call = call
   )
 
-  httr2::req_perform(req)
+  httr2::req_perform(req, error_call = call)
 }
 
 #' Get record ID column (or rownames) from data

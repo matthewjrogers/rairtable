@@ -177,7 +177,7 @@ req_delete_records <- function(req = NULL,
     paste0("?", paste0("records=", records, collapse = "&"))
   )
 
-  httr2::req_perform(req)
+  httr2::req_perform(req, error_call = call)
 }
 
 #' @rdname req_delete_records
@@ -198,5 +198,5 @@ req_delete_record <- function(req = NULL,
     call = call
   )
 
-  httr2::req_perform(req)
+  httr2::req_perform(req, error_call = call)
 }

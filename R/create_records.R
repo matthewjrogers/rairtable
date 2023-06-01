@@ -60,5 +60,5 @@ req_create_records <- function(req = NULL,
     data = list("records" = split_list(data, 1), "typecast" = typecast)
   )
 
-  httr2::req_perform(req)
+  httr2::req_perform(req, error_call = call)
 }

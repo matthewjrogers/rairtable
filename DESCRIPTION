@@ -16,7 +16,7 @@ BugReports: https://github.com/matthewjrogers/rairtable/issues
 Imports:
     cli,
     glue,
-    httr2,
+    httr2 (>= 0.2.3),
     lifecycle,
     rlang (>= 1.1.0),
     tibble,
