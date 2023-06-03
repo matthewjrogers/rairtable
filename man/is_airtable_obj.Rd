@@ -26,11 +26,11 @@ attribute that is a valid Airtable API url.}
 \item{require_table}{If \code{TRUE}, the string "tbl" must be included in the
 supplied url. If require_table is a string, it is treated as the required
 table name which must be part of url. If \code{FALSE} (default), there is no
-check for a table being present in the URL.}
+check for a table being present in the API request URL.}
 
 \item{require_view}{If \code{TRUE}, the string "viw" must be included in the
 string supplied to url. If \code{FALSE} (default), there is no check
-for a view being present in the URL.}
+for a view being present in the API request URL.}
 
 \item{require_fields}{If \code{TRUE}, check that x includes a "fields" value that
 is a list with the \code{airtable_fields_schema} class. Defaults to \code{FALSE}.}

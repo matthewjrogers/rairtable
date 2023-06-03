@@ -14,6 +14,7 @@ airtable(
   api_url = NULL,
   api_version = NULL,
   token = NULL,
+  require_table = TRUE,
   ...
 )
 }
@@ -48,6 +49,11 @@ api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{require_table}{If \code{TRUE}, the string "tbl" must be included in the
+supplied url. If require_table is a string, it is treated as the required
+table name which must be part of url. If \code{FALSE} (default), there is no
+check for a table being present in the API request URL.}
 
 \item{...}{Additional parameters passed to \code{\link[=check_airtable_obj]{check_airtable_obj()}}. Primarily
 intended for internal use.}

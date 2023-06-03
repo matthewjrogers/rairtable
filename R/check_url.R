@@ -63,17 +63,17 @@ check_airtable_url <- function(url,
 #' @name check_airtable_api_url
 #' @rdname check_airtable_url
 #' @param require_base If `TRUE` (default), the string "app" must be included in
-#'   the supplied url.
+#'   the supplied API request URL.
 #' @param require_table If `TRUE`, the string "tbl" must be included in the
 #'   supplied url. If require_table is a string, it is treated as the required
 #'   table name which must be part of url. If `FALSE` (default), there is no
-#'   check for a table being present in the URL.
+#'   check for a table being present in the API request URL.
 #' @param require_view If `TRUE`, the string "viw" must be included in the
 #'   string supplied to url. If `FALSE` (default), there is no check
-#'   for a view being present in the URL.
+#'   for a view being present in the API request URL.
 #' @param require_view If `TRUE`, the string "viw" must be included in the
 #'   string supplied to url. If `FALSE` (default), there is no check
-#'   for a view being present in the URL.
+#'   for a view being present in the API request URL.
 #' @keywords internal
 check_airtable_api_url <- function(url,
                                    require_base = TRUE,

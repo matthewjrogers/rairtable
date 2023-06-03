@@ -65,16 +65,16 @@ require_view is \code{FALSE}.}
 api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
 
 \item{require_base}{If \code{TRUE} (default), the string "app" must be included in
-the supplied url.}
+the supplied API request URL.}
 
 \item{require_table}{If \code{TRUE}, the string "tbl" must be included in the
 supplied url. If require_table is a string, it is treated as the required
 table name which must be part of url. If \code{FALSE} (default), there is no
-check for a table being present in the URL.}
+check for a table being present in the API request URL.}
 
 \item{require_view}{If \code{TRUE}, the string "viw" must be included in the
 string supplied to url. If \code{FALSE} (default), there is no check
-for a view being present in the URL.}
+for a view being present in the API request URL.}
 
 \item{...}{
   Arguments passed on to \code{\link[=parse_airtable_url]{parse_airtable_url}}

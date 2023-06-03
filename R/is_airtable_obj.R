@@ -35,7 +35,7 @@ check_airtable_obj <- function(x,
   }
 
   if (!is_airtable_obj(x)) {
-    not <- "not a {.obj_type_friendly {class(airtable)}}."
+    not <- "not {.obj_type_friendly {airtable}}."
     if (is_url(x)) {
       not <- "not a url."
     }
@@ -48,7 +48,7 @@ check_airtable_obj <- function(x,
 
   check_string(x[["base"]], call = call)
 
-  if (require_table) {
+  if (is_true(require_table)) {
     check_string(x[["table"]], call = call)
   }
 

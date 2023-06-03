@@ -41,6 +41,7 @@ airtable <- function(table = NULL,
                      api_url = NULL,
                      api_version = NULL,
                      token = NULL,
+                     require_table = TRUE,
                      ...) {
   atbl <- new_airtable_obj(
     base = base,
@@ -54,8 +55,13 @@ airtable <- function(table = NULL,
     token = token
   )
 
+  if (!is_table_id(table)) {
+    require_table <- table
+  }
+
   check_airtable_obj(
     atbl,
+    require_table = require_table,
     ...
   )
 
@@ -123,7 +129,13 @@ new_airtable_obj <- function(base,
   }
 
   base_url <- getOption("rairtable.base_url", "https://airtable.com")
-  table_url <- as.character(glue("{base_url}/{base}/{table}"))
+  base_url <- glue("{base_url}/{base}")
+
+  table_url <- NULL
+  if (is_table_id(table)) {
+    table_url <- as.character(glue("{base_url}/{table}"))
+  }
+
   request_url <- req[["url"]]
 
   vctrs::new_vctr(
@@ -136,6 +148,7 @@ new_airtable_obj <- function(base,
         "view" = view %||% list(),
         "fields" = fields %||% list(),
         "permissions" = permissions,
+        "base_url" = base_url,
         "table_url" = table_url,
         "request_url" = request_url
       )
@@ -195,6 +208,6 @@ print.airtable <- function(x, ...) {
   }
 
   cli::cli_bullets(text)
-  cli::cli_rule("{.url {x$table_url}}")
+  cli::cli_rule("{.url {x$table_url %||% x$base_url}}")
   invisible(x)
 }
