@@ -144,7 +144,7 @@ request_airtable <- function(airtable = NULL,
 
   if (is_true(require_view) && is_null(view)) {
     cli_abort(
-      "{.arg table} must be supplied.",
+      "{.arg view} must be supplied.",
       call = call
     )
   }
