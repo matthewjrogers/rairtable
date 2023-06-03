@@ -60,6 +60,13 @@ request_airtable <- function(airtable = NULL,
                              require_view = FALSE,
                              ...,
                              call = caller_env()) {
+  if (is_empty(c(airtable, url, base))) {
+    cli_abort(
+      "{.arg airtable}, {.arg url}, or {.arg base} must be supplied.",
+      call = call
+    )
+  }
+
   if (!is_null(airtable)) {
     check_airtable_obj(
       airtable,
@@ -124,6 +131,20 @@ request_airtable <- function(airtable = NULL,
     cli_abort(
       "{.arg url} must be a valid url starting with
       {.url {base_url}} or {.url {api_url}}",
+      call = call
+    )
+  }
+
+  if (is_true(require_table) && is_null(table)) {
+    cli_abort(
+      "{.arg table} must be supplied.",
+      call = call
+    )
+  }
+
+  if (is_true(require_view) && is_null(view)) {
+    cli_abort(
+      "{.arg table} must be supplied.",
       call = call
     )
   }
