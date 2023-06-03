@@ -92,7 +92,7 @@ check_airtable_api_url <- function(url,
     missing <- c(missing, "a {.arg table} name starting with {.val tbl}")
   }
 
-  if (!is_logical(require_table) && !grepl(require_table, url)) {
+  if (is_string(require_table) && !grepl(require_table, url)) {
     check_string(require_table, call = call)
     missing <- c(missing, "a {.arg table} named {.val {require_table}}")
   }

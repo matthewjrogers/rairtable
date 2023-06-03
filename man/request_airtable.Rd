@@ -33,6 +33,8 @@ req_airtable(
   token = NULL,
   string = NULL,
   allow_key = TRUE,
+  require_base = TRUE,
+  require_table = FALSE,
   remove_view = TRUE,
   call = caller_env()
 )

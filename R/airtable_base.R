@@ -93,12 +93,14 @@ airtable_base <- function(base = NULL,
 get_base_schema <- function(base = NULL,
                             token = NULL,
                             simplifyVector = TRUE,
-                            ...) {
+                            ...,
+                            call = caller_env()) {
   resp <- request_airtable_meta(
     base = base,
     ...,
     meta = "schema_base",
-    token = token
+    token = token,
+    call = call
   )
 
   httr2::resp_body_json(resp, simplifyVector = simplifyVector)
@@ -110,8 +112,9 @@ get_base_schema <- function(base = NULL,
 #' @importFrom tibble as_tibble
 list_base_tables <- function(base = NULL,
                              token = NULL,
-                             ...) {
-  body <- get_base_schema(base = base, token = token, ...)
+                             ...,
+                             call = caller_env()) {
+  body <- get_base_schema(base = base, token = token, ..., call = call)
 
   tibble::as_tibble(body[["tables"]])
 }

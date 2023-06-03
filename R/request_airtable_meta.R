@@ -96,8 +96,10 @@ request_airtable_meta <- function(url = NULL,
       ...,
       token = token,
       call = call,
+      require_base = FALSE,
+      require_table = FALSE,
       allow_key = FALSE
     )
 
-  httr2::req_perform(req)
+  httr2::req_perform(req, error_call = call)
 }

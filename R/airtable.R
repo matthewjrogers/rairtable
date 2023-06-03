@@ -55,7 +55,8 @@ airtable <- function(table = NULL,
     token = token
   )
 
-  if (!is_table_id(table)) {
+  if (!is_table_id(table) && !is_url(table)) {
+    # Set require_table to table if table appears to be a table name
     require_table <- table
   }
 

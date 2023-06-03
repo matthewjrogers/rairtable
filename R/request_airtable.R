@@ -60,7 +60,8 @@ request_airtable <- function(airtable = NULL,
                              require_view = FALSE,
                              ...,
                              call = caller_env()) {
-  if (is_empty(c(airtable, url, base))) {
+  if (is_empty(c(airtable, url)) && (require_base && is_null(base))) {
+    print(require_base)
     cli_abort(
       "{.arg airtable}, {.arg url}, or {.arg base} must be supplied.",
       call = call
@@ -223,6 +224,8 @@ req_airtable <- function(.req = NULL,
                          token = NULL,
                          string = NULL,
                          allow_key = TRUE,
+                         require_base = TRUE,
+                         require_table = FALSE,
                          remove_view = TRUE,
                          call = caller_env()) {
   .req <-
@@ -231,6 +234,8 @@ req_airtable <- function(.req = NULL,
       url = url,
       api_url = api_url,
       api_version = api_version,
+      require_base = require_base,
+      require_table = require_table,
       call = call
     )
 

@@ -9,9 +9,15 @@
 \usage{
 airtable_base(base = NULL, token = NULL, ...)
 
-get_base_schema(base = NULL, token = NULL, simplifyVector = TRUE, ...)
+get_base_schema(
+  base = NULL,
+  token = NULL,
+  simplifyVector = TRUE,
+  ...,
+  call = caller_env()
+)
 
-list_base_tables(base = NULL, token = NULL, ...)
+list_base_tables(base = NULL, token = NULL, ..., call = caller_env())
 
 list_bases(bases = NULL, token = NULL, ...)
 }
@@ -28,6 +34,11 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 
 \item{simplifyVector}{Should JSON arrays containing only primitives (i.e.
 booleans, numbers, and strings) be caused to atomic vectors?}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 
 \item{bases}{A character vectors of base ID or name values. If provided, the
 results of list_bases are filtered to matching bases only. Defaults to
