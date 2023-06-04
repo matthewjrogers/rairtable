@@ -214,6 +214,7 @@ req_update_record <- function(req = NULL,
 #'
 #' @noRd
 #' @importFrom tibble has_rownames
+#' @importFrom tidyselect all_of
 get_record_id_col <- function(data,
                               id_col = NULL,
                               id_col_arg = caller_arg(id_col),
@@ -230,7 +231,7 @@ get_record_id_col <- function(data,
 
   if (is_string(id_col) && (id_col != "")) {
     check_data_frame(data, call = call)
-    data <- select_cols(id_col, data = data)
+    data <- select_cols(tidyselect::all_of(id_col), data = data)
 
     if (ncol(data) != 1) {
       cli_abort(

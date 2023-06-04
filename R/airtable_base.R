@@ -72,11 +72,9 @@ airtable_base <- function(base = NULL,
       base_schema,
       function(tbl) {
         airtable(
-          table = list(
-            "id" = tbl[["id"]],
-            "name" = tbl[["name"]],
-            "description" = tbl[["description"]]
-          ),
+          table = tbl[["id"]],
+          name = tbl[["name"]],
+          description = tbl[["description"]],
           fields = as.list(names(tbl[["fields"]])),
           base = base
         )

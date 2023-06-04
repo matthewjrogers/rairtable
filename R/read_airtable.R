@@ -281,7 +281,7 @@ req_perform_offset <- function(req,
         offset = offset
       )
 
-    resp <- httr2::req_perform(req)
+    resp <- httr2::req_perform(req, error_call = call)
 
     offset <- httr2::resp_body_json(resp)[["offset"]]
 
@@ -353,8 +353,7 @@ resp_body_records <- function(resp,
     if (is_empty(fields)) {
       fields <- data.frame()
       cli::cli_warn(
-        "{.arg record} is empty.",
-        call = call
+        "{.arg record} is empty."
       )
     }
   }

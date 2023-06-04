@@ -61,7 +61,6 @@ request_airtable <- function(airtable = NULL,
                              ...,
                              call = caller_env()) {
   if (is_empty(c(airtable, url)) && (require_base && is_null(base))) {
-    print(require_base)
     cli_abort(
       "{.arg airtable}, {.arg url}, or {.arg base} must be supplied.",
       call = call
