@@ -1,30 +1,45 @@
-test_that("airtable works", {
-  url <- get_rairtable_test_url()
-  ids <- parse_airtable_url(url)
-
+test_that("airtable errors", {
   expect_error(airtable())
 
   expect_error(
-    airtable(table = ids$table)
+    airtable(table = "tbl123")
   )
+
   expect_error(
-    airtable(table = c(ids$table, "extra_table"), base = ids$base)
+    airtable(table = c("tbl123", "extra_table"), base = "app123")
   )
+})
 
-  skip_if_no_pat()
-  expect_s3_class(
-    airtable(
-      table = ids$table,
-      base = ids$base
-    ),
-    "airtable"
-  )
+httptest2::with_mock_dir("airtable", {
+  test_that("airtable works", {
+    url <- get_rairtable_test_url()
+    ids <- parse_airtable_url(url)
 
-  expect_s3_class(
-    airtable(
-      table = url,
-      base = ids$base
-    ),
-    "airtable"
-  )
+    skip_if_no_pat()
+    expect_s3_class(
+      airtable(
+        table = ids$table,
+        base = ids$base
+      ),
+      "airtable"
+    )
+
+    expect_s3_class(
+      airtable(
+        table = url,
+        base = ids$base
+      ),
+      "airtable"
+    )
+
+    tables <- list_base_tables(base = ids$base)
+
+    expect_s3_class(
+      airtable(
+        table = tables$name[[1]],
+        base = ids$base
+      ),
+      "airtable"
+    )
+  })
 })

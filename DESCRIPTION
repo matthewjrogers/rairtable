@@ -13,7 +13,7 @@ Description: Create, read, update, and delete Airtable records or read
 License: MIT + file LICENSE
 URL: https://matthewjrogers.github.io/rairtable/
 BugReports: https://github.com/matthewjrogers/rairtable/issues
-Imports:
+Imports: 
     cli,
     glue,
     httr2 (>= 0.2.3),
@@ -24,7 +24,8 @@ Imports:
     utils,
     vctrs,
     withr
-Suggests:
+Suggests: 
+    httptest2,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
