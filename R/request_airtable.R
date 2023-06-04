@@ -47,7 +47,7 @@
 #' @keywords internal
 #' @export
 #' @importFrom cli cli_alert_warning
-#' @importFrom httr2 request req_url_path_append
+#' @importFrom httr2 request
 request_airtable <- function(airtable = NULL,
                              url = NULL,
                              base = NULL,
@@ -84,6 +84,56 @@ request_airtable <- function(airtable = NULL,
     return(httr2::request(airtable[["request_url"]]))
   }
 
+  if (!is_null(url)) {
+    if (!is_empty(c(base, table, view))) {
+      cli::cli_alert_warning(
+        "Any {.arg base}, {.arg table}, or {.arg view} values supplied are
+        ignored when {.arg url} is an Airtable URL."
+      )
+    }
+
+    req <-
+      request_airtable_url(
+        url,
+        require_base = require_base,
+        require_table = require_table,
+        require_view = require_view,
+        api_url = api_url,
+        api_version = api_version,
+        ...,
+        call = call
+      )
+
+    return(req)
+  }
+
+  request_airtable_api_url(
+    base = base,
+    table = table,
+    view = view,
+    api_url = api_url,
+    api_version = api_version,
+    require_table = require_table,
+    require_view = require_view,
+    call = call
+  )
+}
+
+#' Build a request from an Airtable URL or error if a URL is not valid
+#'
+#' @noRd
+#' @importFrom httr2 request
+request_airtable_url <- function(url = NULL,
+                                 base = NULL,
+                                 table = NULL,
+                                 view = NULL,
+                                 api_url = NULL,
+                                 api_version = NULL,
+                                 require_base = TRUE,
+                                 require_table = TRUE,
+                                 require_view = FALSE,
+                                 ...,
+                                 call = caller_env()) {
   if (is_airtable_api_url(url)) {
     check_airtable_api_url(
       url,
@@ -98,43 +148,57 @@ request_airtable <- function(airtable = NULL,
   }
 
   if (is_airtable_url(url)) {
-    if (!is_empty(c(base, table, view))) {
-      cli::cli_alert_warning(
-        "Any {.arg base}, {.arg table}, or {.arg view} values supplied are
-        ignored when {.arg url} is an Airtable URL."
-      )
-    }
-
     ids <- parse_airtable_url(
       url,
       ...,
       api_url = api_url,
+      api_version = api_version,
       require_table = require_table,
       require_view = require_view,
       call = call
     )
 
-    base <- ids[["base"]]
-    table <- ids[["table"]]
-    view <- ids[["view"]]
-    url <- NULL
+    req <-
+      request_airtable_api_url(
+        base = ids[["base"]],
+        table = ids[["table"]],
+        view = ids[["view"]],
+        api_url = api_url,
+        api_version = api_version,
+        require_table = require_table,
+        require_view = require_view,
+        call = call
+      )
+
+    return(req)
   }
 
-  if (!is_null(url)) {
-    check_url(url, call = call)
+  check_url(url, call = call)
 
-    api_url <- api_url %||%
-      getOption("rairtable.api_url", "https://api.airtable.com")
-    base_url <-
-      getOption("rairtable.base_url", "https://airtable.com")
+  api_url <- api_url %||%
+    getOption("rairtable.api_url", "https://api.airtable.com")
+  base_url <-
+    getOption("rairtable.base_url", "https://airtable.com")
 
-    cli_abort(
-      "{.arg url} must be a valid url starting with
+  cli_abort(
+    "{.arg url} must be a valid url starting with
       {.url {base_url}} or {.url {api_url}}",
-      call = call
-    )
-  }
+    call = call
+  )
+}
 
+#' Build an Airtable API request when a base and table are supplied
+#'
+#' @noRd
+#' @importFrom httr2 request req_url_path_append
+request_airtable_api_url <- function(base = NULL,
+                                     table = NULL,
+                                     view = NULL,
+                                     api_url = NULL,
+                                     api_version = NULL,
+                                     require_table = FALSE,
+                                     require_view = FALSE,
+                                     call = caller_env()) {
   if (is_true(require_table) && is_null(table)) {
     cli_abort(
       "{.arg table} must be supplied.",
@@ -149,25 +213,6 @@ request_airtable <- function(airtable = NULL,
     )
   }
 
-  airtable_api_url_request(
-    base = base,
-    table = table,
-    view = view,
-    api_url = api_url,
-    api_version = api_version,
-    call = call
-  )
-}
-
-#' Build an Airtable API request when a base and table are supplied
-#'
-#' @noRd
-airtable_api_url_request <- function(base = NULL,
-                                     table = NULL,
-                                     view = NULL,
-                                     api_url = NULL,
-                                     api_version = NULL,
-                                     call = caller_env()) {
   api_url <- api_url %||%
     getOption("rairtable.api_url", "https://api.airtable.com")
   check_string(api_url, call = call)

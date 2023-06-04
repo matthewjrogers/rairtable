@@ -62,6 +62,12 @@ running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
+\value{
+\itemize{
+\item \code{\link[=is_airtable_url]{is_airtable_url()}} returns \code{TRUE} if the input matching an Airtable URL or \code{FALSE} otherwise.
+\item \code{\link[=parse_airtable_url]{parse_airtable_url()}} returns a list of values named "base", "table", "view", or "field".
+}
+}
 \description{
 Utility functions primarily intended for use by developers for checking and
 validating Airtable URLs, \code{\link[=is_airtable_url]{is_airtable_url()}} returns \code{TRUE} if a url starts

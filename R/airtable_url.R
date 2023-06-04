@@ -12,6 +12,9 @@
 #'
 #' @name airtable_url
 #' @inheritParams request_airtable
+#' @returns
+#'  - [is_airtable_url()] returns `TRUE` if the input matching an Airtable URL or `FALSE` otherwise.
+#'  - [parse_airtable_url()] returns a list of values named "base", "table", "view", or "field".
 NULL
 
 #' @rdname airtable_url
@@ -59,7 +62,8 @@ is_url <- function(x) {
 
 #' Does url match the pattern of an Airtable API url?
 #'
-#' [is_airtable_api_url()] returns `TRUE` if a url starts with the api_url value.
+#' [is_airtable_api_url()] returns `TRUE` if a url starts with the api_url
+#' value.
 #'
 #' @inheritParams is_airtable_url
 #' @param api_url Expected base URL for an API url. Defaults to `NULL` and set

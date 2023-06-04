@@ -49,7 +49,7 @@ API key.}
 \itemize{
 \item \code{\link[=airtable_base]{airtable_base()}} returns an \code{airtable_base_schema} object.
 \item \code{\link[=get_base_schema]{get_base_schema()}} returns the response from the Airtable get base schema
-API method or \code{\link[=list_base_table]{list_base_table()}} returns a tibble with the list of tables
+API method or \code{\link[=list_base_tables]{list_base_tables()}} returns a tibble with the list of tables
 from the schema response.
 \item \code{\link[=list_bases]{list_bases()}} returns a tibble of base IDs, names, and permission levels.
 }

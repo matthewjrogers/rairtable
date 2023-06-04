@@ -28,7 +28,8 @@ set_airtable_api_key <- function(key,
                                  call = caller_env()) {
   cli_warn(
     c("Airtable API keys will no longer be supported starting in early 2024.",
-      "i" = "Moving forward, using {.fn set_airtable_pat} with a personal access token is strongly recommended."
+      "i" = "Moving forward, using {.fn set_airtable_pat} with a personal
+      access token is strongly recommended."
     ),
     .frequency = "once",
     .frequency_id = "api_deprecate",

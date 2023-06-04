@@ -74,7 +74,7 @@ check_airtable_obj <- function(x,
       cli_abort(
         "{.arg airtable} must include a list of fields.",
         call = call
-        )
+      )
     }
 
     if (!is_airtable_fields_schema(fields)) {

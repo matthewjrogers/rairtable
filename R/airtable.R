@@ -55,8 +55,8 @@ airtable <- function(table = NULL,
     token = token
   )
 
+  # Set require_table to table if table appears to be a table name
   if (!is_table_id(table) && !is_url(table)) {
-    # Set require_table to table if table appears to be a table name
     require_table <- table
   }
 
@@ -107,7 +107,7 @@ new_airtable_obj <- function(base,
   check_string(table, call = call)
   check_character(view, allow_null = TRUE, call = call)
 
-  req <- airtable_api_url_request(
+  req <- request_airtable_api_url(
     base = base,
     table = table,
     view = view,
@@ -205,7 +205,11 @@ print.airtable <- function(x, ...) {
       list("vec-trunc" = getOption("rairtable.fields-trunc", 6))
     )
 
-    text <- c(text, "*" = "{length(x$fields)} field{?s} including {.field {fields}}.")
+    text <-
+      c(
+        text,
+        "*" = "{length(x$fields)} field{?s} including {.field {fields}}."
+      )
   }
 
   cli::cli_bullets(text)

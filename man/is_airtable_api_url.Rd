@@ -17,6 +17,7 @@ supported.}
 to \code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
 }
 \description{
-\code{\link[=is_airtable_api_url]{is_airtable_api_url()}} returns \code{TRUE} if a url starts with the api_url value.
+\code{\link[=is_airtable_api_url]{is_airtable_api_url()}} returns \code{TRUE} if a url starts with the api_url
+value.
 }
 \keyword{internal}

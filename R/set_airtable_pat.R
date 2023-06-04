@@ -44,7 +44,10 @@ get_airtable_pat <- function(pat = NULL,
 #'
 #' @keywords internal
 get_airtable_pat_or_key <- function(token = NULL,
-                                    default = c("AIRTABLE_PAT", "AIRTABLE_API_KEY"),
+                                    default = c(
+                                      "AIRTABLE_PAT",
+                                      "AIRTABLE_API_KEY"
+                                    ),
                                     call = caller_env()) {
   try_fetch(
     get_airtable_pat(token, call = call, default = default[[1]]),
@@ -84,7 +87,8 @@ set_airtable_token <- function(token,
 
     cli::cli_bullets(
       c(
-        "v" = "{.envvar {default}} set to {.val {token}} with {.fn Sys.setenv}.",
+        "v" = "{.envvar {default}} set to {.val {token}} with
+        {.fn Sys.setenv}.",
         "*" = "To use this token in future sessions, run
         {.fn {caller_name}} using {.arg install = TRUE}."
       )
@@ -127,7 +131,8 @@ set_airtable_token <- function(token,
 
   cli::cli_bullets(
     c(
-      "v" = "{.val {token}} saved to {.file .Renviron} variable {.envvar {default}}.",
+      "v" = "{.val {token}} saved to {.file .Renviron} variable
+      {.envvar {default}}.",
       "*" = "Restart R or run {.code readRenviron(\"~/.Renviron\")} then use
       {.code Sys.getenv(\"{default}\")} to access the token."
     )

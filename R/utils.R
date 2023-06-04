@@ -18,6 +18,7 @@ map <- function(.x, .f, ...) {
 #' @param action String with the action to display in the progress message.
 #' @noRd
 #' @importFrom cli symbol pb_bar pb_percent cli_progress_along
+#' @importFrom rlang with_options
 map_along <- function(x,
                       .f,
                       ...,
@@ -26,7 +27,7 @@ map_along <- function(x,
   format <- format %||%
     "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
 
-  withr::with_options(
+  rlang::with_options(
     list("cli.progress_show_after" = 0.75),
     map(
       cli::cli_progress_along(x, format = format),
@@ -90,7 +91,8 @@ check_data_frame_rows <- function(x,
 
   if (n_rows < min) {
     cli_abort(
-      "{.arg {arg}} must be a data frame with {min} or more rows, not {n_rows}.",
+      "{.arg {arg}} must be a data frame with {min} or more rows,
+      not {n_rows}.",
       call = call
     )
   }

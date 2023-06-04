@@ -14,6 +14,6 @@ airtable_fields_schema(field_schema)
 An \code{airtable_fields_schema} object
 }
 \description{
-Create an \code{airtable_fields_schema} object from a list of lists to use for data
-validation.
+Create an \code{airtable_fields_schema} object from a list of lists to use for
+data validation.
 }

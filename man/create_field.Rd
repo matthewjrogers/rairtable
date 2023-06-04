@@ -58,6 +58,8 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 \code{\link[=req_airtable]{req_airtable()}}, additional parameters passed to
 \code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
 \code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
+
+\item{column}{Field ID of column to update.}
 }
 \value{
 A list with the created field name, field ID, description (if

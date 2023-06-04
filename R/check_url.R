@@ -20,7 +20,8 @@ check_url <- function(url,
 #'
 #' Utility functions for checking and validating Airtable URLs and API URLs.
 #'
-#' - [check_airtable_url()] errors if url does not start with the base_url value.
+#' - [check_airtable_url()] errors if url does not start with the base_url
+#' value.
 #' - [check_airtable_api_url()] errors if url is not a valid API url.
 #'
 #' For more information on the expected URL format for different Airtable API
@@ -41,7 +42,11 @@ check_airtable_url <- function(url,
                                call = caller_env()) {
   check_url(url, allow_null = allow_null, call = call)
 
-  if (is_airtable_url(url, base_url, allow_shared) || (allow_null && is_null(url))) {
+  if (allow_null && is_null(url)) {
+    return(invisible(NULL))
+  }
+
+  if (is_airtable_url(url, base_url, allow_shared)) {
     return(invisible(NULL))
   }
 
@@ -82,24 +87,9 @@ check_airtable_api_url <- function(url,
                                    api_url = NULL,
                                    call = caller_env()) {
   check_string(url, call = call)
-  missing <- NULL
 
-  if (require_base && !grepl("app", url)) {
-    missing <- c(missing, "a {.arg base} name starting with {.val app}")
-  }
-
-  if (is_true(require_table) && !grepl("tbl", url)) {
-    missing <- c(missing, "a {.arg table} name starting with {.val tbl}")
-  }
-
-  if (is_string(require_table) && !grepl(require_table, url)) {
-    check_string(require_table, call = call)
-    missing <- c(missing, "a {.arg table} named {.val {require_table}}")
-  }
-
-  if (require_view && !grepl("viw", url)) {
-    missing <- c(missing, "a {.arg view} name starting with {.val viw}")
-  }
+  missing <-
+    set_missing_message(url, require_base, require_table, require_view, call)
 
   if (is_airtable_api_url(url, api_url) && is_null(missing)) {
     return(invisible(NULL))
@@ -123,6 +113,35 @@ check_airtable_api_url <- function(url,
     message = message,
     call = call
   )
+}
+
+#' Set message component based on if url is missing required elements
+#'
+#' @noRd
+set_missing_message <- function(url,
+                                require_base = TRUE,
+                                require_table = FALSE,
+                                require_view = FALSE,
+                                call = caller_env()) {
+  missing <- NULL
+
+  if (require_base && !grepl("app", url)) {
+    missing <- c(missing, "a {.arg base} name starting with {.val app}")
+  }
+
+  if (is_true(require_table) && !grepl("tbl", url)) {
+    missing <- c(missing, "a {.arg table} name starting with {.val tbl}")
+  }
+
+  if (is_string(require_table) && !grepl(require_table, url)) {
+    missing <- c(missing, "a {.arg table} named {.val {require_table}}")
+  }
+
+  if (require_view && !grepl("viw", url)) {
+    missing <- c(missing, "a {.arg view} name starting with {.val viw}")
+  }
+
+  missing
 }
 
 #' Does the parsed values from a URL included required IDs?

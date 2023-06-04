@@ -58,7 +58,8 @@ Utility functions for checking and validating Airtable URLs and API URLs.
 }
 \details{
 \itemize{
-\item \code{\link[=check_airtable_url]{check_airtable_url()}} errors if url does not start with the base_url value.
+\item \code{\link[=check_airtable_url]{check_airtable_url()}} errors if url does not start with the base_url
+value.
 \item \code{\link[=check_airtable_api_url]{check_airtable_api_url()}} errors if url is not a valid API url.
 }
 

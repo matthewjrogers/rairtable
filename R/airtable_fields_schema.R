@@ -1,7 +1,7 @@
 #' Create an `airtable_fields_schema` objec
 #'
-#' Create an `airtable_fields_schema` object from a list of lists to use for data
-#' validation.
+#' Create an `airtable_fields_schema` object from a list of lists to use for
+#' data validation.
 #'
 #' @param field_schema A list of lists. Each child list should have a `name`,
 #'   `type`, and `id` as well as an optional `options`

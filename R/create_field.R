@@ -72,7 +72,10 @@ create_field <- function(airtable = NULL,
 
 #' @rdname create_field
 #' @name update_field
+#' @param column Field ID of column to update.
 #' @export
+#' @importFrom vctrs list_drop_empty
+#' @importFrom httr2 resp_body_json
 update_field <- function(airtable = NULL,
                          column = NULL,
                          name = NULL,

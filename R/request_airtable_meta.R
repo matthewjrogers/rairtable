@@ -39,9 +39,12 @@ request_airtable_meta <- function(url = NULL,
         error_call = call
       )
 
-    base_required <- !(meta %in% c("create_base", "list_base"))
-    table_required <- meta %in% c("update_table", "update_field", "create_field")
-    column_required <- meta == "update_field"
+    base_required <-
+      !(meta %in% c("create_base", "list_base"))
+    table_required <-
+      meta %in% c("update_table", "update_field", "create_field")
+    column_required <-
+      meta == "update_field"
   }
 
 

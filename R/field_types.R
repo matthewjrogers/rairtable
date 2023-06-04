@@ -11,9 +11,9 @@ field_types <-
     "currency", "singleSelect", "multipleSelects", "singleCollaborator",
     "multipleCollaborators", "multipleRecordLinks", "date", "dateTime",
     "phoneNumber", "multipleAttachments", "checkbox", "formula", "createdTime",
-    "rollup", "count", "lookup", "multipleLookupValues", "autoNumber", "barcode",
-    "rating", "richText", "duration", "lastModifiedTime", "button", "createdBy",
-    "lastModifiedBy", "externalSyncSource"
+    "rollup", "count", "lookup", "multipleLookupValues", "autoNumber",
+    "barcode", "rating", "richText", "duration", "lastModifiedTime", "button",
+    "createdBy", "lastModifiedBy", "externalSyncSource"
   )
 
 

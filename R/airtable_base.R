@@ -13,7 +13,7 @@
 #' @returns
 #'  - [airtable_base()] returns an `airtable_base_schema` object.
 #'  - [get_base_schema()] returns the response from the Airtable get base schema
-#'  API method or [list_base_table()] returns a tibble with the list of tables
+#'  API method or [list_base_tables()] returns a tibble with the list of tables
 #'  from the schema response.
 #'  - [list_bases()] returns a tibble of base IDs, names, and permission levels.
 #' @export
@@ -186,7 +186,9 @@ print.airtable_base_schema <- function(x, ...) {
 
   cli::cli_bullets(
     set_names(
-      paste0("{.value ", names_at(x, "name"), "} - {.field ", names_at(x, "id"), "}"),
+      paste0(
+        "{.value ", names_at(x, "name"), "} - {.field ", names_at(x, "id"), "}"
+      ),
       rep_len("*", n_tbls)
     )
   )
@@ -253,7 +255,9 @@ print.airtable_fields_schema <- function(x, ...) {
   cli::cli_text("{cli::symbol$line} {n_fields} field{?s}:")
   cli::cli_bullets(
     set_names(
-      paste0("{.field ", names_at(x, "name"), "} - {.code ", names_at(x, "type"), "}"),
+      paste0(
+        "{.field ", names_at(x, "name"), "} - {.code ", names_at(x, "type"), "}"
+      ),
       rep_len("*", n_fields)
     )
   )

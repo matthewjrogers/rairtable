@@ -33,7 +33,8 @@ httptest2::with_mock_dir("read_airtable", {
       "data.frame"
     )
 
-    records <- atbl_df[!is.na(atbl_df$Name), ][[getOption("rairtable.id_col", "airtable_record_id")]]
+    id_col <- getOption("rairtable.id_col", "airtable_record_id")
+    records <- atbl_df[!is.na(atbl_df$Name), ][[id_col]]
 
     expect_s3_class(
       get_record(
