@@ -135,6 +135,8 @@ new_airtable_obj <- function(base,
   table_url <- NULL
   if (is_table_id(table)) {
     table_url <- as.character(glue("{base_url}/{table}"))
+  } else {
+    name <- name %||% table
   }
 
   request_url <- req[["url"]]
