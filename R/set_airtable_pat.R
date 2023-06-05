@@ -101,7 +101,7 @@ set_airtable_token <- function(token,
   renv <- file.path(home, ".Renviron")
 
   if (file.exists(renv)) {
-    has_default <- any(grepl(default, readLines(renv)))
+    has_default <- any(grepl(paste0("^", default), readLines(renv)))
 
     if (has_default && !overwrite) {
       cli_abort(
