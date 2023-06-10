@@ -106,6 +106,7 @@ list_records <- function(airtable = NULL,
                          cell_format = NULL,
                          token = NULL,
                          offset = NULL,
+                         airtable_id_col = NULL,
                          ...) {
   req <- req_list_records(
     airtable = airtable,
@@ -123,7 +124,14 @@ list_records <- function(airtable = NULL,
     token = token
   )
 
-  req_perform_offset(req = req, offset = offset)
+  airtable_id_col <- airtable_id_col %||%
+    getOption("rairtable.id_col", "airtable_record_id")
+
+  req_perform_offset(
+    req = req,
+    offset = offset,
+    record_nm = c(airtable_id_col, "createdTime")
+  )
 }
 
 #' Build a request for the Airtable list records API method

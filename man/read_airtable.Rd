@@ -30,6 +30,7 @@ list_records(
   cell_format = NULL,
   token = NULL,
   offset = NULL,
+  airtable_id_col = NULL,
   ...
 )
 
