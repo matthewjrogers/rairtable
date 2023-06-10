@@ -22,6 +22,8 @@ set_airtable_pat <- function(pat,
                              overwrite = FALSE,
                              default = "AIRTABLE_PAT",
                              call = caller_env()) {
+  default <- getOption("rairtable.pat_default", default)
+
   set_airtable_token(pat, install, overwrite, default, call)
 }
 
@@ -31,12 +33,15 @@ set_airtable_pat <- function(pat,
 get_airtable_pat <- function(pat = NULL,
                              default = "AIRTABLE_PAT",
                              call = caller_env()) {
+  default <- getOption("rairtable.pat_default", default)
+
   get_airtable_token(
     pat,
     message = c("Personal access token can't be found at {.envvar {default}}.",
       "*" = "Use {.fn set_airtable_pat} to set {.envvar {default}}."
     ),
-    default = default, call = call
+    default = default,
+    call = call
   )
 }
 
@@ -50,9 +55,17 @@ get_airtable_pat_or_key <- function(token = NULL,
                                     ),
                                     call = caller_env()) {
   try_fetch(
-    get_airtable_pat(token, call = call, default = default[[1]]),
+    get_airtable_pat(
+      token,
+      default = default[[1]],
+      call = call
+      ),
     error = function(cnd) {
-      get_airtable_api_key(token, call = call, default = default[[2]])
+      get_airtable_api_key(
+        token,
+        default = default[[2]],
+        call = call
+        )
     }
   )
 }

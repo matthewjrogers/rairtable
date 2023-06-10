@@ -10,6 +10,10 @@ These are environment variables and options that users may set, to modify the be
 
 ## User facing environment variables
 
+### `rairtable.pat_default` and `rairtable.key_default`
+
+The default value used for the Airtable Personal Access Token and API Key variables that are set with `set_airtable_token()` or `set_airtable_api_key()` and retrieved using `get_airtable_pat()` or `get_airtable_api_key()`.
+
 ### `rairtable.id_col`
 
 A number of functions use the `airtable_id_col` parameter to set the name of the column holding record id values. The default value "airtable_id_col" can be modified using the `rairtable.id_col` option. This option is used by [read_airtable()], [update_records()], [delete_records()], and other functions.

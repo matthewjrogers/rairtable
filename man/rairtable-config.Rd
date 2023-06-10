@@ -11,6 +11,11 @@ rairtable environment variables and options
 
 These are environment variables and options that users may set, to modify the behavior of rairtable.
 \subsection{User facing environment variables}{
+\subsection{\code{rairtable.pat_default} and \code{rairtable.key_default}}{
+
+The default value used for the Airtable Personal Access Token and API Key variables that are set with \code{set_airtable_token()} or \code{set_airtable_api_key()} and retrieved using \code{get_airtable_pat()} or \code{get_airtable_api_key()}.
+}
+
 \subsection{\code{rairtable.id_col}}{
 
 A number of functions use the \code{airtable_id_col} parameter to set the name of the column holding record id values. The default value "airtable_id_col" can be modified using the \code{rairtable.id_col} option. This option is used by \code{\link[=read_airtable]{read_airtable()}}, \code{\link[=update_records]{update_records()}}, \code{\link[=delete_records]{delete_records()}}, and other functions.

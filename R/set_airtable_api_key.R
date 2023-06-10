@@ -36,6 +36,8 @@ set_airtable_api_key <- function(key,
     call = call
   )
 
+  default <- getOption("rairtable.api_default", default)
+
   set_airtable_token(key, install, overwrite, default, call)
 }
 
@@ -45,6 +47,8 @@ set_airtable_api_key <- function(key,
 get_airtable_api_key <- function(key = NULL,
                                  default = "AIRTABLE_API_KEY",
                                  call = caller_env()) {
+  default <- getOption("rairtable.api_default", default)
+
   get_airtable_token(
     key,
     message = c("API key can't be found at {.envvar {default}}.",
