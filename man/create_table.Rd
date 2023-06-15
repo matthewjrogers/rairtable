@@ -56,7 +56,8 @@ Invisibly returns a list with the table ID, name, description,
 primary field ID, and field names, types, and IDs.
 }
 \description{
-Create or update an Airtable table or create a table model. At least one of
+Create or update an Airtable table or create a table model. \code{\link[=create_table]{create_table()}}
+requires both a name and fields (or a model with a name and fields). Either a
 name or description must be provided for \code{\link[=update_table]{update_table()}}.
 }
 \details{
