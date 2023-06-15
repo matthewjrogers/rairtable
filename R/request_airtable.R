@@ -351,9 +351,6 @@ req_auth_airtable <- function(req,
   } else {
     token <- token %||% get_airtable_pat(token, default = default)
   }
-  # FIXME: Sys.getenv() had some odd issues with the period in pat so escaping
-  # the token then removing escaping characters may be necessary in some cases
-  token <- sub("\\\\", "", token)
 
   req <-
     httr2::req_auth_bearer_token(
@@ -387,17 +384,28 @@ req_auth_airtable <- function(req,
 #'
 #' @noRd
 airtable_error_body <- function(resp) {
+  status <- httr2::resp_status(resp)
   error <- httr2::resp_body_json(resp)[["error"]]
-  if (has_name(error, "message")) {
-    c(
-      error[["message"]],
-      "More information: <https://airtable.com/developers/web/api/errors>"
-    )
-  } else if (has_name(error, "type")) {
-    error[["type"]]
-  } else {
-    as.character(error)
+
+  if (!is_null(status)) {
+    err_url <-
+      paste0("https://airtable.com/developers/web/api/errors#anchor-", status)
+
+    message <-
+      cli::cli_fmt(
+        cli::cli_bullets(c("i" = "More information: {.url {err_url}}"))
+        )
   }
+
+  if (has_name(error, "message")) {
+    return(c("x" = error[["message"]], message))
+  }
+
+  if (has_name(error, "type")) {
+    return(c("x" = error[["type"]], message))
+  }
+
+  c(as.character(error), message)
 }
 
 #' Add view query to URL if view is not already part of the request URL
