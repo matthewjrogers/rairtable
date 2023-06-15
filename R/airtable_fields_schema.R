@@ -39,13 +39,14 @@ check_airtable_fields_schema <- function(fields, call = caller_env()) {
     )
   }
 
+  # TODO: Double-check if "description" should be added to the allowed names
   allowed_names <- c("type", "id", "name", "options")
   fields_names <- vapply(fields, FUN = names, FUN.VALUE = NA_character_)
 
   if (!all(fields_names %in% allowed_names)) {
     cli_abort(
       "{.arg fields} names must be
-      {.val {cli::cli_vec(allowed_names, style = c(style, `vec-last` = 'or'))}},
+      {.val {cli::cli_vec(allowed_names, style = c(`vec-last` = 'or'))}},
       not {.val {fields_names[!(fields_names %in% allowed_names)]}}.",
       call = call
     )
