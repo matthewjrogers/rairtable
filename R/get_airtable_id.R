@@ -1,3 +1,15 @@
+#' Is x an Airtable ID?
+#'
+#' @param x Object to test.
+#' @noRd
+is_rairtable_id <- function(x, pattern) {
+  if (is_null(x) || !is_string(x)) {
+    return(FALSE)
+  }
+
+  grepl(pattern, x)
+}
+
 #' Is x an Airtable base ID?
 #'
 #' Return TRUE if x is a string starting with "app".
@@ -5,11 +17,7 @@
 #' @param x Object to test.
 #' @noRd
 is_base_id <- function(x) {
-  if (is_null(x) || !is_string(x)) {
-    return(FALSE)
-  }
-
-  grepl("^app[[:alnum:]]+$", x)
+  is_rairtable_id(x, "^app[[:alnum:]]+$")
 }
 
 #' Is x an Airtable table ID?
@@ -20,17 +28,10 @@ is_base_id <- function(x) {
 #' @param x Object to test.
 #' @noRd
 is_table_id <- function(x, table_name = NULL) {
-  if (is_null(x) || !is_string(x)) {
-    return(FALSE)
-  }
-
-  if (is_null(table_name)) {
-    # FIXME: table_name is not exposed so there is no option to pass a table
-    # name to is_table_id from get_table_id
-    return(grepl("^tbl[[:alnum:]]+$", x))
-  }
-
-  grepl(paste0("^", table_name, "$"), x)
+  # FIXME: table_name is not exposed so there is no option to pass a table
+  # name to is_table_id from get_table_id
+  table_name <- table_name %||% "tbl[[:alnum:]]+"
+  is_rairtable_id(x, paste0("^", table_name, "$"))
 }
 
 #' Is x an Airtable field ID?
@@ -40,11 +41,27 @@ is_table_id <- function(x, table_name = NULL) {
 #' @param x Object to test.
 #' @noRd
 is_field_id <- function(x) {
-  if (is_null(x) || !is_string(x)) {
-    return(FALSE)
-  }
+  is_rairtable_id(x, "^fld[[:alnum:]]+$")
+}
 
-  grepl("^fld[[:alnum:]]+$", x)
+#' Is x an Airtable record ID?
+#'
+#' Return TRUE if x is a string starting with "rec".
+#'
+#' @param x Object to test.
+#' @noRd
+is_record_id <- function(x) {
+  is_rairtable_id(x, "^rec[[:alnum:]]+$")
+}
+
+#' Is x an Airtable comment ID?
+#'
+#' Return TRUE if x is a string starting with "rec".
+#'
+#' @param x Object to test.
+#' @noRd
+is_comment_id <- function(x) {
+  is_rairtable_id(x, "^com[[:alnum:]]+$")
 }
 
 #' Get an Airtable base ID from a URL or Airtable
@@ -101,7 +118,7 @@ get_table_id <- function(table = NULL,
   }
 
   if (is_url(table)) {
-    return(parse_url_table_id(url, table_name, call))
+    return(parse_url_table_id(table, table_name, call))
   }
 
   cli_abort(
@@ -113,7 +130,7 @@ get_table_id <- function(table = NULL,
 
 #' Get an Airtable column/field ID from a string or URL
 #'
-#' Return the provided field ID or a field ID extracted from a URL.
+#' Return the provided field ID or a field ID parsed from a URL.
 #'
 #' @noRd
 get_field_id <- function(column = NULL,
@@ -132,6 +149,32 @@ get_field_id <- function(column = NULL,
   cli_abort(
     "{.arg column} must be a field ID string or an Airtable URL with a field ID,
     not {.obj_type_friendly {column}}.",
+    call = call
+  )
+}
+
+
+#' Get an Airtable record ID from a string or URL
+#'
+#' Return the provided record ID or a record ID parsed from a URL.
+#'
+#' @noRd
+get_record_id <- function(record = NULL,
+                          url = NULL,
+                          call = caller_env()) {
+  record <- record %||% url
+
+  if (is_record_id(record)) {
+    return(record)
+  }
+
+  if (is_url(record)) {
+    return(parse_url_record_id(record))
+  }
+
+  cli_abort(
+    "{.arg record} must be a record ID string or an Airtable URL
+    with a record ID, not {.obj_type_friendly {column}}.",
     call = call
   )
 }

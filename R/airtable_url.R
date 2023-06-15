@@ -197,6 +197,20 @@ parse_url_field_id <- function(url) {
   string_extract(url, field_pattern)
 }
 
+#' Parse record ID from URL
+#'
+#' @noRd
+parse_url_record_id <- function(url) {
+  record_name <- "rec[[:alnum:]]+"
+
+  record_pattern <-
+    glue(
+      "((?<=/){record_name}(?=/|\\?))|((?<=/){record_name}$)|((?<=view\\=){record_name})"
+    )
+
+  string_extract(url, record_pattern)
+}
+
 #' Extract pattern from a length 1 string
 #'
 #' @param string Passed to x parameter of [regmatches()]
