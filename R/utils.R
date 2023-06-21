@@ -155,7 +155,7 @@ safety_check <- function(safely = NULL,
 
   check_character(message, call = call)
 
-  cli::cli_abort(
+  cli_abort(
     message = message,
     .envir = .envir,
     call = call
@@ -170,7 +170,7 @@ cli_ask <- function(prompt = "?",
                     .envir = rlang::caller_env(),
                     call = .envir) {
   if (!rlang::is_interactive()) {
-    cli::cli_abort(
+    cli_abort(
       "User interaction is required.",
       call = call
     )

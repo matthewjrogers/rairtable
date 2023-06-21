@@ -284,7 +284,7 @@ req_airtable <- function(.req = NULL,
     )
 
   if (!is_httr2_req(.req)) {
-    cli::cli_abort(
+    cli_abort(
       "{.arg .req} must be a {.cls httr2_request} object.",
       call = call
     )
@@ -394,7 +394,7 @@ airtable_error_body <- function(resp) {
     message <-
       cli::cli_fmt(
         cli::cli_bullets(c("i" = "More information: {.url {err_url}}"))
-        )
+      )
   }
 
   if (has_name(error, "message")) {

@@ -59,13 +59,13 @@ get_airtable_pat_or_key <- function(token = NULL,
       token,
       default = default[[1]],
       call = call
-      ),
+    ),
     error = function(cnd) {
       get_airtable_api_key(
         token,
         default = default[[2]],
         call = call
-        )
+      )
     }
   )
 }

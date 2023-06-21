@@ -116,7 +116,6 @@ req_comments <- function(airtable = NULL,
                          require_record = TRUE,
                          require_comment = FALSE,
                          call = caller_env()) {
-
   if (is_null(airtable) && is_url(record)) {
     airtable <- record
   }
@@ -149,11 +148,11 @@ req_comments <- function(airtable = NULL,
   }
 
   if (require_comment && !is_comment_id(comment)) {
-      cli_abort(
-        "{.arg comment} must be a valid comment ID.",
-        call = call
-      )
-    }
+    cli_abort(
+      "{.arg comment} must be a valid comment ID.",
+      call = call
+    )
+  }
 
   req_airtable(
     template = template,

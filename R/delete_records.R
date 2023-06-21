@@ -57,7 +57,7 @@ delete_records <- function(data = NULL,
       records <- get_record_id_col(data, id_col = airtable_id_col)
     } else {
       check_data_frame(data)
-      cli::cli_abort(
+      cli_abort(
         "{.arg data} must be a data frame with a column named {airtable_id_col}
         or a data frame with rownames."
       )

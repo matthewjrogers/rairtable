@@ -109,7 +109,7 @@ check_airtable_api_url <- function(url,
     )
   }
 
-  cli::cli_abort(
+  cli_abort(
     message = message,
     call = call
   )
