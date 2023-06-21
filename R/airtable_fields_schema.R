@@ -1,4 +1,4 @@
-#' Create an `airtable_fields_schema` objec
+#' Create an `airtable_fields_schema` object
 #'
 #' Create an `airtable_fields_schema` object from a list of lists to use for
 #' data validation.
@@ -14,7 +14,7 @@ airtable_fields_schema <- function(field_schema) {
 #' @noRd
 new_airtable_fields_schema <- function(fields, call = caller_env()) {
   check_list(fields, call = call)
-  class(fields) <- "airtable_fields_schema"
+  fields <- vctrs::new_vctr(fields, class = "airtable_fields_schema")
   check_airtable_fields_schema(fields, call = call)
   fields
 }
@@ -75,7 +75,18 @@ make_field_list <- function(data,
                             call = caller_env()) {
   check_required(data, call = call)
 
-  if (!is.data.frame(data) && is_list(data)) {
+  if (!is.data.frame(data)) {
+    if (!is_list(data)) {
+      cli_abort(
+        "{.arg {arg}} must be a list or data frame.",
+        call = call
+      )
+    }
+
+    if (!is_list_of_lists(data)) {
+      data <- list(data)
+    }
+
     return(data)
   }
 
@@ -133,4 +144,15 @@ make_field_config <- function(field = NULL,
   field[["type"]] <- field_type_match(field[["type"]], error_arg = "type")
 
   field
+}
+
+#' Is x a list of lists?
+#'
+#' @noRd
+is_list_of_lists <- function(x) {
+  if (!is_list(x)) {
+    return(FALSE)
+  }
+
+  all(vapply(x, is_list, TRUE))
 }
