@@ -177,7 +177,7 @@ check_table_model <- function(model, allow_null = FALSE, call = caller_env()) {
 
   if (!is_list(model[["fields"]])) {
     cli_abort(
-      "{.arg model} must include a field list.",
+      "{.arg model} must include a field array.",
       call = call
     )
   }
