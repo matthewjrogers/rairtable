@@ -232,11 +232,12 @@ get_record_id_col <- function(data,
   if (is_string(id_col) && (id_col != "")) {
     check_data_frame(data, call = call)
     data <- select_cols(tidyselect::all_of(id_col), data = data)
+    n_cols <- ncol(data)
 
-    if (ncol(data) != 1) {
+    if (n_cols != 1) {
       cli_abort(
         "{.arg {id_col_arg}} must select a single record ID column,
-        not {ncol(data)} columns.",
+        not {n_cols} column{?s}.",
         call = call
       )
     }
@@ -245,7 +246,7 @@ get_record_id_col <- function(data,
   }
 
   cli_abort(
-    "{.arg {id_col_arg}} can't be {.code NULL} when
+    "{.arg {id_col_arg}} can't be empty when
     {.arg data} has no rownames.",
     call = call
   )
