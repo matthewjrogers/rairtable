@@ -17,7 +17,7 @@ httptest2::with_mock_dir("create_field", {
       name = "Test_create_field"
     )
 
-    tables <- list_base_tables(atbl)
+    tables <- get_table_models(atbl)
 
     expect_true(
       "Test_create_field" %in% tables[["fields"]][[1]][["name"]]

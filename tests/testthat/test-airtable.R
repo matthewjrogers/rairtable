@@ -32,7 +32,7 @@ httptest2::with_mock_dir("airtable", {
       "airtable"
     )
 
-    tables <- list_base_tables(base = ids$base)
+    tables <- get_table_models(base = ids$base)
 
     expect_s3_class(
       airtable(

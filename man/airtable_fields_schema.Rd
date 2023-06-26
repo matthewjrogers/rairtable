@@ -2,7 +2,7 @@
 % Please edit documentation in R/airtable_fields_schema.R
 \name{airtable_fields_schema}
 \alias{airtable_fields_schema}
-\title{Create an \code{airtable_fields_schema} objec}
+\title{Create an \code{airtable_fields_schema} object}
 \usage{
 airtable_fields_schema(field_schema)
 }

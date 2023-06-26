@@ -3,53 +3,50 @@
 \name{create_table}
 \alias{create_table}
 \alias{update_table}
-\alias{make_table_model}
 \title{Create or update an Airtable table}
 \usage{
 create_table(
   airtable = NULL,
-  model = NULL,
+  config = NULL,
   name = NULL,
   description = NULL,
   fields = NULL,
+  model = NULL,
   token = NULL,
   ...
 )
 
 update_table(airtable = NULL, name = NULL, description = NULL, ...)
-
-make_table_model(
-  name = NULL,
-  description = NULL,
-  fields = NULL,
-  ...,
-  call = caller_env()
-)
 }
 \arguments{
 \item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
 must include a request_url attribute. url is ignored if airtable is
 provided. Optional if url or base \emph{and} table are supplied.}
 
-\item{model}{A table model with a name, description, and field list.
-Typically created with \code{\link[=make_table_model]{make_table_model()}}.}
+\item{config}{A table model with a name, description, and field array from
+\code{\link[=make_table_config]{make_table_config()}}.}
 
-\item{name}{Table name. Required to create model for \code{\link[=create_table]{create_table()}}.}
+\item{name}{Table name. Optional for \code{\link[=copy_table_config]{copy_table_config()}}.}
 
 \item{description}{Table description. Optional.}
 
-\item{fields}{Field list. Required to create model for \code{\link[=create_table]{create_table()}}.}
+\item{fields}{Field list.}
+
+\item{model}{A model for an existing table to copy for a new table config. If
+name or description are supplied, any existing name or description from the
+model is ignored. model is ignored if table is supplied.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}}
-
-\item{call}{The execution environment of a currently
-running function, e.g. \code{caller_env()}. The function will be
-mentioned in error messages as the source of the error. See the
-\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+\item{...}{Additional parameters:
+\itemize{
+\item For \code{\link[=airtable_base]{airtable_base()}} and \code{\link[=get_base_schema]{get_base_schema()}}, additional parameters
+may include airtable or url. One of the three is required if base is \code{NULL}.
+\item For \code{\link[=get_table_models]{get_table_models()}}, additional parameters are passed to
+\code{\link[=get_base_schema]{get_base_schema()}} so may include simplifyVector.
+}}
 }
 \value{
 Invisibly returns a list with the table ID, name, description,
@@ -64,7 +61,7 @@ name or description must be provided for \code{\link[=update_table]{update_table
 Find more information on the create table API:
 \url{https://airtable.com/developers/web/api/create-table} or the update table
 API: \url{https://airtable.com/developers/web/api/update-table} Find more
-information about table models for the Airtable API:
+information about the table config for the Airtable API:
 \url{https://airtable.com/developers/web/api/model/table-model}
 }
 \examples{

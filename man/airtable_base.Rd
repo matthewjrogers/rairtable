@@ -3,9 +3,9 @@
 \name{airtable_base}
 \alias{airtable_base}
 \alias{get_base_schema}
+\alias{get_table_models}
 \alias{list_base_tables}
-\alias{list_bases}
-\title{Get metadata for an Airtable base or list bases for an account}
+\title{Get metadata for an Airtable base}
 \usage{
 airtable_base(base = NULL, token = NULL, ...)
 
@@ -17,9 +17,14 @@ get_base_schema(
   call = caller_env()
 )
 
-list_base_tables(base = NULL, token = NULL, ..., call = caller_env())
-
-list_bases(bases = NULL, token = NULL, ...)
+get_table_models(
+  base = NULL,
+  tables = NULL,
+  schema = NULL,
+  token = NULL,
+  ...,
+  call = caller_env()
+)
 }
 \arguments{
 \item{base}{An Airtable base ID, an airtable object containing a base ID, or
@@ -30,7 +35,13 @@ supplied to the additional parameters passed to \code{\link[=req_airtable]{req_a
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}.}
+\item{...}{Additional parameters:
+\itemize{
+\item For \code{\link[=airtable_base]{airtable_base()}} and \code{\link[=get_base_schema]{get_base_schema()}}, additional parameters
+may include airtable or url. One of the three is required if base is \code{NULL}.
+\item For \code{\link[=get_table_models]{get_table_models()}}, additional parameters are passed to
+\code{\link[=get_base_schema]{get_base_schema()}} so may include simplifyVector.
+}}
 
 \item{simplifyVector}{Should JSON arrays containing only primitives (i.e.
 booleans, numbers, and strings) be caused to atomic vectors?}
@@ -40,24 +51,24 @@ running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 
-\item{bases}{A character vectors of base ID or name values. If provided, the
-results of list_bases are filtered to matching bases only. Defaults to
-\code{NULL} which returns all bases associated with the personal access token or
-API key.}
+\item{tables}{Optional character vector of table names or IDs to include in
+the returned data frame or list.}
+
+\item{schema}{A base schema list from \code{\link[=get_base_schema]{get_base_schema()}} using
+\code{simplifyVector = FALSE}. Optional if base is supplied.}
 }
 \value{
 \itemize{
 \item \code{\link[=airtable_base]{airtable_base()}} returns an \code{airtable_base_schema} object.
 \item \code{\link[=get_base_schema]{get_base_schema()}} returns the response from the Airtable get base schema
-API method or \code{\link[=list_base_tables]{list_base_tables()}} returns a tibble with the list of tables
-from the schema response.
-\item \code{\link[=list_bases]{list_bases()}} returns a tibble of base IDs, names, and permission levels.
+API method
+\item \code{\link[=get_table_models]{get_table_models()}} returns a tibble with the list of tables
+from the schema response or a list.
 }
 }
 \description{
-Get an "airtable_base_schema" object, a tibble with a list of tables, or a
-tibble with a list of bases associated with the provided personal access
-token. Additional parameters are not used by \code{\link[=list_bases]{list_bases()}} at present.
+Get an "airtable_base_schema" object, a base schema, or a list of table
+models from a base schema.
 }
 \examples{
 \dontrun{
