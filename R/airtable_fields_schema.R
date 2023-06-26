@@ -29,6 +29,8 @@ is_airtable_fields_schema <- function(x) {
 #' Error if fields does not meet the requirements for an airtable_fields_schema
 #' object
 #'
+#' Note: this function maybe could use [check_airtable_field()]
+#'
 #' @noRd
 check_airtable_fields_schema <- function(fields, call = caller_env()) {
   if (any(vapply(fields, length, NA_integer_)) < 3) {
@@ -40,14 +42,14 @@ check_airtable_fields_schema <- function(fields, call = caller_env()) {
   }
 
   # TODO: Double-check if "description" should be added to the allowed names
-  allowed_names <- c("type", "id", "name", "options")
+  allow_names <- c("type", "id", "name", "options")
   fields_names <- vapply(fields, FUN = names, FUN.VALUE = NA_character_)
 
-  if (!all(fields_names %in% allowed_names)) {
+  if (!all(fields_names %in% allow_names)) {
     cli_abort(
       "{.arg fields} names must be
-      {.val {cli::cli_vec(allowed_names, style = c(`vec-last` = 'or'))}},
-      not {.val {fields_names[!(fields_names %in% allowed_names)]}}.",
+      {.val {cli::cli_vec(allow_names, style = c(`vec-last` = 'or'))}},
+      not {.val {fields_names[!(fields_names %in% allow_names)]}}.",
       call = call
     )
   }
@@ -64,95 +66,4 @@ modify_fields <- function(fields, drop = NULL) {
       x
     }
   })
-}
-
-#' Convert a data frame into a list of lists
-#'
-#' @noRd
-make_field_list <- function(data,
-                            arg = caller_arg(data),
-                            max_rows = NULL,
-                            call = caller_env()) {
-  check_required(data, call = call)
-
-  if (!is.data.frame(data)) {
-    if (!is_list(data)) {
-      cli_abort(
-        "{.arg {arg}} must be a list or data frame.",
-        call = call
-      )
-    }
-
-    if (!is_list_of_lists(data)) {
-      data <- list(data)
-    }
-
-    return(data)
-  }
-
-  check_data_frame(data, arg = arg, call = call)
-  if (!is_null(max_rows) && (nrow(data) > max_rows)) {
-    cli_abort(
-      "{.arg {arg}} must be a list or data frame with {max_rows} row{?s},
-        not {nrow(data)} row{?s}.",
-      call = call
-    )
-  }
-
-  do.call(
-    "mapply",
-    c(
-      FUN = list,
-      data,
-      SIMPLIFY = FALSE,
-      USE.NAMES = FALSE
-    )
-  )
-}
-
-#' Make a field config object
-#'
-#' <https://airtable.com/developers/web/api/field-model>
-#'
-#' @noRd
-make_field_config <- function(field = NULL,
-                              name = NULL,
-                              type = NULL,
-                              ...,
-                              call = caller_env()) {
-  field <- field %||% list(name = name, type = type, ...)
-
-  if (is.data.frame(field)) {
-    field <- make_field_list(
-      field,
-      max_rows = 1,
-      call = call
-    )
-  }
-
-  check_list(field, call = call)
-
-  if (!all(has_name(field, c("name", "type")))) {
-    cli_abort(
-      "{.arg field} must have the names {.val name} and {.val type}.",
-      call = call
-    )
-  }
-
-  check_name(field[["name"]], arg = "name", call = call)
-
-  field[["type"]] <- field_type_match(field[["type"]], error_arg = "type")
-
-  field
-}
-
-#' Is x a list of lists?
-#'
-#' @noRd
-is_list_of_lists <- function(x) {
-  if (!is_list(x)) {
-    return(FALSE)
-  }
-
-  all(vapply(x, is_list, TRUE))
 }
