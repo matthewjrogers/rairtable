@@ -5,12 +5,41 @@
 # license: https://unlicense.org
 # imports: rlang
 # ---
-#' map (from standalone-purrr.R)
+#' map and keep (from standalone-purrr.R)
 #'
 #' @noRd
 map <- function(.x, .f, ...) {
   .f <- rlang::as_function(.f, env = rlang::global_env())
   lapply(.x, .f, ...)
+}
+
+#' @noRd
+map_lgl <- function(.x, .f, ...) {
+  .rlang_purrr_map_mold(.x, .f, logical(1), ...)
+}
+
+#' @noRd
+.rlang_purrr_map_mold <- function(.x, .f, .mold, ...) {
+  .f <- as_function(.f, env = global_env())
+  out <- vapply(.x, .f, .mold, ..., USE.NAMES = FALSE)
+  names(out) <- names(.x)
+  out
+}
+
+#' @noRd
+keep <- function(.x, .f, ...) {
+  .x[.rlang_purrr_probe(.x, .f, ...)]
+}
+
+#' @noRd
+.rlang_purrr_probe <- function(.x, .p, ...) {
+  if (is_logical(.p)) {
+    stopifnot(length(.p) == length(.x))
+    .p
+  } else {
+    .p <- as_function(.p, env = global_env())
+    map_lgl(.x, .p, ...)
+  }
 }
 
 #' Wrapper for cli::cli_progress_along
@@ -37,6 +66,17 @@ map_along <- function(x,
   )
 }
 
+#' Is x a list of lists?
+#'
+#' @noRd
+is_list_of_lists <- function(x) {
+  if (!is_list(x)) {
+    return(FALSE)
+  }
+
+  all(vapply(x, is_list, TRUE))
+}
+
 #' Split list or vector into equal size pieces
 #'
 #' @noRd
@@ -51,17 +91,34 @@ split_list <- function(x,
 
   check_number_whole(batch_size, call = call)
 
+  len <- length(x)
+
   mapply(
     FUN = function(a, b) {
       x[a:b]
     },
-    seq.int(from = 1, to = length(x), by = batch_size),
+    seq.int(from = 1, to = len, by = batch_size),
     pmin(
-      seq.int(from = 1, to = length(x), by = batch_size) + (batch_size - 1),
-      length(x)
+      seq.int(from = 1, to = len, by = batch_size) + (batch_size - 1),
+      len
     ),
     SIMPLIFY = FALSE
   )
+}
+
+#' Set list names optionally using an attribute from each item in the list
+#'
+#' @noRd
+set_list_names <- function(x, nm = NULL, at = "name") {
+  nm <- nm %||% names_at(x, at)
+  set_names(x, nm)
+}
+
+#' @noRd
+names_at <- function(x, at = "name") {
+  vapply(x, function(x) {
+    x[[at]]
+  }, NA_character_)
 }
 
 #' Check if object is a data frame with a specified number of rows
@@ -102,6 +159,7 @@ check_data_frame_rows <- function(x,
 #'
 #' @noRd
 check_list <- function(x,
+                       max_length = NULL,
                        allow_na = FALSE,
                        allow_null = FALSE,
                        arg = caller_arg(x),
@@ -112,6 +170,13 @@ check_list <- function(x,
 
   if (allow_null && is_null(x)) {
     return(invisible(NULL))
+  }
+
+  if (!is_null(max_length) && length(x) > max_length) {
+    cli_abort(
+      "{.arg {arg}} must be length {max_length} or less, not length {length(x)}.",
+      call = call
+    )
   }
 
   if (!is_list(x)) {

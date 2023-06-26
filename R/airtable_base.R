@@ -1,21 +1,24 @@
-#' Get metadata for an Airtable base or list bases for an account
+#' Get metadata for an Airtable base
 #'
-#' Get an "airtable_base_schema" object, a tibble with a list of tables, or a
-#' tibble with a list of bases associated with the provided personal access
-#' token. Additional parameters are not used by [list_bases()] at present.
+#' Get an "airtable_base_schema" object, a base schema, or a list of table
+#' models from a base schema.
 #'
 #' @param base An Airtable base ID, an airtable object containing a base ID, or
 #'   a URL that can be parsed for a base ID. Optional if url or airtable are
 #'   supplied to the additional parameters passed to [req_airtable()].
 #' @inheritParams req_airtable
-#' @param ... Additional parameters passed to [req_airtable()].
+#' @param ... Additional parameters:
+#' - For [airtable_base()] and [get_base_schema()], additional parameters
+#' may include airtable or url. One of the three is required if base is `NULL`.
+#' - For [get_table_models()], additional parameters are passed to
+#' [get_base_schema()] so may include simplifyVector.
 #'
 #' @returns
 #'  - [airtable_base()] returns an `airtable_base_schema` object.
 #'  - [get_base_schema()] returns the response from the Airtable get base schema
-#'  API method or [list_base_tables()] returns a tibble with the list of tables
-#'  from the schema response.
-#'  - [list_bases()] returns a tibble of base IDs, names, and permission levels.
+#'  API method
+#'  - [get_table_models()] returns a tibble with the list of tables
+#'  from the schema response or a list.
 #' @export
 #' @importFrom vctrs new_vctr
 #'
@@ -87,7 +90,7 @@ airtable_base <- function(base = NULL,
 #' @name get_base_schema
 #' @inheritParams httr2::resp_body_json
 #' @export
-#' @importFrom httr2 req_perform resp_body_json
+#' @importFrom httr2 resp_body_json
 get_base_schema <- function(base = NULL,
                             token = NULL,
                             simplifyVector = TRUE,
@@ -105,47 +108,46 @@ get_base_schema <- function(base = NULL,
 }
 
 #' @rdname airtable_base
-#' @name list_base_tables
+#' @name get_table_models
+#' @param tables Optional character vector of table names or IDs to include in
+#'   the returned data frame or list.
+#' @param schema A base schema list from [get_base_schema()] using
+#'   `simplifyVector = FALSE`. Optional if base is supplied.
+#' @aliases list_base_tables
 #' @export
 #' @importFrom tibble as_tibble
-list_base_tables <- function(base = NULL,
+get_table_models <- function(base = NULL,
+                             tables = NULL,
+                             schema = NULL,
                              token = NULL,
                              ...,
                              call = caller_env()) {
-  body <- get_base_schema(base = base, token = token, ..., call = call)
+  schema <- schema %||%
+    get_base_schema(
+      base = base,
+      token = token,
+      ...,
+      call = call
+    )
 
-  tibble::as_tibble(body[["tables"]])
-}
-
-#' @rdname airtable_base
-#' @name list_bases
-#' @param bases A character vectors of base ID or name values. If provided, the
-#'   results of list_bases are filtered to matching bases only. Defaults to
-#'   `NULL` which returns all bases associated with the personal access token or
-#'   API key.
-#' @export
-#' @importFrom httr2 req_perform resp_body_json
-#' @importFrom tibble as_tibble
-list_bases <- function(bases = NULL,
-                       token = NULL,
-                       ...) {
-  resp <- request_airtable_meta(
-    meta = "list_base",
-    token = token,
-    ...
-  )
-
-  body <- httr2::resp_body_json(resp, simplifyVector = TRUE)
-
-  base_list <- tibble::as_tibble(body[["bases"]])
-
-  if (is_null(bases)) {
-    return(base_list)
+  if (!is_list(schema)) {
+    cli_abort(
+      "{.arg schema} must be a list, not {.obj_simple_type {schema}}.",
+      call = call
+    )
   }
 
-  check_character(bases, call = call)
+  table_models <- schema[["tables"]]
 
-  base_list[(base_list[["id"]] %in% bases) | (base_list[["name"]] %in% bases), ]
+  if (is.data.frame(table_models)) {
+    table_models <- tibble::as_tibble(table_models)
+  }
+
+  if (is_null(tables)) {
+    return(table_models)
+  }
+
+  filter_with_values(table_models, values = tables, call = call)
 }
 
 #' Is x have an airtable_base_schema class?
@@ -262,19 +264,4 @@ print.airtable_fields_schema <- function(x, ...) {
     )
   )
   invisible(x)
-}
-
-#' Set list names optionally using an attribute from each item in the list
-#'
-#' @noRd
-set_list_names <- function(x, nm = NULL, at = "name") {
-  nm <- nm %||% names_at(x, at)
-  set_names(x, nm)
-}
-
-#' @noRd
-names_at <- function(x, at = "name") {
-  vapply(x, function(x) {
-    x[[at]]
-  }, NA_character_)
 }
