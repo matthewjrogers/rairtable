@@ -67,6 +67,19 @@ request_airtable <- function(airtable = NULL,
     )
   }
 
+  if (!is_empty(c(base, table, view))) {
+    if (!is_null(airtable)) {
+      when <- "when {.arg airtable} is supplied."
+    } else if (!is_null(url)) {
+      when <- "when {.arg url} is supplied."
+    }
+
+    cli::cli_alert_warning(
+      paste0("{.arg base}, {.arg table}, and {.arg view} values are
+        ignored ", when)
+    )
+  }
+
   if (!is_null(airtable)) {
     check_airtable_obj(
       airtable,
@@ -85,13 +98,6 @@ request_airtable <- function(airtable = NULL,
   }
 
   if (!is_null(url)) {
-    if (!is_empty(c(base, table, view))) {
-      cli::cli_alert_warning(
-        "Any {.arg base}, {.arg table}, or {.arg view} values supplied are
-        ignored when {.arg url} is an Airtable URL."
-      )
-    }
-
     req <-
       request_airtable_url(
         url,
@@ -189,7 +195,7 @@ request_airtable_url <- function(url = NULL,
 
 #' Build an Airtable API request when a base and table are supplied
 #'
-#' @noRd
+#' @keywords internal
 #' @importFrom httr2 request req_url_path_append
 request_airtable_api_url <- function(base = NULL,
                                      table = NULL,
