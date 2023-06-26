@@ -1,7 +1,15 @@
 #' Make a field config or a list of field config elements
 #'
+#' @description
+#'
+#' These functions are intended for advanced users or developers.
+#'
 #' [make_field_config()] is a helper function for creating a field config for
 #' adding new fields to an existing table or to add to a table config object.
+#'
+#' [get_field_config()] gets a field config from an existing table model with
+#' some modifications to field types (required for compatibility with the
+#' Airtable API). See details.
 #'
 #' Learn more about the Airtable Web API field model:
 #' <https://airtable.com/developers/web/api/field-model>
@@ -214,31 +222,36 @@ check_field_array <- function(fields,
 }
 
 
-#' Get a field config from a table model
+#' @name get_field_config
+#' @rdname make_field_config
 #'
-#' This function allows you to copy a field configuration from an existing table
-#' to use in creating a new table.
+#' @details Modifications from table model fields to copied field config
+#'
+#' Fields with type "lastModifiedTime" or "createdTime" are dropped from the
+#' config, fields with "multipleRecordLinks" are converted to "singleLineText"
+#' unless a replacement linkedTableId is provided, and only name and color
+#' options are retained for "singleSelect" or "multipleSelects" fields.
 #'
 #' @param fields A list of fields. Optional if table or table and schema are
 #'   supplied.
 #' @param table A table schema from [get_table_models()], a base schema with a
 #'   single table, or a string with a table name (if schema is provided).
-#' @inheritParams get_table_models
 #' @param schema A base schema from [get_base_schema()] created with
 #'   `simplifyVector = FALSE`.
+#' @param model A model for an existing table to use for a new field config.
+#' @inheritParams prep_table_field
 #' @param ... Additional parameters. Unused.
 #' @inheritParams rlang::args_error_context
-#' @return A field configuration list,
-#' @rdname get_field_config
-#' @noRd
+#' @export
 get_field_config <- function(fields = NULL,
                              table = NULL,
                              schema = NULL,
+                             model = NULL,
                              linkedTableId = NULL,
                              viewIdForRecordSelection = NULL,
                              ...,
                              call = caller_env()) {
-  fields <- get_model_fields(fields, table, schema, call = call)
+  fields <- get_model_fields(fields, table, schema, model, call = call)
 
   check_list(fields, call = call)
 
@@ -256,26 +269,26 @@ get_field_config <- function(fields = NULL,
 get_model_fields <- function(fields = NULL,
                              table = NULL,
                              schema = NULL,
+                             model = NULL,
                              ...,
                              call = caller_env()) {
   if (is_list_of_lists(fields)) {
     return(fields)
   }
 
-  table <- get_table_model(
+  model <- model %||% get_table_model(
     table = table,
     schema = schema,
     ...,
     call = call
   )
 
-  check_list(table, max_length = 1, call = call)
-
-  fields <- table[[1]][["fields"]]
+  fields <- model[["fields"]]
 
   if (is_empty(fields)) {
     cli_abort(
-      "{.arg table} must be a list or data frame with fields.",
+      c("{.arg model} must be a list with fields.",
+        "*" = "Check input {.arg table}, {.arg schema}, or {.arg model} for issues."),
       call = call
     )
   }
@@ -285,7 +298,13 @@ get_model_fields <- function(fields = NULL,
 
 #' Prep a field configuration from a table model for use as a new field config
 #'
-#' @noRd
+#' Internal helper function.
+#'
+#' @param linkedTableId Table ID for a linked table option to use with any
+#'   multipleRecordLinks field type.
+#' @param viewIdForRecordSelection View ID from linked table to use for record
+#'   selection on multipleRecordLinks field type.
+#' @keywords internal
 prep_table_field <- function(field,
                              linkedTableId = NULL,
                              viewIdForRecordSelection = NULL) {

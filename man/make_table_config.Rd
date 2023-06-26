@@ -10,6 +10,7 @@ make_table_config(
   description = NULL,
   fields = NULL,
   model = NULL,
+  ...,
   call = caller_env()
 )
 
@@ -18,11 +19,13 @@ copy_table_config(
   model = NULL,
   name = NULL,
   description = NULL,
-  ...
+  ...,
+  call = caller_env()
 )
 }
 \arguments{
-\item{name}{Table name. Optional for \code{\link[=copy_table_config]{copy_table_config()}}.}
+\item{name}{Table name. Optional for \code{\link[=copy_table_config]{copy_table_config()}} unless the table
+config is expected to be used within the same base.}
 
 \item{description}{Table description. Optional.}
 
@@ -32,14 +35,6 @@ copy_table_config(
 name or description are supplied, any existing name or description from the
 model is ignored. model is ignored if table is supplied.}
 
-\item{call}{The execution environment of a currently
-running function, e.g. \code{caller_env()}. The function will be
-mentioned in error messages as the source of the error. See the
-\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
-
-\item{table}{A base schema or, if schema is provided, a string with a table
-name or ID.}
-
 \item{...}{
   Arguments passed on to \code{\link[=get_table_model]{get_table_model}}
   \describe{
@@ -48,8 +43,19 @@ name or ID.}
     \item{\code{simplifyVector}}{Should JSON arrays containing only primitives (i.e.
 booleans, numbers, and strings) be caused to atomic vectors?}
   }}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+
+\item{table}{A base schema or, if schema is provided, a string with a table
+name or ID.}
 }
 \description{
+Note that copying a config from a table model requires modifying or ignoring
+some field types. See \code{\link[=copy_field_config]{copy_field_config()}} for details.
+
 Learn more about the Airtable Web API table config object:
 \url{https://airtable.com/developers/web/api/model/table-config}
 }

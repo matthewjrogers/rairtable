@@ -1,9 +1,14 @@
 #' Make a new table config or copy a table config from an existing table model
 #'
+#' @description
+#' Note that copying a config from a table model requires modifying or ignoring
+#' some field types. See [copy_field_config()] for details.
+#'
 #' Learn more about the Airtable Web API table config object:
 #' <https://airtable.com/developers/web/api/model/table-config>
 #'
-#' @param name Table name. Optional for [copy_table_config()].
+#' @param name Table name. Optional for [copy_table_config()] unless the table
+#'   config is expected to be used within the same base.
 #' @param description Table description. Optional.
 #' @param fields Field list.
 #' @inheritParams rlang::args_error_context
@@ -12,12 +17,15 @@ make_table_config <- function(name = NULL,
                               description = NULL,
                               fields = NULL,
                               model = NULL,
+                              ...,
                               call = caller_env()) {
   if (!is_null(model)) {
     table_config <- copy_table_config(
       model = model,
       name = name,
-      description = description
+      description = description,
+      ...,
+      call = call
     )
 
     return(table_config)
@@ -57,18 +65,23 @@ copy_table_config <- function(table = NULL,
                               model = NULL,
                               name = NULL,
                               description = NULL,
-                              ...) {
-  table <- table %||% model
+                              ...,
+                              call = caller_env()) {
+  if (!all(has_name(model, c("name", "fields")))) {
+    table <- table %||% model
 
-  model <- get_table_model(
-    table = table,
-    ...
-  )
+    model <- get_table_model(
+      table = table,
+      ...,
+      call = call
+    )
+  }
 
   make_table_config(
     name = name %||% model[["name"]],
     description = description %||% model[["description"]],
-    fields = get_field_config(model[["fields"]])
+    fields = get_field_config(model[["fields"]], call = call),
+    call = call
   )
 }
 

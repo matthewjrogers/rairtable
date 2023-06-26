@@ -26,7 +26,8 @@ provided. Optional if url or base \emph{and} table are supplied.}
 \item{config}{A table model with a name, description, and field array from
 \code{\link[=make_table_config]{make_table_config()}}.}
 
-\item{name}{Table name. Optional for \code{\link[=copy_table_config]{copy_table_config()}}.}
+\item{name}{Table name. Optional for \code{\link[=copy_table_config]{copy_table_config()}} unless the table
+config is expected to be used within the same base.}
 
 \item{description}{Table description. Optional.}
 

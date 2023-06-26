@@ -2,12 +2,24 @@
 % Please edit documentation in R/field_config.R
 \name{make_field_config}
 \alias{make_field_config}
+\alias{get_field_config}
 \title{Make a field config or a list of field config elements}
 \usage{
 make_field_config(
   field = NULL,
   name = NULL,
   type = NULL,
+  ...,
+  call = caller_env()
+)
+
+get_field_config(
+  fields = NULL,
+  table = NULL,
+  schema = NULL,
+  model = NULL,
+  linkedTableId = NULL,
+  viewIdForRecordSelection = NULL,
   ...,
   call = caller_env()
 )
@@ -23,18 +35,50 @@ to each element in the list.}
 \item{type}{A type to use for the field. Must be a string matching a value in
 \code{field_types}. Optional if field is supplied.}
 
+\item{...}{Additional parameters. Unused.}
+
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+
+\item{fields}{A list of fields. Optional if table or table and schema are
+supplied.}
+
+\item{table}{A table schema from \code{\link[=get_table_models]{get_table_models()}}, a base schema with a
+single table, or a string with a table name (if schema is provided).}
+
+\item{schema}{A base schema from \code{\link[=get_base_schema]{get_base_schema()}} created with
+\code{simplifyVector = FALSE}.}
+
+\item{model}{A model for an existing table to use for a new field config.}
+
+\item{linkedTableId}{Table ID for a linked table option to use with any
+multipleRecordLinks field type.}
+
+\item{viewIdForRecordSelection}{View ID from linked table to use for record
+selection on multipleRecordLinks field type.}
 }
 \description{
+These functions are intended for advanced users or developers.
+
 \code{\link[=make_field_config]{make_field_config()}} is a helper function for creating a field config for
 adding new fields to an existing table or to add to a table config object.
-}
-\details{
+
+\code{\link[=get_field_config]{get_field_config()}} gets a field config from an existing table model with
+some modifications to field types (required for compatibility with the
+Airtable API). See details.
+
 Learn more about the Airtable Web API field model:
 \url{https://airtable.com/developers/web/api/field-model}
+}
+\details{
+Modifications from table model fields to copied field config
+
+Fields with type "lastModifiedTime" or "createdTime" are dropped from the
+config, fields with "multipleRecordLinks" are converted to "singleLineText"
+unless a replacement linkedTableId is provided, and only name and color
+options are retained for "singleSelect" or "multipleSelects" fields.
 }
 \seealso{
 field_types
