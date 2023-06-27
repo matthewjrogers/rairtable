@@ -54,16 +54,3 @@ check_airtable_fields_schema <- function(fields, call = caller_env()) {
     )
   }
 }
-
-#' Drop a named value from list
-#'
-#' @param drop Name of item from fields to drop
-#' @noRd
-modify_fields <- function(fields, drop = NULL) {
-  lapply(fields, function(x) {
-    if (!is_null(drop)) {
-      x[[drop]] <- NULL
-      x
-    }
-  })
-}
