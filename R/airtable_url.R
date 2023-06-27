@@ -45,7 +45,6 @@ is_airtable_url <- function(url, base_url = NULL, allow_shared = FALSE) {
   }
 }
 
-
 #' Does x match the pattern of a URL?
 #'
 #' @noRd
@@ -133,22 +132,23 @@ parse_url_base_id <- function(url,
                               api_url = NULL,
                               api_version = NULL,
                               call = caller_env()) {
-  api_url <- api_url %||%
-    getOption("rairtable.api_url", "https://api.airtable.com")
+  # api_url <- api_url %||%
+  #   getOption("rairtable.api_url", "https://api.airtable.com")
+  base_name <- "app[[:alnum:]]+"
 
   if (is_airtable_api_url(url, api_url)) {
-    api_version <- api_version %||%
-      getOption("rairtable.api_version", "0")
+    # api_version <- api_version %||%
+    #   getOption("rairtable.api_version", "0")
+    # FIXME: api_url and api_version are not required if base ID matches pattern
 
     base_pattern <- glue(
-      "(?<={api_url}/v{api_version}/)",
-      "app[[:alnum:]]+(?=/)"
+      "((?<=/){base_name}(?=/))|((?<=/){base_name}$)|((?<=/){base_name}(?=\\?))"
     )
   } else {
     base_url <- base_url %||%
       getOption("rairtable.base_url", "https://airtable.com")
 
-    base_pattern <- glue("(?<={base_url}/)app[[:alnum:]]+(?=/)")
+    base_pattern <- glue("(?<={base_url}/){base_name}(?=/)")
 
     check_airtable_url(url, base_url, call = call)
   }
