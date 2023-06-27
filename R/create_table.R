@@ -93,8 +93,12 @@ create_table <- function(airtable = NULL,
 
   body <- httr2::resp_body_json(resp)
 
-  base_url <- getOption("rairtable.base_url", "https://airtable.com")
-  table_url <- glue("{base_url}/{base}/{body[['id']]}")
+  table_url <- paste0(
+    getOption("rairtable.base_url", "https://airtable.com"),
+    base,
+    body[["id"]],
+    sep = "/"
+  )
 
   cli_progress_step(
     "New table created at {.url {table_url}}"
@@ -131,6 +135,27 @@ update_table <- function(airtable = NULL,
       )
     ),
     ...
+  )
+
+  message <- NULL
+
+  if (!is_null(name)) {
+    message <- "name"
+  }
+
+  if (!is_null(description)) {
+    message <- c(message, "description")
+  }
+
+  table_url <- paste0(
+    getOption("rairtable.base_url", "https://airtable.com"),
+    parse_url_base_id(resp[["url"]]),
+    parse_url_table_id(resp[["url"]]),
+    sep = "/"
+  )
+
+  cli_progress_step(
+    "Table {message} updated at {.url {table_url}}"
   )
 
   invisible(httr2::resp_body_json(resp))
