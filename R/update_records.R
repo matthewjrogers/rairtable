@@ -139,7 +139,7 @@ req_update_records <- function(req = NULL,
     return(resp)
   }
 
-  data <- make_field_list(data, call = call)
+  data <- make_list_of_lists(data, call = call)
 
   if (n_records > batch_size) {
     batched_records <- split_list(records, batch_size, call = call)
@@ -167,7 +167,7 @@ req_update_records <- function(req = NULL,
   req <- httr2::req_body_json(
     req,
     data = list(
-      "fields" = make_field_list(data, 1, call = call),
+      "fields" = make_list_of_lists(data, 1, call = call),
       "typecast" = typecast
     )
   )
@@ -191,7 +191,7 @@ req_update_record <- function(req = NULL,
   check_string(record, allow_empty = FALSE, call = call)
 
   data <- list(
-    "fields" = make_field_list(
+    "fields" = make_list_of_lists(
       data,
       max_rows = 1,
       call = call

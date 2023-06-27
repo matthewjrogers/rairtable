@@ -28,7 +28,7 @@ req_create_records <- function(req = NULL,
       token = token
     )
 
-  data <- make_field_list(data, call = call)
+  data <- make_list_of_lists(data, call = call)
   n_records <- length(data)
   batch_size <- as.integer(getOption("rairtable.batch_size", 10))
 

@@ -36,17 +36,15 @@ make_field_config <- function(field = NULL,
   }
 
   if (is.data.frame(field)) {
-    field <- make_field_list(
+    field <- make_list_of_lists(
       field,
       max_rows = 1,
       call = call
-    )
+    )[[1]]
   }
 
   check_field_config(
     field,
-    name_arg = caller_arg(name),
-    type_arg = caller_arg(type),
     call = call
   )
 
@@ -93,11 +91,11 @@ check_field_config <- function(field,
 #' @inheritParams rlang::args_error_context
 #' @keywords internal
 #' @noRd
-make_field_list <- function(data,
-                            arg = caller_arg(data),
-                            max_rows = NULL,
-                            cols = NULL,
-                            call = caller_env()) {
+make_list_of_lists <- function(data,
+                               arg = caller_arg(data),
+                               max_rows = NULL,
+                               cols = NULL,
+                               call = caller_env()) {
   check_required(data, call = call)
 
   if (!is.data.frame(data)) {
@@ -164,7 +162,7 @@ make_field_array <- function(fields = NULL,
   }
 
   field_array <- lapply(
-    X = make_field_list(
+    X = make_list_of_lists(
       fields,
       cols = c("type", "name", "description", "options"),
       arg = arg,
@@ -288,7 +286,8 @@ get_model_fields <- function(fields = NULL,
   if (is_empty(fields)) {
     cli_abort(
       c("{.arg model} must be a list with fields.",
-        "*" = "Check input {.arg table}, {.arg schema}, or {.arg model} for issues."),
+        "*" = "Check input {.arg table}, {.arg schema}, or {.arg model} for issues."
+      ),
       call = call
     )
   }
