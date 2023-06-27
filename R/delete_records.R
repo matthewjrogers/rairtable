@@ -21,8 +21,8 @@
 #' @param batch_size Deprecated. Number of records to delete in a single batch.
 #'   batch_size can now be set using the "rairtable.batch_size" option.
 #' @inheritParams request_airtable
-#' @param return_json If `TRUE`, return the JSON response from the Airtable API.
-#'   If `FALSE` (default), return a vector of deleted record IDs.
+#' @param return_records If `FALSE`, return the JSON response from the Airtable
+#'   API. If `TRUE` (default), return a vector of deleted record IDs.
 #' @inheritDotParams request_airtable -api_url -api_version -call
 #' @returns A vector of deleted record IDs returned invisibly.
 #'
@@ -34,7 +34,7 @@ delete_records <- function(data = NULL,
                            records = NULL,
                            safely = NULL,
                            batch_size = deprecated(),
-                           return_json = FALSE,
+                           return_records = TRUE,
                            token = NULL,
                            ...) {
   if (is_null(data) && is_null(records)) {
@@ -92,15 +92,7 @@ delete_records <- function(data = NULL,
     msg_failed = "Can't delete records."
   )
 
-  if (return_json) {
-    if (!is_httr2_resp(resp)) {
-      return(c(map(lapply, httr2::resp_body_json)))
-    }
-
-    return(httr2::resp_body_json(resp))
-  }
-
-  invisible(records)
+  return_data_resp(records, resp, return_records)
 }
 
 

@@ -10,7 +10,7 @@ insert_records(
   airtable = NULL,
   typecast = FALSE,
   batch_size = deprecated(),
-  return_json = FALSE,
+  return_data = TRUE,
   ...
 )
 
@@ -19,7 +19,7 @@ create_records(
   airtable = NULL,
   typecast = FALSE,
   batch_size = deprecated(),
-  return_json = FALSE,
+  return_data = TRUE,
   ...
 )
 }
@@ -37,8 +37,9 @@ base. Required.}
 
 \item{batch_size}{Deprecated. Set using the \code{rairtable.batch_size} option.}
 
-\item{return_json}{If \code{TRUE}, return the response from the Airtable API as
-list. If \code{FALSE} (default), return the input data frame or list.}
+\item{return_data}{If \code{FALSE}, return JSON response from the Airtable web API
+as a list. If \code{TRUE} (default) and data is not \code{NULL}, return input data
+frame or list.}
 
 \item{...}{For \code{\link[=request_airtable]{request_airtable()}}, additional parameters passed to
 \code{\link[=parse_airtable_url]{parse_airtable_url()}} if an Airtable url is provided. For

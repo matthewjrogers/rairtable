@@ -9,8 +9,7 @@
 #' @param data A data frame with records to insert or create.
 #' @inheritParams request_airtable
 #' @inheritParams req_create_records
-#' @param return_json If `TRUE`, return the response from the Airtable API as
-#'   list. If `FALSE` (default), return the input data frame or list.
+#' @inheritParams return_data_resp
 #' @param batch_size Deprecated. Set using the `rairtable.batch_size` option.
 #' @return A data frame (invisibly) of the input data, to be stored as an object
 #'   or piped into additional functions or, if as_json is `TRUE`, the function
@@ -21,9 +20,9 @@ insert_records <- function(data,
                            airtable = NULL,
                            typecast = FALSE,
                            batch_size = deprecated(),
-                           return_json = FALSE,
+                           return_data = TRUE,
                            ...) {
-  check_airtable_obj(airtable, allow_null = TRUE)
+  # TODO: Add support for inserting records from a list
   check_data_frame_rows(data)
   n_records <- nrow(data)
 
@@ -39,15 +38,7 @@ insert_records <- function(data,
     msg_failed = "Can't create records."
   )
 
-  if (return_json) {
-    if (!is_httr2_resp(resp)) {
-      return(c(lapply(resp, httr2::resp_body_json)))
-    }
-
-    return(httr2::resp_body_json(resp))
-  }
-
-  invisible(data)
+  return_data_resp(data, resp, return_data)
 }
 
 #' @rdname insert_records
@@ -57,14 +48,14 @@ create_records <- function(data,
                            airtable = NULL,
                            typecast = FALSE,
                            batch_size = deprecated(),
-                           return_json = FALSE,
+                           return_data = TRUE,
                            ...) {
   insert_records(
     data = data,
     airtable = airtable,
     typecast = typecast,
     batch_size = batch_size,
-    return_json = return_json,
+    return_data = return_data,
     ...
   )
 }

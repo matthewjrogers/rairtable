@@ -11,7 +11,7 @@ delete_records(
   records = NULL,
   safely = NULL,
   batch_size = deprecated(),
-  return_json = FALSE,
+  return_records = TRUE,
   token = NULL,
   ...
 )
@@ -38,8 +38,8 @@ records and abort if confirmation is not provided.}
 \item{batch_size}{Deprecated. Number of records to delete in a single batch.
 batch_size can now be set using the "rairtable.batch_size" option.}
 
-\item{return_json}{If \code{TRUE}, return the JSON response from the Airtable API.
-If \code{FALSE} (default), return a vector of deleted record IDs.}
+\item{return_records}{If \code{FALSE}, return the JSON response from the Airtable
+API. If \code{TRUE} (default), return a vector of deleted record IDs.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or

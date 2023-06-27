@@ -25,8 +25,7 @@
 #'   Defaults to `NULL`.
 #' @param safely If `TRUE`, confirm number and names of columns to update and
 #'   number of rows before executing update.
-#' @param return_json If `TRUE`, return JSON response from the Airtable web API
-#'   as a list. If `FALSE` (default), return input data.
+#' @inheritParams return_data_resp
 #' @inheritDotParams request_airtable -api_url -api_version -call
 #' @return A data frame of the input data, to be stored as an object or piped
 #'   into further additional functions. The data frame is returned invisibly.
@@ -39,9 +38,8 @@ update_records <- function(data,
                            columns = tidyselect::everything(),
                            records = NULL,
                            safely = TRUE,
-                           return_json = FALSE,
+                           return_data = TRUE,
                            ...) {
-  check_airtable_obj(airtable, allow_null = TRUE)
 
   if (is_null(records)) {
     airtable_id_col <- airtable_id_col %||%
@@ -82,15 +80,7 @@ update_records <- function(data,
     msg_failed = "Can't update records."
   )
 
-  if (return_json) {
-    if (!is_httr2_resp(resp)) {
-      return(c(lapply(resp, httr2::resp_body_json)))
-    }
-
-    return(httr2::resp_body_json(resp))
-  }
-
-  invisible(data)
+  return_data_resp(data, resp, return_data)
 }
 
 #' Update one or more records in an Airtable base

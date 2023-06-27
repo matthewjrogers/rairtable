@@ -11,7 +11,7 @@ update_records(
   columns = tidyselect::everything(),
   records = NULL,
   safely = TRUE,
-  return_json = FALSE,
+  return_data = TRUE,
   ...
 )
 }
@@ -40,8 +40,9 @@ Defaults to \code{NULL}.}
 \item{safely}{If \code{TRUE}, confirm number and names of columns to update and
 number of rows before executing update.}
 
-\item{return_json}{If \code{TRUE}, return JSON response from the Airtable web API
-as a list. If \code{FALSE} (default), return input data.}
+\item{return_data}{If \code{FALSE}, return JSON response from the Airtable web API
+as a list. If \code{TRUE} (default) and data is not \code{NULL}, return input data
+frame or list.}
 
 \item{...}{
   Arguments passed on to \code{\link[=request_airtable]{request_airtable}}

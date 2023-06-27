@@ -121,6 +121,29 @@ names_at <- function(x, at = "name") {
   }, NA_character_)
 }
 
+#' Return data, response body, or combined body from list of response objects
+#'
+#' An internal helper function to optionally return data, response body as a
+#' list, or combined list of httr2_res response objects.
+#'
+#' @param data Input data frame or list
+#' @param return_data If `FALSE`, return JSON response from the Airtable web API
+#'   as a list. If `TRUE` (default) and data is not `NULL`, return input data
+#'   frame or list.
+#' @inheritParams httr2::resp_body_json
+#' @keywords internal
+return_data_resp <- function(data = NULL, resp = NULL, return_data = TRUE) {
+  if (return_data && !is_null(data)) {
+    return(invisible(data))
+  }
+
+  if (!is_httr2_resp(resp)) {
+    return(c(lapply(resp, httr2::resp_body_json)))
+  }
+
+  httr2::resp_body_json(resp)
+}
+
 #' Check if object is a data frame with a specified number of rows
 #'
 #' @noRd
