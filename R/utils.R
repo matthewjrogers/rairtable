@@ -1,3 +1,11 @@
+.onLoad <- function(lib, pkg) {
+  utils::data(
+    list = c("field_types"),
+    package = pkg,
+    envir = parent.env(environment())
+  )
+}
+
 # ---
 # repo: r-lib/rlang
 # file: standalone-purrr.R

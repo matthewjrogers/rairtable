@@ -10,3 +10,4 @@
 ^CRAN-RELEASE$
 ^codemeta\.json$
 ^README\.Rmd$
+^data-raw$
