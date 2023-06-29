@@ -85,11 +85,18 @@ create_table <- function(airtable = NULL,
     token = token
   )
 
-  cli_progress_step(
-    "Creating table {.val {model[['name']]}} with primary field
-    {.val {model[['fields']][[1]][['name']]}} and {length(model[['fields']])-1}
+  if (length(config[["fields"]]) > 1) {
+    cli_progress_step(
+      "Creating table {.val {config[['name']]}} with primary field
+    {.val {config[['fields']][[1]][['name']]}} and {length(config[['fields']])-1}
     more field{?s}"
-  )
+    )
+  } else {
+    cli_progress_step(
+      "Creating table {.val {config[['name']]}} with primary field
+      {.val {config[['fields']][[1]][['name']]}}"
+    )
+  }
 
   body <- httr2::resp_body_json(resp)
 
@@ -140,11 +147,11 @@ update_table <- function(airtable = NULL,
   message <- NULL
 
   if (!is_null(name)) {
-    message <- "name"
+    message <- cli::cli_fmt(cli::cli_bullets("name updated to {.val {name}}"))
   }
 
   if (!is_null(description)) {
-    message <- c(message, "description")
+    message <- c(message, cli::cli_fmt(cli::cli_bullets("description updated to {.val {description}}")))
   }
 
   table_url <- paste0(
@@ -155,7 +162,7 @@ update_table <- function(airtable = NULL,
   )
 
   cli_progress_step(
-    "Table {message} updated at {.url {table_url}}"
+    "Table {message} at {.url {table_url}}"
   )
 
   invisible(httr2::resp_body_json(resp))
