@@ -220,7 +220,7 @@ get_record_id_col <- function(data,
 
   if (is_string(id_col) && (id_col != "")) {
     check_data_frame(data, call = call)
-    data <- select_cols(tidyselect::all_of(id_col), data = data)
+    data <- select_cols(tidyselect::all_of(id_col), .data = data)
     n_cols <- ncol(data)
 
     if (n_cols != 1) {
@@ -253,14 +253,14 @@ get_data_columns <- function(data,
     data <- data[, names(data) != id_col]
   }
 
-  select_cols(columns, data = data)
+  select_cols(columns, .data = data)
 }
 
 #' Get names of selected columns
 #'
 #' @noRd
-get_data_colnames <- function(..., data) {
-  names(select_cols(..., data = data))
+get_data_colnames <- function(..., .data) {
+  names(select_cols(..., .data = .data))
 }
 
 #' Use tidyselect to pull a column from a data frame
@@ -268,6 +268,6 @@ get_data_colnames <- function(..., data) {
 #' @noRd
 #' @importFrom tidyselect eval_select
 #' @importFrom rlang expr
-select_cols <- function(..., data) {
-  data[, tidyselect::eval_select(expr(c(...)), data = data)]
+select_cols <- function(..., .data, .drop = FALSE) {
+  .data[, tidyselect::eval_select(expr(c(...)), data = .data), drop = .drop]
 }

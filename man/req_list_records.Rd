@@ -8,15 +8,18 @@ req_list_records(
   req = NULL,
   airtable = NULL,
   view = NULL,
+  fields = NULL,
   sort = NULL,
-  max_records = 100,
-  page_size = NULL,
+  direction = "asc",
+  filter = NULL,
+  fields_by_id = FALSE,
+  cell_format = NULL,
   tz = NULL,
   locale = NULL,
-  fields_by_id = FALSE,
-  fields = NULL,
-  desc = FALSE,
-  cell_format = NULL,
+  metadata = c("id", "createdTime"),
+  max_records = 100,
+  page_size = NULL,
+  model = NULL,
   token = NULL,
   ...,
   call = caller_env()
@@ -27,26 +30,33 @@ req_list_records(
 airtable object includes a view, the view provided to this parameter is
 ignored.}
 
+\item{fields}{Fields to return from Airtable base, Default: \code{NULL}}
+
 \item{sort}{Field to sort by, Default: \code{NULL}}
 
-\item{max_records}{Maximum number of records to return, Default: \code{NULL}. Must
-be 100 or less.}
+\item{direction}{A string ("asc" for ascending (default) or "desc" for
+descending) or character vector matching length of sort parameter. Ignored
+if sort is \code{NULL}.}
 
-\item{page_size}{Max records to return per page, Default: \code{NULL}}
+\item{fields_by_id}{If \code{TRUE}, return fields by id, Default: \code{FALSE}}
+
+\item{cell_format}{Cell format for "Link to another record" fields. Defaults
+to "json" which returns a unique record ID. A "string" cell_format returns
+the displayed character string.}
 
 \item{tz, locale}{Time zone and locale, Defaults to \code{NULL}. If cell_format is
 "string", tz defaults to \code{Sys.timezone()} and locale defaults to
 \code{Sys.getlocale("LC_TIME")}.}
 
-\item{fields_by_id}{If \code{TRUE}, return fields by id, Default: \code{FALSE}}
+\item{metadata}{Record metadata columns to include with returned data frame.
+Options including "id", "createdTime", and "commentCount". Defaults to
+\code{c("id", "createdTime")}. If metadata is \code{NULL}, no additional fields are
+added to the returned data frame.}
 
-\item{fields}{Fields to return from Airtable base, Default: \code{NULL}}
+\item{max_records}{Maximum number of records to return, Default: \code{NULL}. Must
+be 100 or less.}
 
-\item{desc}{If \code{TRUE}, sort in descending order, Default: \code{FALSE}}
-
-\item{cell_format}{Cell format for "Link to another record" fields. Defaults
-to "json" which returns a unique record ID. A "string" cell_format returns
-the displayed character string.}
+\item{page_size}{Max records to return per page, Default: \code{NULL}}
 }
 \description{
 Build a request for the Airtable list records API method

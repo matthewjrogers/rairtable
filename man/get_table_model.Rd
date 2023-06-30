@@ -22,13 +22,7 @@ name or ID.}
 \item{simplifyVector}{Should JSON arrays containing only primitives (i.e.
 booleans, numbers, and strings) be caused to atomic vectors?}
 
-\item{...}{Additional parameters:
-\itemize{
-\item For \code{\link[=airtable_base]{airtable_base()}} and \code{\link[=get_base_schema]{get_base_schema()}}, additional parameters
-may include airtable or url. One of the three is required if base is \code{NULL}.
-\item For \code{\link[=get_table_models]{get_table_models()}}, additional parameters are passed to
-\code{\link[=get_base_schema]{get_base_schema()}} so may include simplifyVector.
-}}
+\item{...}{Additional parameters passed to \code{\link[=get_table_models]{get_table_models()}}.}
 
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be

@@ -9,8 +9,8 @@ req_perform_offset(
   req,
   offset = NULL,
   type = "combine",
-  record_cols = c("id", "createdTime"),
-  record_nm = record_cols,
+  airtable_id_col = NULL,
+  metadata = c("id", "createdTime", "commentCount"),
   max_rows = NULL,
   call = caller_env()
 )
@@ -19,8 +19,8 @@ resp_body_records(
   resp,
   simplifyVector = TRUE,
   type = "combine",
-  record_cols = c("id", "createdTime"),
-  record_nm = NULL,
+  airtable_id_col = NULL,
+  metadata = c("id", "createdTime", "commentCount"),
   ...,
   call = caller_env()
 )
@@ -39,14 +39,11 @@ Primarily intended for developer use only.}
 records from the API response. Additional supported options are "records"
 and "fields".}
 
-\item{record_cols}{Column names for columns to retain from records data frame
-when type is "records" or "combine".}
+\item{airtable_id_col}{An alternate name to use for the id column of the
+response data frame.}
 
-\item{record_nm}{Names to use for additional columns indicated by
-record_cols. Defaults to \code{NULL}.}
-
-\item{id_col}{An alternate name to use for the id column of the response
-data frame.}
+\item{metadata}{Columns to return when type is "records" or to combine
+with fields when type is "combine".}
 }
 \description{
 Get the body from API requests with a series of offset values

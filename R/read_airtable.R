@@ -19,13 +19,18 @@
 #'   to the returned data frame as a new column. If `FALSE`, the airtable record
 #'   IDs are used as row names.
 #' @param airtable_id_col Airtable record ID column name assigned to returned
-#'   data frame. Ignored if id_to_col is `TRUE`. Defaults to `NULL` which is set
-#'   to `getOption("rairtable.id_col", "airtable_record_id")`.
-#' @param max_rows Optional maximum number of rows to read. Defaults to `NULL`
-#' @param ... For [read_airtable()], additional query parameters can be passed
-#'   to [req_airtable()]. For [list_records()] and
-#'   [get_record()], additional parameters, such as url, can be passed
-#'   to [request_airtable()].
+#'   data frame. Defaults to `NULL` which is sets record ID column name to
+#'   `getOption("rairtable.id_col", "airtable_record_id")`. For [list_records()]
+#'   and [get_record()], airtable_id_col is not used if metadata is `NULL` or
+#'   does not include "id". The record ID column is dropped and converted to
+#'   rownames if id_to_col is `FALSE`.
+#' @param model A table model from [get_table_model()]. Optionally used to
+#'   validate fields and sort parameters.
+#' @param max_rows Deprecated. Maximum number of rows to read.
+#' @param ... For [read_airtable()], additional query parameters, such as url,
+#'   can be passed to [req_airtable()]. For [list_records()] and [get_record()],
+#'   additional parameters are passed to [request_airtable()] and can also
+#'   include base and table.
 #' @inheritParams rlang::args_error_context
 #'
 #' @return A data frame with the records from the Airtable base and table
@@ -41,26 +46,25 @@ read_airtable <- function(airtable = NULL,
                           id_to_col = TRUE,
                           airtable_id_col = NULL,
                           max_rows = deprecated(),
+                          model = NULL,
                           token = NULL,
                           ...) {
   check_airtable_obj(airtable, allow_null = TRUE)
 
-  .req <- req_airtable(
+  req <- req_airtable(
     airtable = airtable,
     ...,
-    fields = fields,
     remove_view = FALSE,
     token = token
   )
 
-  airtable_id_col <- airtable_id_col %||%
-    getOption("rairtable.id_col", "airtable_record_id")
+  req <- req_records_fields(req, fields = fields, model = model)
 
   data <-
     req_perform_offset(
-      req = .req,
-      record_cols = "id",
-      record_nm = airtable_id_col
+      req = req,
+      airtable_id_col = airtable_id_col,
+      metadata = "id"
     )
 
   if ("data.frame" %in% lapply(data, class)) {
@@ -79,6 +83,9 @@ read_airtable <- function(airtable = NULL,
     return(data)
   }
 
+  airtable_id_col <- airtable_id_col %||%
+    getOption("rairtable.id_col", "airtable_record_id")
+
   # set ids to rownames if not instructed to do otherwise
   tibble::column_to_rownames(
     data,
@@ -95,129 +102,45 @@ read_airtable <- function(airtable = NULL,
 #' @export
 list_records <- function(airtable = NULL,
                          view = NULL,
+                         airtable_id_col = NULL,
+                         fields = NULL,
                          sort = NULL,
-                         max_records = 100,
-                         page_size = NULL,
+                         direction = "asc",
+                         fields_by_id = FALSE,
+                         cell_format = NULL,
                          tz = NULL,
                          locale = NULL,
-                         fields_by_id = FALSE,
-                         fields = NULL,
-                         desc = FALSE,
-                         cell_format = NULL,
-                         token = NULL,
+                         max_records = 100,
+                         page_size = NULL,
+                         metadata = c("id", "createdTime"),
                          offset = NULL,
-                         airtable_id_col = NULL,
+                         model = NULL,
+                         token = NULL,
                          ...) {
   req <- req_list_records(
     airtable = airtable,
     view = view,
     ...,
+    fields = fields,
     sort = sort,
-    max_records = max_records,
-    page_size = page_size,
+    direction = direction,
+    fields_by_id = fields_by_id,
+    cell_format = cell_format,
     tz = tz,
     locale = locale,
-    fields_by_id = fields_by_id,
-    fields = fields,
-    desc = desc,
-    cell_format = cell_format,
+    max_records = max_records,
+    page_size = page_size,
+    metadata = metadata,
+    model = model,
     token = token
   )
 
-  airtable_id_col <- airtable_id_col %||%
-    getOption("rairtable.id_col", "airtable_record_id")
-
   req_perform_offset(
     req = req,
-    offset = offset,
-    record_nm = c(airtable_id_col, "createdTime")
+    airtable_id_col = airtable_id_col,
+    metadata = metadata,
+    offset = offset
   )
-}
-
-#' Build a request for the Airtable list records API method
-#'
-#' @name req_list_records
-#' @param view Airtable view ID or name, Default: `NULL`. If the supplied url or
-#'   airtable object includes a view, the view provided to this parameter is
-#'   ignored.
-#' @param fields Fields to return from Airtable base, Default: `NULL`
-#' @param sort Field to sort by, Default: `NULL`
-#' @param desc If `TRUE`, sort in descending order, Default: `FALSE`
-#' @param max_records Maximum number of records to return, Default: `NULL`. Must
-#'   be 100 or less.
-#' @param page_size Max records to return per page, Default: `NULL`
-#' @param cell_format Cell format for "Link to another record" fields. Defaults
-#'   to "json" which returns a unique record ID. A "string" cell_format returns
-#'   the displayed character string.
-#' @param tz,locale Time zone and locale, Defaults to `NULL`. If cell_format is
-#'   "string", tz defaults to `Sys.timezone()` and locale defaults to
-#'   `Sys.getlocale("LC_TIME")`.
-#' @param fields_by_id If `TRUE`, return fields by id, Default: `FALSE`
-#' @keywords internal
-#' @importFrom httr2 req_url_path_append req_url_query
-req_list_records <- function(req = NULL,
-                             airtable = NULL,
-                             view = NULL,
-                             sort = NULL,
-                             max_records = 100,
-                             page_size = NULL,
-                             tz = NULL,
-                             locale = NULL,
-                             fields_by_id = FALSE,
-                             fields = NULL,
-                             desc = FALSE,
-                             cell_format = NULL,
-                             token = NULL,
-                             ...,
-                             call = caller_env()) {
-  req <- req %||% request_airtable(
-    airtable = airtable,
-    view = view,
-    ...,
-    call = call
-  )
-
-  if (!is.null(sort)) {
-    sort <- glue("field: \"{sort}\"")
-    if (desc) {
-      sort <- glue("{sort}, direction: \"desc\"")
-    }
-    sort <- glue("[{{sort}}]")
-  }
-
-  cell_format <- cell_format %||% "json"
-  cell_format <- arg_match0(cell_format, c("json", "string"), error_call = call)
-
-  if (cell_format == "string") {
-    tz <- tz %||% Sys.timezone()
-    locale <- locale %||% Sys.getlocale("LC_TIME")
-  }
-
-  if (!fields_by_id) {
-    fields_by_id <- NULL
-  }
-
-  req <- req_airtable(
-    .req = req,
-    sort = sort,
-    cellFormat = cell_format,
-    timeZone = tz,
-    userLocale = locale,
-    maxRecords = max_records,
-    pageSize = page_size,
-    returnFieldsByFieldId = fields_by_id,
-    remove_view = FALSE,
-    token = token,
-    call = call
-  )
-
-  if (!is_null(fields)) {
-    for (f in fields) {
-      req <- httr2::req_url_query(req, field = glue("[{f}]"))
-    }
-  }
-
-  req
 }
 
 #' @rdname read_airtable
@@ -225,10 +148,14 @@ req_list_records <- function(req = NULL,
 #' @param record Record ID (a string starting with "rec"). Required for
 #'   [get_record()].
 #' @export
-#' @importFrom httr2 req_url_path_append req_perform
+#' @importFrom httr2 req_perform
 get_record <- function(airtable = NULL,
                        record,
                        airtable_id_col = NULL,
+                       cell_format = NULL,
+                       tz = NULL,
+                       locale = NULL,
+                       metadata = c("id", "createdTime"),
                        token = NULL,
                        ...) {
   req <- request_airtable(
@@ -245,14 +172,238 @@ get_record <- function(airtable = NULL,
     token = token
   )
 
+  req <- req_record_cell_format(req, cell_format, tz, locale)
+
   resp <- httr2::req_perform(req)
 
-  airtable_id_col <- airtable_id_col %||%
-    getOption("rairtable.id_col", "airtable_record_id")
+  if (!is_null(metadata)) {
+    metadata <- record_metadata_match(metadata, values = c("id", "createdTime"))
+  }
 
   resp_body_records(
     resp,
-    record_nm = c(airtable_id_col, "createdTime")
+    airtable_id_col = airtable_id_col,
+    metadata = metadata
+  )
+}
+
+#' Build a request for the Airtable list records API method
+#'
+#' @name req_list_records
+#' @param view Airtable view ID or name, Default: `NULL`. If the supplied url or
+#'   airtable object includes a view, the view provided to this parameter is
+#'   ignored.
+#' @param fields Fields to return from Airtable base, Default: `NULL`
+#' @param sort Field to sort by, Default: `NULL`
+#' @param direction A string ("asc" for ascending (default) or "desc" for
+#'   descending) or character vector matching length of sort parameter. Ignored
+#'   if sort is `NULL`.
+#' @param max_records Maximum number of records to return, Default: `NULL`. Must
+#'   be 100 or less.
+#' @param page_size Max records to return per page, Default: `NULL`
+#' @param cell_format Cell format for "Link to another record" fields. Defaults
+#'   to "json" which returns a unique record ID. A "string" cell_format returns
+#'   the displayed character string.
+#' @param tz,locale Time zone and locale, Defaults to `NULL`. If cell_format is
+#'   "string", tz defaults to `Sys.timezone()` and locale defaults to
+#'   `Sys.getlocale("LC_TIME")`.
+#' @param fields_by_id If `TRUE`, return fields by id, Default: `FALSE`
+#' @param metadata Record metadata columns to include with returned data frame.
+#'   Options including "id", "createdTime", and "commentCount". Defaults to
+#'   `c("id", "createdTime")`. If metadata is `NULL`, no additional fields are
+#'   added to the returned data frame.
+#' @keywords internal
+#' @importFrom httr2 req_url_query
+#' @importFrom rlang exec
+req_list_records <- function(req = NULL,
+                             airtable = NULL,
+                             view = NULL,
+                             fields = NULL,
+                             sort = NULL,
+                             direction = "asc",
+                             filter = NULL,
+                             fields_by_id = FALSE,
+                             cell_format = NULL,
+                             tz = NULL,
+                             locale = NULL,
+                             metadata = c("id", "createdTime"),
+                             max_records = 100,
+                             page_size = NULL,
+                             model = NULL,
+                             token = NULL,
+                             ...,
+                             call = caller_env()) {
+  req <- req %||% request_airtable(
+    airtable = airtable,
+    view = view,
+    ...,
+    call = call
+  )
+
+  if (!is_null(sort)) {
+    req <- req_records_sort(
+      req,
+      sort = sort,
+      direction = direction,
+      call = call
+    )
+  }
+
+  if (!is_null(fields)) {
+    req <- req_records_fields(fields, model = model, call = call)
+  }
+
+  if (!is_null(metadata)) {
+    req <- req_record_metadata(req, metadata = metadata, call = call)
+  }
+
+  req <- req_record_cell_format(
+    req,
+    cell_format = cell_format,
+    tz = tz,
+    locale = locale,
+    call = call
+  )
+
+
+  if (!is_null(filter)) {
+    check_string(filter, allow_empty = FALSE, call = call)
+
+    req <- httr2::req_url_query(
+      req,
+      filterByFormula = filter
+    )
+
+    if (nchar(req[["url"]]) > 16000) {
+      # TODO: To avoid this limit, make a POST request to
+      # /v0/{base}/{table}/listRecords while passing the parameters within the
+      # body of the request instead of the query parameters
+      cli_abort(
+        "Request URLs can't be longer than 16,000 characters.",
+        call = call
+      )
+    }
+  }
+
+  if (!fields_by_id) {
+    fields_by_id <- NULL
+  }
+
+  req_airtable(
+    .req = req,
+    maxRecords = max_records,
+    pageSize = page_size,
+    returnFieldsByFieldId = fields_by_id,
+    remove_view = FALSE,
+    token = token,
+    call = call
+  )
+}
+
+#' Add fields to list records request with optional validation
+#'
+#' @noRd
+req_records_fields <- function(req,
+                               fields,
+                               model = NULL,
+                               call = caller_env()) {
+  if (!is_null(model)) {
+    fields <- field_name_match(
+      fields,
+      model = model,
+      error_arg = "fields",
+      error_call = call
+    )
+  }
+
+  req <- req_remove_airtable_view(req, TRUE)
+
+  req <- httr2::req_url_query(req, view = NULL)
+  fields <- set_names(fields, "fields[]")
+  rlang::exec(httr2::req_url_query, req, !!!fields)
+}
+
+#' Add sort to list records request with optional validation
+#'
+#' @noRd
+#' @importFrom vctrs vec_recycle
+req_records_sort <- function(req,
+                             sort,
+                             direction = "asc",
+                             model = NULL,
+                             call = caller_env()) {
+  if (!is_null(model)) {
+    sort <- field_name_match(
+      sort,
+      model = model,
+      error_arg = "sort",
+      error_call = call
+    )
+  }
+
+  sort <- set_names(sort, glue("sort[{seq_along(sort) - 1}][field]"))
+
+  req <- rlang::exec(httr2::req_url_query, req, !!!sort)
+
+  direction <- arg_match(
+    direction,
+    c("asc", "desc"),
+    multiple = TRUE,
+    error_call = call
+  )
+
+  direction <- vctrs::vec_recycle(
+    direction,
+    size = length(sort),
+    x_arg = "direction",
+    call = call
+  )
+
+  direction <- set_names(
+    direction,
+    glue("sort[{seq_along(sort) - 1}][direction]")
+  )
+
+  rlang::exec(httr2::req_url_query, req, !!!direction)
+}
+
+#' Add commentCount to request if required by metadata values
+#'
+#' @noRd
+req_record_metadata <- function(req,
+                                metadata,
+                                values = c("id", "createdTime", "commentCount"),
+                                call = caller_env()) {
+  metadata <- record_metadata_match(metadata, values = values, call = call)
+
+  if ("commentCount" %in% metadata) {
+    return(httr2::req_url_query(req, recordMetadata = "commentCount"))
+  }
+
+  req
+}
+
+#' Add a cell format parameter to a request
+#'
+#' @noRd
+req_record_cell_format <- function(req,
+                                   cell_format = NULL,
+                                   tz = NULL,
+                                   locale = NULL,
+                                   call = caller_env()) {
+  cell_format <- cell_format %||% "json"
+  cell_format <- arg_match0(cell_format, c("json", "string"), error_call = call)
+
+  if (cell_format == "string") {
+    tz <- tz %||% Sys.timezone()
+    locale <- locale %||% Sys.getlocale("LC_TIME")
+  }
+
+  httr2::req_url_query(
+    req,
+    cellFormat = cell_format,
+    timeZone = tz,
+    userLocale = locale
   )
 }
 
@@ -266,20 +417,24 @@ get_record <- function(airtable = NULL,
 #'   more information on how the offset value is used by the Airtable API.
 #'   Primarily intended for developer use only.
 #' @keywords internal
-#' @importFrom httr2 req_url_query req_perform
+#' @importFrom httr2 req_url_query req_perform resp_body_json
 #' @importFrom tibble as_tibble
+#' @importFrom vctrs vec_init
 req_perform_offset <- function(req,
                                offset = NULL,
                                type = "combine",
-                               record_cols = c("id", "createdTime"),
-                               record_nm = record_cols,
+                               airtable_id_col = NULL,
+                               metadata = c("id", "createdTime", "commentCount"),
                                max_rows = NULL,
                                call = caller_env()) {
   max_rows <- max_rows %||% 50000
   check_number_whole(max_rows, max = 50000, call = call)
+  if (!is_null(metadata)) {
+    metadata <- record_metadata_match(metadata, call = call)
+  }
 
   # pre-allocate space for data
-  body_list <- vector(ceiling(max_rows / 100), mode = "list")
+  body_list <- vctrs::vec_init(list(), ceiling(max_rows / 100))
 
   # pre-allocate space for data
   for (i in seq_along(body_list)) {
@@ -291,16 +446,16 @@ req_perform_offset <- function(req,
 
     resp <- httr2::req_perform(req, error_call = call)
 
-    offset <- httr2::resp_body_json(resp)[["offset"]]
-
     body_list[[i]] <-
       resp_body_records(
         resp,
         type = type,
-        record_cols = record_cols,
-        record_nm = record_nm,
+        airtable_id_col = airtable_id_col,
+        metadata = metadata,
         call = call
       )
+
+    offset <- httr2::resp_body_json(resp)[["offset"]]
 
     if (is_null(offset)) {
       # End loop if no offset returned
@@ -320,19 +475,20 @@ req_perform_offset <- function(req,
 #' @param type "combine" (default) combines the data frames with fields and
 #'   records from the API response. Additional supported options are "records"
 #'   and "fields".
-#' @param id_col An alternate name to use for the id column of the response
-#'   data frame.
-#' @param record_cols Column names for columns to retain from records data frame
-#'   when type is "records" or "combine".
-#' @param record_nm Names to use for additional columns indicated by
-#'   record_cols. Defaults to `NULL`.
+#' @param airtable_id_col An alternate name to use for the id column of the
+#'   response data frame.
+#' @param metadata Columns to return when type is "records" or to combine
+#'   with fields when type is "combine".
 #' @keywords internal
+#' @importFrom httr2 resp_body_json
+#' @importFrom cli cli_warn
+#' @importFrom tidyselect any_of
 #' @importFrom vctrs vec_cbind
 resp_body_records <- function(resp,
                               simplifyVector = TRUE,
                               type = "combine",
-                              record_cols = c("id", "createdTime"),
-                              record_nm = NULL,
+                              airtable_id_col = NULL,
+                              metadata = c("id", "createdTime", "commentCount"),
                               ...,
                               call = caller_env()) {
   body <- httr2::resp_body_json(resp, simplifyVector = simplifyVector)
@@ -344,19 +500,9 @@ resp_body_records <- function(resp,
     # Used by read_airtable and list_records
     records <- body[["records"]]
     fields <- records[["fields"]]
-
-    if (has_length(record_cols, 1)) {
-      records <- records[record_cols]
-    } else {
-      records <- records[, record_cols]
-    }
   } else if (has_name(body, c("fields"))) {
     # Used by get_record
     fields <- body[["fields"]]
-    records <- data.frame(
-      "id" = body[["id"]],
-      "createdTime" = body[["createdTime"]]
-    )
 
     if (is_empty(fields)) {
       fields <- data.frame()
@@ -364,9 +510,26 @@ resp_body_records <- function(resp,
         "{.arg record} is empty."
       )
     }
+
+    records <- data.frame(
+      "id" = body[["id"]],
+      "createdTime" = body[["createdTime"]]
+    )
   }
 
-  record_nm <- record_nm %||% names(records)
+  # If metadata is not NULL
+  if (!is_null(metadata)) {
+    records <- select_cols(.data = records, tidyselect::any_of(metadata))
+    record_nm <- names(records)
+
+    if ("id" %in% record_nm) {
+      record_nm[record_nm == "id"] <- airtable_id_col %||%
+        getOption("rairtable.id_col", "airtable_record_id")
+    }
+  } else if (type != "records") {
+    type <- "fields"
+    fields <- as.data.frame(fields)
+  }
 
   switch(type,
     "records" = records,
@@ -377,5 +540,19 @@ resp_body_records <- function(resp,
       ...,
       .error_call = call
     )
+  )
+}
+
+#' Match metadata argument
+#'
+#' @noRd
+record_metadata_match <- function(metadata,
+                                  values = c("id", "createdTime", "commentCount"),
+                                  call = caller_env()) {
+  arg_match(
+    metadata,
+    values = values,
+    multiple = TRUE,
+    error_call = call
   )
 }

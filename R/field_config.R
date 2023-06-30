@@ -128,7 +128,7 @@ make_list_of_lists <- function(data,
   if (!is_null(cols)) {
     data <- select_cols(
       tidyselect::any_of(cols),
-      data = data
+      .data = data
     )
   }
 
@@ -286,7 +286,8 @@ get_model_fields <- function(fields = NULL,
   if (is_empty(fields)) {
     cli_abort(
       c("{.arg model} must be a list with fields.",
-        "*" = "Check input {.arg table}, {.arg schema}, or {.arg model} for issues."
+        "*" = "Check input {.arg table}, {.arg schema},
+        or {.arg model} for issues."
       ),
       call = call
     )

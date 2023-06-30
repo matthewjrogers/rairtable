@@ -130,6 +130,7 @@ check_table_config <- function(model, allow_null = FALSE, call = caller_env()) {
 #' @param table A base schema or, if schema is provided, a string with a table
 #'   name or ID.
 #' @inheritParams get_table_models
+#' @param ... Additional parameters passed to [get_table_models()].
 #' @keywords internal
 get_table_model <- function(table = NULL,
                             schema = NULL,

@@ -12,6 +12,7 @@ read_airtable(
   id_to_col = TRUE,
   airtable_id_col = NULL,
   max_rows = deprecated(),
+  model = NULL,
   token = NULL,
   ...
 )
@@ -19,22 +20,34 @@ read_airtable(
 list_records(
   airtable = NULL,
   view = NULL,
+  airtable_id_col = NULL,
+  fields = NULL,
   sort = NULL,
-  max_records = 100,
-  page_size = NULL,
+  direction = "asc",
+  fields_by_id = FALSE,
+  cell_format = NULL,
   tz = NULL,
   locale = NULL,
-  fields_by_id = FALSE,
-  fields = NULL,
-  desc = FALSE,
-  cell_format = NULL,
-  token = NULL,
+  max_records = 100,
+  page_size = NULL,
+  metadata = c("id", "createdTime"),
   offset = NULL,
-  airtable_id_col = NULL,
+  model = NULL,
+  token = NULL,
   ...
 )
 
-get_record(airtable = NULL, record, airtable_id_col = NULL, token = NULL, ...)
+get_record(
+  airtable = NULL,
+  record,
+  airtable_id_col = NULL,
+  cell_format = NULL,
+  tz = NULL,
+  locale = NULL,
+  metadata = c("id", "createdTime"),
+  token = NULL,
+  ...
+)
 }
 \arguments{
 \item{airtable}{An \code{airtable} class object. Optional for \code{\link[=read_airtable]{read_airtable()}} if
@@ -50,41 +63,54 @@ to the returned data frame as a new column. If \code{FALSE}, the airtable record
 IDs are used as row names.}
 
 \item{airtable_id_col}{Airtable record ID column name assigned to returned
-data frame. Ignored if id_to_col is \code{TRUE}. Defaults to \code{NULL} which is set
-to \code{getOption("rairtable.id_col", "airtable_record_id")}.}
+data frame. Defaults to \code{NULL} which is sets record ID column name to
+\code{getOption("rairtable.id_col", "airtable_record_id")}. For \code{\link[=list_records]{list_records()}}
+and \code{\link[=get_record]{get_record()}}, airtable_id_col is not used if metadata is \code{NULL} or
+does not include "id". The record ID column is dropped and converted to
+rownames if id_to_col is \code{FALSE}.}
 
-\item{max_rows}{Optional maximum number of rows to read. Defaults to \code{NULL}}
+\item{max_rows}{Deprecated. Maximum number of rows to read.}
+
+\item{model}{A table model from \code{\link[=get_table_model]{get_table_model()}}. Optionally used to
+validate fields and sort parameters.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{For \code{\link[=read_airtable]{read_airtable()}}, additional query parameters can be passed
-to \code{\link[=req_airtable]{req_airtable()}}. For \code{\link[=list_records]{list_records()}} and
-\code{\link[=get_record]{get_record()}}, additional parameters, such as url, can be passed
-to \code{\link[=request_airtable]{request_airtable()}}.}
+\item{...}{For \code{\link[=read_airtable]{read_airtable()}}, additional query parameters, such as url,
+can be passed to \code{\link[=req_airtable]{req_airtable()}}. For \code{\link[=list_records]{list_records()}} and \code{\link[=get_record]{get_record()}},
+additional parameters are passed to \code{\link[=request_airtable]{request_airtable()}} and can also
+include base and table.}
 
 \item{view}{Airtable view ID. View ID values starts with "viw". Optional if
 require_view is \code{FALSE}.}
 
 \item{sort}{Field to sort by, Default: \code{NULL}}
 
-\item{max_records}{Maximum number of records to return, Default: \code{NULL}. Must
-be 100 or less.}
+\item{direction}{A string ("asc" for ascending (default) or "desc" for
+descending) or character vector matching length of sort parameter. Ignored
+if sort is \code{NULL}.}
 
-\item{page_size}{Max records to return per page, Default: \code{NULL}}
+\item{fields_by_id}{If \code{TRUE}, return fields by id, Default: \code{FALSE}}
+
+\item{cell_format}{Cell format for "Link to another record" fields. Defaults
+to "json" which returns a unique record ID. A "string" cell_format returns
+the displayed character string.}
 
 \item{tz, locale}{Time zone and locale, Defaults to \code{NULL}. If cell_format is
 "string", tz defaults to \code{Sys.timezone()} and locale defaults to
 \code{Sys.getlocale("LC_TIME")}.}
 
-\item{fields_by_id}{If \code{TRUE}, return fields by id, Default: \code{FALSE}}
+\item{max_records}{Maximum number of records to return, Default: \code{NULL}. Must
+be 100 or less.}
 
-\item{desc}{If \code{TRUE}, sort in descending order, Default: \code{FALSE}}
+\item{page_size}{Max records to return per page, Default: \code{NULL}}
 
-\item{cell_format}{Cell format for "Link to another record" fields. Defaults
-to "json" which returns a unique record ID. A "string" cell_format returns
-the displayed character string.}
+\item{metadata}{Record metadata columns to include with returned data frame.
+Options including "id", "createdTime", and "commentCount". Defaults to
+\code{c("id", "createdTime")}. If metadata is \code{NULL}, no additional fields are
+added to the returned data frame.}
 
 \item{offset}{Offset value to passed to \code{\link[httr2:req_url]{httr2::req_url_query()}} as part of
 the API call. See
