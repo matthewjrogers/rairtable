@@ -29,9 +29,7 @@
 #' @param view Airtable view ID. View ID values starts with "viw". Optional if
 #'   require_view is `FALSE`.
 #' @param api_url Airtable API URL, If `NULL` (default), the api_url is set to
-#'   `getOption("rairtable.api_url", "https://api.airtable.com")`.
-#' @param api_version Airtable API version number, If `NULL` (default), the
-#'   api_version is set to `getOption("rairtable.api_version", 0))`.
+#'   `getOption("rairtable.api_url", "https://api.airtable.com/v0")`.
 #' @param ... For [request_airtable()], additional parameters passed to
 #'   [parse_airtable_url()] if an Airtable url is provided. For
 #'   [req_airtable()], additional parameters passed to
@@ -54,7 +52,6 @@ request_airtable <- function(airtable = NULL,
                              table = NULL,
                              view = NULL,
                              api_url = NULL,
-                             api_version = NULL,
                              require_base = TRUE,
                              require_table = TRUE,
                              require_view = FALSE,
@@ -105,7 +102,6 @@ request_airtable <- function(airtable = NULL,
         require_table = require_table,
         require_view = require_view,
         api_url = api_url,
-        api_version = api_version,
         ...,
         call = call
       )
@@ -118,7 +114,6 @@ request_airtable <- function(airtable = NULL,
     table = table,
     view = view,
     api_url = api_url,
-    api_version = api_version,
     require_table = require_table,
     require_view = require_view,
     call = call
@@ -134,7 +129,6 @@ request_airtable_url <- function(url = NULL,
                                  table = NULL,
                                  view = NULL,
                                  api_url = NULL,
-                                 api_version = NULL,
                                  require_base = TRUE,
                                  require_table = TRUE,
                                  require_view = FALSE,
@@ -158,7 +152,6 @@ request_airtable_url <- function(url = NULL,
       url,
       ...,
       api_url = api_url,
-      api_version = api_version,
       require_table = require_table,
       require_view = require_view,
       call = call
@@ -170,7 +163,6 @@ request_airtable_url <- function(url = NULL,
         table = ids[["table"]],
         view = ids[["view"]],
         api_url = api_url,
-        api_version = api_version,
         require_table = require_table,
         require_view = require_view,
         call = call
@@ -182,7 +174,7 @@ request_airtable_url <- function(url = NULL,
   check_url(url, call = call)
 
   api_url <- api_url %||%
-    getOption("rairtable.api_url", "https://api.airtable.com")
+    getOption("rairtable.api_url", "https://api.airtable.com/v0")
   base_url <-
     getOption("rairtable.base_url", "https://airtable.com")
 
@@ -201,7 +193,6 @@ request_airtable_api_url <- function(base = NULL,
                                      table = NULL,
                                      view = NULL,
                                      api_url = NULL,
-                                     api_version = NULL,
                                      require_table = FALSE,
                                      require_view = FALSE,
                                      call = caller_env()) {
@@ -220,16 +211,10 @@ request_airtable_api_url <- function(base = NULL,
   }
 
   api_url <- api_url %||%
-    getOption("rairtable.api_url", "https://api.airtable.com")
+    getOption("rairtable.api_url", "https://api.airtable.com/v0")
   check_string(api_url, call = call)
 
   req <- httr2::request(api_url)
-
-  api_version <- api_version %||%
-    getOption("rairtable.api_version", 0)
-  check_number_whole(api_version, call = call)
-
-  req <- httr2::req_url_path_append(req, paste0("v", api_version))
 
   if (!is_empty(base)) {
     check_string(base, call = call)
@@ -247,8 +232,8 @@ request_airtable_api_url <- function(base = NULL,
 #' @rdname request_airtable
 #' @name req_airtable
 #' @param .req A request object created by [httr2::request()] or
-#'   [request_airtable()]. If .req is provided, any supplied url, api_url,
-#'   api_version, or airtable parameters are ignored.
+#'   [request_airtable()]. If .req is provided, any supplied url, api_url, or
+#'   airtable parameters are ignored.
 #' @param template Template for query parameters passed to
 #'   [httr2::req_template()], Default: `NULL`.
 #' @param remove_view If `TRUE` (default), remove view from request (only using
@@ -266,7 +251,6 @@ req_airtable <- function(.req = NULL,
                          airtable = NULL,
                          url = NULL,
                          api_url = NULL,
-                         api_version = NULL,
                          ...,
                          template = NULL,
                          method = NULL,
@@ -283,7 +267,6 @@ req_airtable <- function(.req = NULL,
       airtable = airtable,
       url = url,
       api_url = api_url,
-      api_version = api_version,
       require_base = require_base,
       require_table = require_table,
       call = call
@@ -296,9 +279,7 @@ req_airtable <- function(.req = NULL,
     )
   }
 
-  if (remove_view) {
-    .req <- httr2::req_url_query(.req, view = NULL)
-  }
+  .req <- req_remove_airtable_view(.req, remove_view = remove_view)
 
   if (!is_null(template)) {
     .req <- httr2::req_template(.req, template = template, ...)
@@ -428,6 +409,18 @@ req_airtable_view <- function(req,
 
   check_string(view, allow_empty = FALSE, allow_null = allow_null, call = call)
   httr2::req_url_query(req, view = view)
+}
+
+#' Remove a view query parameter from a request
+#'
+#' @noRd
+req_remove_airtable_view <- function(req,
+                                     remove_view = FALSE) {
+  if (remove_view) {
+    return(httr2::req_url_query(req, view = NULL))
+  }
+
+  req
 }
 
 #' Does x have the class httr2_request?

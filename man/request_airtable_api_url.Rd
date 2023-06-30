@@ -9,7 +9,6 @@ request_airtable_api_url(
   table = NULL,
   view = NULL,
   api_url = NULL,
-  api_version = NULL,
   require_table = FALSE,
   require_view = FALSE,
   call = caller_env()

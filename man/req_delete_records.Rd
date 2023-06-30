@@ -32,9 +32,7 @@ with "tbl". Optional if require_table is \code{FALSE}.}
     \item{\code{view}}{Airtable view ID. View ID values starts with "viw". Optional if
 require_view is \code{FALSE}.}
     \item{\code{api_url}}{Airtable API URL, If \code{NULL} (default), the api_url is set to
-\code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
-    \item{\code{api_version}}{Airtable API version number, If \code{NULL} (default), the
-api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
+\code{getOption("rairtable.api_url", "https://api.airtable.com/v0")}.}
     \item{\code{require_base}}{If \code{TRUE} (default), the string "app" must be included in
 the supplied API request URL.}
     \item{\code{require_table}}{If \code{TRUE}, the string "tbl" must be included in the

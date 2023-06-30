@@ -51,7 +51,7 @@ string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the API request URL.}
 
 \item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
-\code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
+\code{getOption("rairtable.api_url", "https://api.airtable.com/v0")}.}
 }
 \description{
 Utility functions for checking and validating Airtable URLs and API URLs.

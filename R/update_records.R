@@ -26,7 +26,7 @@
 #' @param safely If `TRUE`, confirm number and names of columns to update and
 #'   number of rows before executing update.
 #' @inheritParams return_data_resp
-#' @inheritDotParams request_airtable -api_url -api_version -call
+#' @inheritDotParams request_airtable -api_url -call
 #' @return A data frame of the input data, to be stored as an object or piped
 #'   into further additional functions. The data frame is returned invisibly.
 #'
@@ -40,7 +40,6 @@ update_records <- function(data,
                            safely = TRUE,
                            return_data = TRUE,
                            ...) {
-
   if (is_null(records)) {
     airtable_id_col <- airtable_id_col %||%
       getOption("rairtable.id_col", "airtable_record_id")
@@ -87,7 +86,7 @@ update_records <- function(data,
 #'
 #' @param req A HTTP response created by [req_airtable()]. Optional if
 #'   airttable, url, *or* base and table are passed to [request_airtable()].
-#' @inheritDotParams request_airtable -api_url -api_version
+#' @inheritDotParams request_airtable -api_url
 #' @inheritParams req_airtable
 #' @param records,record Record ID or IDs to update as a character vector.
 #'   Required.

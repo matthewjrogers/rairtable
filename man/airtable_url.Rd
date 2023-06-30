@@ -12,7 +12,6 @@ parse_airtable_url(
   url,
   base_url = NULL,
   api_url = NULL,
-  api_version = NULL,
   table_name = NULL,
   view_name = NULL,
   require_table = FALSE,
@@ -36,10 +35,7 @@ for any shared base or view URL that starts with
 "https://airtable.com/shr".}
 
 \item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
-\code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
-
-\item{api_version}{Airtable API version number, If \code{NULL} (default), the
-api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
+\code{getOption("rairtable.api_url", "https://api.airtable.com/v0")}.}
 
 \item{table_name, view_name}{Pattern to use when parsing a table name or view
 name. Defaults to \code{NULL} which extracts strings starting with "tbl" for

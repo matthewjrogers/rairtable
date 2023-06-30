@@ -13,7 +13,7 @@ These are environment variables and options that users may set, to modify the be
 \subsection{User facing environment variables}{
 \subsection{\code{rairtable.pat_default} and \code{rairtable.key_default}}{
 
-The default value used for the Airtable Personal Access Token and API Key variables that are set with \code{set_airtable_token()} or \code{set_airtable_api_key()} and retrieved using \code{get_airtable_pat()} or \code{get_airtable_api_key()}.
+The default value used for the Airtable Personal Access Token and API Key variables that are set with \code{\link[=set_airtable_token]{set_airtable_token()}} or \code{\link[=set_airtable_api_key]{set_airtable_api_key()}} and retrieved using \code{\link[=get_airtable_pat]{get_airtable_pat()}} or \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}.
 }
 
 \subsection{\code{rairtable.id_col}}{
@@ -48,14 +48,7 @@ Airtable limits the number of records that can be deleted, updated, or created i
 
 \subsection{\code{rairtable.api_url}}{
 
-The base URL for the Airtable API is "https://api.airtable.com". This default value can be modified using the \code{rairtable.api_url} option. This option is used by internal functions for checking Airtable API urls and, optionally, \code{\link[=request_airtable]{request_airtable()}}.
-}
-
-\subsection{\code{rairtable.api_version}}{
-
-The Airtable API version number is \code{0}. This default value can be modified using
-the \code{rairtable.api_version} option. This option may be used by
-\code{\link[=request_airtable]{request_airtable()}}.
+The base URL for the Airtable API is "https://api.airtable.com/v0". This default value can be modified using the \code{rairtable.api_url} option. This option is used by internal functions for checking Airtable API urls and, optionally, \code{\link[=request_airtable]{request_airtable()}}.
 }
 
 \subsection{\code{rairtable.base_url}}{

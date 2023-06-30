@@ -15,8 +15,8 @@ req_create_records(
 }
 \arguments{
 \item{req}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
-\code{\link[=request_airtable]{request_airtable()}}. If .req is provided, any supplied url, api_url,
-api_version, or airtable parameters are ignored.}
+\code{\link[=request_airtable]{request_airtable()}}. If .req is provided, any supplied url, api_url, or
+airtable parameters are ignored.}
 
 \item{...}{
   Arguments passed on to \code{\link[=request_airtable]{request_airtable}}

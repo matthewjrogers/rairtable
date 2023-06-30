@@ -12,7 +12,6 @@ request_airtable(
   table = NULL,
   view = NULL,
   api_url = NULL,
-  api_version = NULL,
   require_base = TRUE,
   require_table = TRUE,
   require_view = FALSE,
@@ -25,7 +24,6 @@ req_airtable(
   airtable = NULL,
   url = NULL,
   api_url = NULL,
-  api_version = NULL,
   ...,
   template = NULL,
   method = NULL,
@@ -61,10 +59,7 @@ with "tbl". Optional if require_table is \code{FALSE}.}
 require_view is \code{FALSE}.}
 
 \item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
-\code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
-
-\item{api_version}{Airtable API version number, If \code{NULL} (default), the
-api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
+\code{getOption("rairtable.api_url", "https://api.airtable.com/v0")}.}
 
 \item{require_base}{If \code{TRUE} (default), the string "app" must be included in
 the supplied API request URL.}
@@ -96,8 +91,8 @@ mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 
 \item{.req}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
-\code{\link[=request_airtable]{request_airtable()}}. If .req is provided, any supplied url, api_url,
-api_version, or airtable parameters are ignored.}
+\code{\link[=request_airtable]{request_airtable()}}. If .req is provided, any supplied url, api_url, or
+airtable parameters are ignored.}
 
 \item{template}{Template for query parameters passed to
 \code{\link[httr2:req_template]{httr2::req_template()}}, Default: \code{NULL}.}

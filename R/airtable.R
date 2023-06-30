@@ -16,6 +16,8 @@
 #' @param fields An optional `airtable_fields_schema` object. Automatically
 #'   populated in tables created by `airtable_base()`.
 #' @inheritParams request_airtable
+#' @param api_version Deprecated. Airtable API version. Version is now part of
+#'   default api_url.
 #' @param name,description Airtable table name and base name/description.
 #'   Optional. Base name is set by [list_bases()] but name remains
 #'   blank if not supplied. These parameters are only used when printing
@@ -39,7 +41,7 @@ airtable <- function(table = NULL,
                      name = NULL,
                      description = NULL,
                      api_url = NULL,
-                     api_version = NULL,
+                     api_version = deprecated(),
                      token = NULL,
                      require_table = TRUE,
                      ...) {
@@ -51,7 +53,6 @@ airtable <- function(table = NULL,
     name = name,
     description = description,
     api_url = api_url,
-    api_version = api_version,
     token = token
   )
 
@@ -78,7 +79,6 @@ new_airtable_obj <- function(base,
                              view = NULL,
                              fields = NULL,
                              api_url = NULL,
-                             api_version = NULL,
                              description = NULL,
                              name = NULL,
                              token = NULL,
@@ -112,7 +112,6 @@ new_airtable_obj <- function(base,
     table = table,
     view = view,
     api_url = api_url,
-    api_version = api_version,
     call = call
   )
 

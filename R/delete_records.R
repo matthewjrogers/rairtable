@@ -23,7 +23,7 @@
 #' @inheritParams request_airtable
 #' @param return_records If `FALSE`, return the JSON response from the Airtable
 #'   API. If `TRUE` (default), return a vector of deleted record IDs.
-#' @inheritDotParams request_airtable -api_url -api_version -call
+#' @inheritDotParams request_airtable -api_url -call
 #' @returns A vector of deleted record IDs returned invisibly.
 #'
 #' @export

@@ -66,7 +66,7 @@ is_url <- function(x) {
 #'
 #' @inheritParams is_airtable_url
 #' @param api_url Expected base URL for an API url. Defaults to `NULL` and set
-#'   to `getOption("rairtable.api_url", "https://api.airtable.com")`.
+#'   to `getOption("rairtable.api_url", "https://api.airtable.com/v0")`.
 #' @keywords internal
 is_airtable_api_url <- function(url,
                                 api_url = NULL) {
@@ -75,7 +75,7 @@ is_airtable_api_url <- function(url,
   }
 
   api_url <- api_url %||%
-    getOption("rairtable.api_url", "https://api.airtable.com")
+    getOption("rairtable.api_url", "https://api.airtable.com/v0")
 
   is_url(url) & grepl(paste0("^", api_url), url)
 }
@@ -93,7 +93,6 @@ is_airtable_api_url <- function(url,
 parse_airtable_url <- function(url,
                                base_url = NULL,
                                api_url = NULL,
-                               api_version = NULL,
                                table_name = NULL,
                                view_name = NULL,
                                require_table = FALSE,
@@ -103,7 +102,7 @@ parse_airtable_url <- function(url,
   ids <-
     vctrs::list_drop_empty(
       list(
-        "base" = parse_url_base_id(url, base_url, api_url, api_version, call),
+        "base" = parse_url_base_id(url, base_url, api_url, call),
         "table" = parse_url_table_id(url, table_name, call),
         "view" = parse_url_view_id(url, view_name, call),
         "field" = parse_url_field_id(url)
@@ -130,16 +129,13 @@ parse_airtable_url <- function(url,
 parse_url_base_id <- function(url,
                               base_url = NULL,
                               api_url = NULL,
-                              api_version = NULL,
                               call = caller_env()) {
   # api_url <- api_url %||%
-  #   getOption("rairtable.api_url", "https://api.airtable.com")
+  #   getOption("rairtable.api_url", "https://api.airtable.com/v0")
   base_name <- "app[[:alnum:]]+"
 
   if (is_airtable_api_url(url, api_url)) {
-    # api_version <- api_version %||%
-    #   getOption("rairtable.api_version", "0")
-    # FIXME: api_url and api_version are not required if base ID matches pattern
+    # FIXME: api_url is not required if base ID matches pattern
 
     base_pattern <- glue(
       "((?<=/){base_name}(?=/))|((?<=/){base_name}$)|((?<=/){base_name}(?=\\?))"

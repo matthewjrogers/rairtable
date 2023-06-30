@@ -12,7 +12,7 @@ airtable(
   name = NULL,
   description = NULL,
   api_url = NULL,
-  api_version = NULL,
+  api_version = deprecated(),
   token = NULL,
   require_table = TRUE,
   ...
@@ -41,10 +41,10 @@ blank if not supplied. These parameters are only used when printing
 airtable objects.}
 
 \item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
-\code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
+\code{getOption("rairtable.api_url", "https://api.airtable.com/v0")}.}
 
-\item{api_version}{Airtable API version number, If \code{NULL} (default), the
-api_version is set to \verb{getOption("rairtable.api_version", 0))}.}
+\item{api_version}{Deprecated. Airtable API version. Version is now part of
+default api_url.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or

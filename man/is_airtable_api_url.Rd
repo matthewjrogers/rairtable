@@ -14,7 +14,7 @@ default, shared URLs of the form "https://airtable.com/shr..." are not
 supported.}
 
 \item{api_url}{Expected base URL for an API url. Defaults to \code{NULL} and set
-to \code{getOption("rairtable.api_url", "https://api.airtable.com")}.}
+to \code{getOption("rairtable.api_url", "https://api.airtable.com/v0")}.}
 }
 \description{
 \code{\link[=is_airtable_api_url]{is_airtable_api_url()}} returns \code{TRUE} if a url starts with the api_url

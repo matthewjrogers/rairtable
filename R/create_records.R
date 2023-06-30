@@ -2,7 +2,7 @@
 #'
 #' @name req_create_records
 #' @inheritParams request_airtable
-#' @inheritDotParams request_airtable -api_url -api_version
+#' @inheritDotParams request_airtable -api_url
 #' @param data A data frame or list of records to create in Airtable. Column
 #'   names or the names of list values must match the field names used in the
 #'   Airtable base. Required.
