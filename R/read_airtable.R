@@ -250,7 +250,7 @@ req_list_records <- function(req = NULL,
   }
 
   if (!is_null(fields)) {
-    req <- req_records_fields(fields, model = model, call = call)
+    req <- req_records_fields(req, fields = fields, model = model, call = call)
   }
 
   if (!is_null(metadata)) {
@@ -316,9 +316,7 @@ req_records_fields <- function(req,
     )
   }
 
-  req <- req_remove_airtable_view(req, TRUE)
-
-  req <- httr2::req_url_query(req, view = NULL)
+  req <- req_remove_airtable_view(req, remove_view = TRUE)
   fields <- set_names(fields, "fields[]")
   rlang::exec(httr2::req_url_query, req, !!!fields)
 }
