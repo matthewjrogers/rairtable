@@ -28,11 +28,12 @@ make_field_config <- function(field = NULL,
                               name = NULL,
                               type = NULL,
                               ...,
+                              error_arg = caller_arg(field),
                               call = caller_env()) {
   field <- field %||% list(name = name, type = type, ...)
 
   if (is_list_of_lists(field)) {
-    return(lapply(field, make_field_config))
+    return(lapply(field, make_field_config, error_arg = error_arg, call = call))
   }
 
   if (is.data.frame(field)) {
@@ -44,7 +45,8 @@ make_field_config <- function(field = NULL,
   }
 
   check_field_config(
-    field,
+    field = field,
+    error_arg = error_arg,
     call = call
   )
 
@@ -57,14 +59,15 @@ make_field_config <- function(field = NULL,
 #'
 #' @noRd
 check_field_config <- function(field,
+                               error_arg = caller_arg(field),
                                name_arg = "name",
                                type_arg = "type",
                                call = caller_env()) {
-  check_list(field, call = call)
+  check_list(field, arg = error_arg, call = call)
 
   if (!all(has_name(field, c("name", "type")))) {
     cli_abort(
-      "{.arg field} must have the names {.val name} and {.val type}.",
+      "{.arg {error_arg}} must have the names {.val name} and {.val type}.",
       call = call
     )
   }
@@ -146,13 +149,34 @@ make_list_of_lists <- function(data,
 #' Make a field array
 #'
 #' @noRd
-make_field_array <- function(fields = NULL,
+make_field_array <- function(fields,
                              table = NULL,
                              values = NULL,
                              ...,
                              arg = caller_arg(fields),
                              token = NULL,
                              call = caller_env()) {
+  field_array <- try_fetch(
+    lapply(
+      X = make_list_of_lists(
+        fields,
+        cols = c("type", "name", "description", "options"),
+        arg = arg,
+        call = call
+      ),
+      FUN = make_field_config,
+      error_arg = "field",
+      call = call
+    ),
+    error = function(cnd) {
+      cli_abort(
+        "{.arg {arg}} must be a list or data frame of valid fields.",
+        parent = cnd,
+        call = call
+      )
+    }
+  )
+
   if (is_string(table)) {
     tables <- get_table_models(..., tables = table, token = token, call = call)
   }
@@ -160,16 +184,6 @@ make_field_array <- function(fields = NULL,
   if (has_name(table, "fields")) {
     values <- table[["fields"]][[1]][["name"]]
   }
-
-  field_array <- lapply(
-    X = make_list_of_lists(
-      fields,
-      cols = c("type", "name", "description", "options"),
-      arg = arg,
-      call = call
-    ),
-    FUN = make_field_config
-  )
 
   if (is_null(values)) {
     return(field_array)
@@ -305,6 +319,7 @@ get_model_fields <- function(fields = NULL,
 #' @param viewIdForRecordSelection View ID from linked table to use for record
 #'   selection on multipleRecordLinks field type.
 #' @keywords internal
+#' @importFrom vctrs list_drop_empty
 prep_table_field <- function(field,
                              linkedTableId = NULL,
                              viewIdForRecordSelection = NULL) {

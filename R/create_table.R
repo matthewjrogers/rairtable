@@ -129,7 +129,7 @@ update_table <- function(airtable = NULL,
   }
 
   check_field_description(description)
-  check_string(name, allow_empty = FALSE, allow_null = TRUE)
+  check_name(name, allow_null = TRUE)
 
   resp <- request_airtable_meta(
     airtable = airtable,

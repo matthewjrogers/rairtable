@@ -2,11 +2,12 @@
 #'
 #' @noRd
 field_type_match <- function(type,
+                             values = field_types[["type"]],
                              error_arg = caller_arg(type),
                              error_call = caller_env()) {
   arg_match(
     type,
-    values = field_types[["type"]],
+    values = values,
     error_arg = error_arg,
     error_call = error_call
   )

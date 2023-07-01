@@ -31,7 +31,7 @@ make_table_config <- function(name = NULL,
     return(table_config)
   }
 
-  check_string(name, allow_empty = FALSE, call = call)
+  check_name(name, call = call)
   # TODO: Double-check if table descriptions have the same constraints as field
   # descriptions
   check_field_description(
@@ -90,12 +90,24 @@ copy_table_config <- function(table = NULL,
 #'
 #' @keywords internal
 #' @noRd
-check_table_config <- function(model, allow_null = FALSE, call = caller_env()) {
-  if (allow_null && is_null(model)) {
+check_table_config <- function(config,
+                               allow_empty = FALSE,
+                               allow_null = FALSE,
+                               call = caller_env()) {
+  if (allow_null && is_null(config)) {
     return(invisible(NULL))
   }
 
-  check_list(config, allow_null = allow_null, call = call)
+  if (allow_empty && is_empty(config)) {
+    return(invisible(NULL))
+  }
+
+  check_list(
+    config,
+    allow_empty = allow_empty,
+    allow_null = allow_null,
+    call = call
+  )
 
   if (!is_string(config[["name"]])) {
     cli_abort(
