@@ -24,3 +24,28 @@ httptest2::with_mock_dir("create_field", {
     )
   })
 })
+
+test_that("create_field errors", {
+  expect_error(
+    create_field(field = "field"),
+    '`field` must be a list, not the string "field".'
+  )
+
+  expect_error(
+    create_field(name = ""),
+    '`name` must be a single string, not the empty string "".'
+  )
+
+  expect_error(
+    create_field(
+      name = "name",
+      description = paste0(rep("x", 20001), collapse = "")
+    ),
+    "`description` must be a string no longer than 20,000 characters."
+  )
+
+  expect_error(
+    create_field(name = "name", type = "type"),
+    "`type` must be one of "
+  )
+})
