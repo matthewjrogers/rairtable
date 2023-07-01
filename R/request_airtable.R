@@ -57,25 +57,22 @@ request_airtable <- function(airtable = NULL,
                              require_view = FALSE,
                              ...,
                              call = caller_env()) {
-  if (is_empty(c(airtable, url)) && (require_base && is_null(base))) {
-    cli_abort(
-      "{.arg airtable}, {.arg url}, or {.arg base} must be supplied.",
-      call = call
-    )
-  }
+  check_request_airtable_args(
+    airtable = airtable,
+    url = url,
+    base = base,
+    table = table,
+    require_base = require_base,
+    require_table = require_table
+  )
 
-  if (!is_empty(c(base, table, view))) {
-    if (!is_null(airtable)) {
-      when <- "when {.arg airtable} is supplied."
-    } else if (!is_null(url)) {
-      when <- "when {.arg url} is supplied."
-    }
-
-    cli::cli_alert_warning(
-      paste0("{.arg base}, {.arg table}, and {.arg view} values are
-        ignored ", when)
-    )
-  }
+  alert_airtable_args(
+    base = base,
+    table = table,
+    view = view,
+    airtable = airtable,
+    url = url
+  )
 
   if (!is_null(airtable)) {
     check_airtable_obj(
@@ -85,12 +82,6 @@ request_airtable <- function(airtable = NULL,
       call = call
     )
 
-    if (!is_null(url)) {
-      cli::cli_alert_warning(
-        "{.arg url} is ignored when {.arg airtable} is supplied."
-      )
-    }
-
     return(httr2::request(airtable[["request_url"]]))
   }
 
@@ -98,11 +89,11 @@ request_airtable <- function(airtable = NULL,
     req <-
       request_airtable_url(
         url,
+        ...,
+        api_url = api_url,
         require_base = require_base,
         require_table = require_table,
         require_view = require_view,
-        api_url = api_url,
-        ...,
         call = call
       )
 
@@ -149,7 +140,7 @@ request_airtable_url <- function(url = NULL,
 
   if (is_airtable_url(url)) {
     ids <- parse_airtable_url(
-      url,
+      url = url,
       ...,
       api_url = api_url,
       require_table = require_table,
@@ -196,35 +187,26 @@ request_airtable_api_url <- function(base = NULL,
                                      require_table = FALSE,
                                      require_view = FALSE,
                                      call = caller_env()) {
-  if (is_true(require_table) && is_null(table)) {
-    cli_abort(
-      "{.arg table} must be supplied.",
-      call = call
-    )
-  }
-
-  if (is_true(require_view) && is_null(view)) {
-    cli_abort(
-      "{.arg view} must be supplied.",
-      call = call
-    )
-  }
-
   api_url <- api_url %||%
     getOption("rairtable.api_url", "https://api.airtable.com/v0")
-  check_string(api_url, call = call)
+
+  check_string(api_url, allow_empty = FALSE, call = call)
 
   req <- httr2::request(api_url)
 
   if (!is_empty(base)) {
-    check_string(base, call = call)
+    check_string(base, allow_empty = FALSE, call = call)
     req <- httr2::req_url_path_append(req, base)
   }
 
+  check_string(table, allow_empty = FALSE, allow_null = !require_table)
+
   if (!is_empty(table)) {
-    check_string(table, call = call)
+    check_string(table, allow_empty = FALSE, call = call)
     req <- httr2::req_url_path_append(req, table)
   }
+
+  check_string(view, allow_empty = FALSE, allow_null = !require_view)
 
   req_airtable_view(req, view = view, call = call)
 }
@@ -435,4 +417,62 @@ is_httr2_req <- function(x) {
 #' @noRd
 is_httr2_resp <- function(x) {
   inherits(x, "httr2_response")
+}
+
+#' Check if request_airtable has minimum required arguments
+#'
+#' @noRd
+check_request_airtable_args <- function(airtable = NULL,
+                                        url = NULL,
+                                        base = NULL,
+                                        table = NULL,
+                                        require_base = TRUE,
+                                        require_table = TRUE,
+                                        call = caller_env()) {
+  if (is_empty(airtable) && is_empty(url) && require_base && is_empty(base)) {
+    message <- "{.arg airtable}, {.arg url}, or {.arg base}"
+
+    if (require_table && is_null(table)) {
+      message <- "{.arg airtable}, {.arg url},
+      or {.arg base} {.emph and} {.arg table}"
+    }
+
+    cli_abort(
+      paste0(message, " must be supplied."),
+      call = call
+    )
+  }
+}
+
+#' Alert if request_airtable has arguments that will be ignored
+#'
+#' @noRd
+alert_airtable_args <- function(base = NULL,
+                                table = NULL,
+                                view = NULL,
+                                airtable = NULL,
+                                url = NULL) {
+  what <- NULL
+
+  if (!is_empty(c(base, table))) {
+    what <- "{.arg base} and {.arg table} are ignored"
+  } else if (!is_empty(view)) {
+    what <- "{.arg view} is ignored"
+  }
+
+  if (!is_null(airtable) && !is_null(what)) {
+    cli::cli_alert_warning(
+      paste0(what, " when {.arg airtable} is supplied.")
+    )
+  } else if (!is_null(url) && !is_null(what)) {
+    cli::cli_alert_warning(
+      paste0(what, " when {.arg url} is supplied.")
+    )
+  }
+
+  if (!is_null(airtable) && !is_null(url)) {
+    cli::cli_alert_warning(
+      "{.arg url} is ignored when {.arg airtable} is supplied."
+    )
+  }
 }
