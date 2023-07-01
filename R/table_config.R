@@ -104,7 +104,7 @@ check_table_config <- function(model, allow_null = FALSE, call = caller_env()) {
     )
   }
 
-  if (!is_list(config[["fields"]])) {
+  if (!is_list(config[["fields"]]) || is_empty(config[["fields"]])) {
     cli_abort(
       "{.arg config} must include a field array list.",
       call = call
@@ -115,7 +115,7 @@ check_table_config <- function(model, allow_null = FALSE, call = caller_env()) {
     check_field_array(config[["fields"]], call = call),
     error = function(cnd) {
       cli_abort(
-        "{.arg config} fields must be a valid field array.",
+        "{.arg config} must include a valid field array list.",
         parent = cnd,
         call = call
       )
@@ -138,6 +138,8 @@ get_table_model <- function(table = NULL,
                             ...,
                             call = caller_env()) {
   if (has_name(table, "tables")) {
+    # FIXME: Add additional checks to avoid this allowing this:
+    # get_table_model(list("tables" = list(1)))
     check_list(table[["tables"]], max_length = 1, call = call)
   } else {
     table <- get_table_models(
