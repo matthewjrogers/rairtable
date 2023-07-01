@@ -35,18 +35,19 @@ check_airtable_obj <- function(x,
   }
 
   if (!is_airtable_obj(x)) {
-    not <- "not {.obj_type_friendly {airtable}}."
+    message <- "not {.obj_type_friendly {x}}."
+
     if (is_url(x)) {
-      not <- "not a url."
+      message <- "not a url."
     }
 
     cli_abort(
-      "{.arg airtable} must be an {.cls airtable} object, {not}",
+      paste0("{.arg airtable} must be an {.cls airtable} object, ", message),
       call = call
     )
   }
 
-  check_string(x[["base"]], call = call)
+  check_string(x[["base"]], allow_empty = FALSE, call = call)
 
   if (is_true(require_table)) {
     check_string(x[["table"]], call = call)
@@ -64,7 +65,7 @@ check_airtable_obj <- function(x,
   }
 
   if (require_view) {
-    check_string(x[["view"]], call = call)
+    check_string(x[["view"]], allow_empty = FALSE, call = call)
   }
 
   if (require_fields) {
