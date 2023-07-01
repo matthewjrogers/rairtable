@@ -6,7 +6,11 @@ check_url <- function(url,
                       call = caller_env()) {
   check_string(url, allow_null = allow_null, call = call)
 
-  if (is_url(url) || (allow_null && is_null(url))) {
+  if (allow_null && is_null(url)) {
+    return(invisible(NULL))
+  }
+
+  if (is_url(url)) {
     return(invisible(NULL))
   }
 
@@ -50,14 +54,14 @@ check_airtable_url <- function(url,
     return(invisible(NULL))
   }
 
+  base_url <- base_url %||%
+    getOption("rairtable.base_url", "https://airtable.com")
+
   message <- "{.arg url} must start with the {.arg base_url}: {.url {base_url}}"
 
   if (!is_null(url) && any(grepl("/shr", url))) {
     message <- "{.arg url} can't be an Airtable shared url."
   }
-
-  base_url <- base_url %||%
-    getOption("rairtable.base_url", "https://airtable.com")
 
   cli_abort(
     message,
@@ -88,8 +92,13 @@ check_airtable_api_url <- function(url,
                                    call = caller_env()) {
   check_string(url, call = call)
 
-  missing <-
-    set_missing_message(url, require_base, require_table, require_view, call)
+  missing <- set_missing_url_message(
+    url,
+    require_base,
+    require_table,
+    require_view,
+    call
+  )
 
   if (is_airtable_api_url(url, api_url) && is_null(missing)) {
     return(invisible(NULL))
@@ -118,27 +127,27 @@ check_airtable_api_url <- function(url,
 #' Set message component based on if url is missing required elements
 #'
 #' @noRd
-set_missing_message <- function(url,
-                                require_base = TRUE,
-                                require_table = FALSE,
-                                require_view = FALSE,
-                                call = caller_env()) {
+set_missing_url_message <- function(url,
+                                    require_base = TRUE,
+                                    require_table = FALSE,
+                                    require_view = FALSE,
+                                    call = caller_env()) {
   missing <- NULL
 
   if (require_base && !grepl("app", url)) {
-    missing <- c(missing, "a {.arg base} name starting with {.val app}")
+    missing <- c(missing, "a base ID starting with {.val app}")
   }
 
   if (is_true(require_table) && !grepl("tbl", url)) {
-    missing <- c(missing, "a {.arg table} name starting with {.val tbl}")
+    missing <- c(missing, "a table ID starting with {.val tbl}")
   }
 
   if (is_string(require_table) && !grepl(require_table, url)) {
-    missing <- c(missing, "a {.arg table} named {.val {require_table}}")
+    missing <- c(missing, "a table named {.val {require_table}}")
   }
 
   if (require_view && !grepl("viw", url)) {
-    missing <- c(missing, "a {.arg view} name starting with {.val viw}")
+    missing <- c(missing, "a view ID starting with {.val viw}")
   }
 
   missing
@@ -156,7 +165,7 @@ check_parsed_airtable_url <- function(ids,
   if (is_empty(ids[["base"]])) {
     cli_abort(
       c("{.arg url} is not valid.",
-        "i" = "{.arg base} can't be found in {.url {url}}."
+        "i" = "A base ID can't be found in {.url {url}}."
       ),
       call = call
     )
@@ -166,7 +175,7 @@ check_parsed_airtable_url <- function(ids,
     cli_abort(
       c("{.arg url} is not valid.",
         "i" = "{.arg require_table} is `TRUE` and
-        {.arg table} can't be found in {.url {url}}."
+        a table ID can't be found in {.url {url}}."
       ),
       call = call
     )
@@ -176,7 +185,7 @@ check_parsed_airtable_url <- function(ids,
     cli_abort(
       c("{.arg url} is not valid.",
         "i" = "{.arg require_view} is `TRUE` and
-        {.arg view} can't be found in {.url {url}}."
+        a view ID can't be found in {.url {url}}."
       ),
       call = call
     )
@@ -186,7 +195,7 @@ check_parsed_airtable_url <- function(ids,
     cli_abort(
       c("{.arg url} is not valid.",
         "i" = "{.arg require_field} is `TRUE` and
-        {.arg field} or {.arg column} can't be found in {.url {url}}."
+        a field ID can't be found in {.url {url}}."
       ),
       call = call
     )
