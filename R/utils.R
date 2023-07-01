@@ -152,40 +152,6 @@ return_data_resp <- function(data = NULL, resp = NULL, return_data = TRUE) {
   httr2::resp_body_json(resp)
 }
 
-#' Check if object is a data frame with a specified number of rows
-#'
-#' @noRd
-check_data_frame_rows <- function(x,
-                                  min = 1,
-                                  rows = NULL,
-                                  arg = caller_arg(x),
-                                  call = caller_env()) {
-  check_data_frame(
-    x,
-    arg = arg,
-    call = call
-  )
-
-  n_rows <- nrow(x)
-
-  if (!is_null(rows) && (n_rows != rows)) {
-    cli_abort(
-      "{.arg {arg}} must be a data frame with {rows} row{?s}, not {n_rows}.",
-      call = call
-    )
-
-    return(invisible())
-  }
-
-  if (n_rows < min) {
-    cli_abort(
-      "{.arg {arg}} must be a data frame with {min} or more rows,
-      not {n_rows}.",
-      call = call
-    )
-  }
-}
-
 #' Check if object is a list
 #'
 #' @noRd
@@ -222,15 +188,17 @@ check_list <- function(x,
     )
   }
 
-  if (!is_list(x)) {
-    stop_input_type(
-      x,
-      what = "a list",
-      allow_na = allow_na,
-      allow_null = allow_null,
-      arg = arg, call = call
-    )
+  if (is_list(x)) {
+    return(invisible(NULL))
   }
+
+  stop_input_type(
+    x,
+    what = "a list",
+    allow_na = allow_na,
+    allow_null = allow_null,
+    arg = arg, call = call
+  )
 }
 
 #' Check if user, confirm action before proceeding

@@ -48,7 +48,6 @@ update_records <- function(data,
 
   check_character(records)
   n_records <- length(records)
-  check_data_frame_rows(data, rows = n_records)
 
   update_data <- get_data_columns(
     data = data,
@@ -220,6 +219,14 @@ get_record_id_col <- function(data,
 
   if (is_string(id_col) && (id_col != "")) {
     check_data_frame(data, call = call)
+
+    if (is_empty(data)) {
+      cli_abort(
+        "{.arg data} can't be empty.",
+        call = call
+      )
+    }
+
     data <- select_cols(tidyselect::all_of(id_col), .data = data)
     n_cols <- ncol(data)
 
@@ -227,6 +234,14 @@ get_record_id_col <- function(data,
       cli_abort(
         "{.arg {id_col_arg}} must select a single record ID column,
         not {n_cols} column{?s}.",
+        call = call
+      )
+    }
+
+    if (!is_character(data[[1]])) {
+      cli_abort(
+          "Records in {.val {id_col}} column must be a character vector,
+          not {.obj_simple_type {data[[1]]}}.",
         call = call
       )
     }
@@ -248,6 +263,8 @@ get_data_columns <- function(data,
                              columns = NULL,
                              id_col = NULL,
                              call = caller_env()) {
+  check_data_frame(data, call = call)
+
   if (!is_null(id_col)) {
     check_name(id_col, call = call)
     data <- data[, names(data) != id_col]

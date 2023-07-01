@@ -23,7 +23,12 @@ insert_records <- function(data,
                            return_data = TRUE,
                            ...) {
   # TODO: Add support for inserting records from a list
-  check_data_frame_rows(data)
+  check_data_frame(data)
+
+  if (is_empty(data)) {
+    cli_abort("{.arg data} can't be an empty data frame.")
+  }
+
   n_records <- nrow(data)
 
   resp <- req_create_records(
