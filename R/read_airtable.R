@@ -49,16 +49,18 @@ read_airtable <- function(airtable = NULL,
                           model = NULL,
                           token = NULL,
                           ...) {
-  check_airtable_obj(airtable, allow_null = TRUE)
-
   req <- req_airtable(
-    airtable = airtable,
-    ...,
+    .req = request_airtable(
+      airtable = airtable,
+      ...
+    ),
     remove_view = FALSE,
     token = token
   )
 
-  req <- req_records_fields(req, fields = fields, model = model)
+  if (!is_null(fields)) {
+    req <- req_records_fields(req, fields = fields, model = model)
+  }
 
   data <-
     req_perform_offset(
@@ -264,7 +266,6 @@ req_list_records <- function(req = NULL,
     locale = locale,
     call = call
   )
-
 
   if (!is_null(filter)) {
     check_string(filter, allow_empty = FALSE, call = call)
