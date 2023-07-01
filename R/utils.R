@@ -192,6 +192,7 @@ check_data_frame_rows <- function(x,
 check_list <- function(x,
                        max_length = NULL,
                        allow_na = FALSE,
+                       allow_empty = FALSE,
                        allow_null = FALSE,
                        arg = caller_arg(x),
                        call = caller_env()) {
@@ -201,6 +202,17 @@ check_list <- function(x,
 
   if (allow_null && is_null(x)) {
     return(invisible(NULL))
+  }
+
+  if (allow_empty && is_empty(x)) {
+    return(invisible(NULL))
+  }
+
+  if (is_empty(x)) {
+    cli_abort(
+      "{.arg {arg}} can't be empty.",
+      call = call
+    )
   }
 
   if (!is_null(max_length) && length(x) > max_length) {
@@ -214,7 +226,8 @@ check_list <- function(x,
     stop_input_type(
       x,
       what = "a list",
-      allow_na = allow_na, allow_null = allow_null,
+      allow_na = allow_na,
+      allow_null = allow_null,
       arg = arg, call = call
     )
   }
