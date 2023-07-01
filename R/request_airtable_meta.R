@@ -18,6 +18,8 @@
 #' @param template URL template passed to [req_airtable()] if meta is `NULL`.
 #' @returns An HTTP response as an S3 list with class httr2_request.
 #' @keywords internal
+#' @importFrom vctrs list_drop_empty
+#' @importFrom httr2 req_perform
 request_airtable_meta <- function(url = NULL,
                                   base = NULL,
                                   table = NULL,
@@ -26,6 +28,7 @@ request_airtable_meta <- function(url = NULL,
                                   ...,
                                   meta = NULL,
                                   template = NULL,
+                                  data = NULL,
                                   token = NULL,
                                   call = caller_env()) {
   if (is_null(template)) {
@@ -97,6 +100,7 @@ request_airtable_meta <- function(url = NULL,
       column = column,
       template = template,
       ...,
+      data = vctrs::list_drop_empty(data),
       token = token,
       call = call,
       require_base = FALSE,

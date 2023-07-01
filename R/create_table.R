@@ -135,11 +135,9 @@ update_table <- function(airtable = NULL,
     airtable = airtable,
     meta = "update_table",
     method = "PATCH",
-    data = vctrs::list_drop_empty(
-      list(
-        name = name,
-        description = description
-      )
+    data = list(
+      name = name,
+      description = description
     ),
     ...
   )

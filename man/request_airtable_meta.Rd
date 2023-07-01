@@ -13,6 +13,7 @@ request_airtable_meta(
   ...,
   meta = NULL,
   template = NULL,
+  data = NULL,
   token = NULL,
   call = caller_env()
 )
@@ -45,6 +46,8 @@ Options include "schema_base", "create_base", "list_base", "update_table",
 provided.}
 
 \item{template}{URL template passed to \code{\link[=req_airtable]{req_airtable()}} if meta is \code{NULL}.}
+
+\item{data}{Data to include in body.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or

@@ -24,7 +24,6 @@
 #' @return A list with the created field name, field ID, description (if
 #'   provided), and options.
 #' @export
-#' @importFrom vctrs list_drop_empty
 #' @importFrom httr2 req_perform
 create_field <- function(airtable = NULL,
                          name = NULL,
@@ -42,19 +41,17 @@ create_field <- function(airtable = NULL,
     options <- field[["options"]] %||% options
   }
 
-  check_string(name, allow_empty = FALSE)
+  check_name(name)
   type <- field_type_match(type)
   check_field_description(description, allow_null = TRUE)
   check_list(options, allow_null = TRUE)
 
   data <-
-    vctrs::list_drop_empty(
-      list(
-        description = description,
-        name = name,
-        options = options,
-        type = type
-      )
+    list(
+      description = description,
+      name = name,
+      options = options,
+      type = type
     )
 
   resp <-
@@ -74,7 +71,6 @@ create_field <- function(airtable = NULL,
 #' @name update_field
 #' @param column Field ID of column to update.
 #' @export
-#' @importFrom vctrs list_drop_empty
 #' @importFrom httr2 resp_body_json
 update_field <- function(airtable = NULL,
                          column = NULL,
@@ -82,7 +78,7 @@ update_field <- function(airtable = NULL,
                          description = NULL,
                          token = NULL,
                          ...) {
-  check_string(name, allow_null = TRUE)
+  check_name(name, allow_null = TRUE)
   check_field_description(description)
 
   resp <-
@@ -90,11 +86,9 @@ update_field <- function(airtable = NULL,
       airtable = airtable,
       meta = "update_field",
       column = column,
-      data = vctrs::list_drop_empty(
-        list(
-          name = name,
-          description = description
-        )
+      data = list(
+        name = name,
+        description = description
       ),
       method = "PATCH",
       token = token,
