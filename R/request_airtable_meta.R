@@ -93,6 +93,10 @@ request_airtable_meta <- function(url = NULL,
     check_string(column, allow_empty = FALSE, call = call)
   }
 
+  if (is_list(data)) {
+    data <- vctrs::list_drop_empty(data)
+  }
+
   req <-
     req_airtable(
       base = base,
@@ -100,7 +104,7 @@ request_airtable_meta <- function(url = NULL,
       column = column,
       template = template,
       ...,
-      data = vctrs::list_drop_empty(data),
+      data = data,
       token = token,
       call = call,
       require_base = FALSE,
