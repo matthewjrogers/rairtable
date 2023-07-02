@@ -29,7 +29,7 @@ list_records(
   cell_format = NULL,
   tz = NULL,
   locale = NULL,
-  max_records = 100,
+  max_records = NULL,
   page_size = NULL,
   metadata = c("id", "createdTime"),
   offset = NULL,

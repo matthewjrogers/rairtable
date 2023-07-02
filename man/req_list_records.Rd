@@ -17,7 +17,7 @@ req_list_records(
   tz = NULL,
   locale = NULL,
   metadata = c("id", "createdTime"),
-  max_records = 100,
+  max_records = NULL,
   page_size = NULL,
   model = NULL,
   token = NULL,
