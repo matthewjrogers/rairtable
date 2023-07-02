@@ -7,9 +7,11 @@
 #'   results of list_bases are filtered to matching bases only. Defaults to
 #'   `NULL` which returns all bases associated with the personal access token or
 #'   API key.
+#' @inheritParams request_airtable_meta
 #' @inheritParams httr2::resp_body_json
 #' @seealso [get_table_models()]
-#' @returns A tibble or list of base IDs, names, and permission levels.
+#' @returns A tibble or list of base IDs, names, and permission levels or a list
+#'   if `simplifyVector = FALSE`.
 #' @export
 #' @importFrom httr2 resp_body_json
 #' @importFrom tibble as_tibble

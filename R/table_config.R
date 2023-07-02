@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Note that copying a config from a table model requires modifying or ignoring
-#' some field types. See [copy_field_config()] for details.
+#' some field types. See [get_field_config()] for details.
 #'
 #' Learn more about the Airtable Web API table config object:
 #' <https://airtable.com/developers/web/api/model/table-config>

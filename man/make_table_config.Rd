@@ -54,7 +54,7 @@ name or ID.}
 }
 \description{
 Note that copying a config from a table model requires modifying or ignoring
-some field types. See \code{\link[=copy_field_config]{copy_field_config()}} for details.
+some field types. See \code{\link[=get_field_config]{get_field_config()}} for details.
 
 Learn more about the Airtable Web API table config object:
 \url{https://airtable.com/developers/web/api/model/table-config}

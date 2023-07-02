@@ -12,14 +12,18 @@ results of list_bases are filtered to matching bases only. Defaults to
 \code{NULL} which returns all bases associated with the personal access token or
 API key.}
 
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
 \item{simplifyVector}{Should JSON arrays containing only primitives (i.e.
 booleans, numbers, and strings) be caused to atomic vectors?}
 
-\item{...}{Other arguments passed on to \code{\link[jsonlite:fromJSON]{jsonlite::fromJSON()}} and
-\code{\link[xml2:read_xml]{xml2::read_xml()}} respectively.}
+\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}}
 }
 \value{
-A tibble or list of base IDs, names, and permission levels.
+A tibble or list of base IDs, names, and permission levels or a list
+if \code{simplifyVector = FALSE}.
 }
 \description{
 Use the Airtable Metadata API to list all Airtable bases accessible with a
