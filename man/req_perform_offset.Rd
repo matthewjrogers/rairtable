@@ -12,6 +12,7 @@ req_perform_offset(
   airtable_id_col = NULL,
   metadata = c("id", "createdTime", "commentCount"),
   max_rows = NULL,
+  .name_repair = "unique",
   call = caller_env()
 )
 
@@ -21,6 +22,7 @@ resp_body_records(
   type = "combine",
   airtable_id_col = NULL,
   metadata = c("id", "createdTime", "commentCount"),
+  .name_repair = "unique",
   ...,
   call = caller_env()
 )
@@ -44,6 +46,12 @@ response data frame.}
 
 \item{metadata}{Columns to return when type is "records" or to combine
 with fields when type is "combine".}
+
+\item{.name_repair}{One of "unique" (default), "universal", "check_unique",
+"unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. See
+\link{vctrs:vec_as_names} for the meaning of these options.}
+
+\item{...}{Additional parameters passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. Not used.}
 }
 \description{
 Get the body from API requests with a series of offset values

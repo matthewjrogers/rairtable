@@ -47,6 +47,7 @@ read_airtable <- function(airtable = NULL,
                           airtable_id_col = NULL,
                           max_rows = deprecated(),
                           model = NULL,
+                          .name_repair = "unique",
                           token = NULL,
                           ...) {
   req <- req_airtable(
@@ -66,7 +67,8 @@ read_airtable <- function(airtable = NULL,
     req_perform_offset(
       req = req,
       airtable_id_col = airtable_id_col,
-      metadata = "id"
+      metadata = "id",
+      .name_repair = .name_repair
     )
 
   if ("data.frame" %in% lapply(data, class)) {
@@ -117,6 +119,7 @@ list_records <- function(airtable = NULL,
                          metadata = c("id", "createdTime"),
                          offset = NULL,
                          model = NULL,
+                         .name_repair = "unique",
                          token = NULL,
                          ...) {
   req <- req_list_records(
@@ -141,6 +144,7 @@ list_records <- function(airtable = NULL,
     req = req,
     airtable_id_col = airtable_id_col,
     metadata = metadata,
+    .name_repair = .name_repair,
     offset = offset
   )
 }
@@ -158,6 +162,7 @@ get_record <- function(airtable = NULL,
                        tz = NULL,
                        locale = NULL,
                        metadata = c("id", "createdTime"),
+                       .name_repair = "unique",
                        token = NULL,
                        ...) {
   req <- request_airtable(
@@ -185,7 +190,8 @@ get_record <- function(airtable = NULL,
   resp_body_records(
     resp,
     airtable_id_col = airtable_id_col,
-    metadata = metadata
+    metadata = metadata,
+    .name_repair = .name_repair
   )
 }
 
@@ -425,6 +431,7 @@ req_perform_offset <- function(req,
                                airtable_id_col = NULL,
                                metadata = c("id", "createdTime", "commentCount"),
                                max_rows = NULL,
+                               .name_repair = "unique",
                                call = caller_env()) {
   max_rows <- max_rows %||% 50000
   check_number_whole(max_rows, max = 50000, call = call)
@@ -451,6 +458,7 @@ req_perform_offset <- function(req,
         type = type,
         airtable_id_col = airtable_id_col,
         metadata = metadata,
+        .name_repair = .name_repair,
         call = call
       )
 
@@ -478,6 +486,10 @@ req_perform_offset <- function(req,
 #'   response data frame.
 #' @param metadata Columns to return when type is "records" or to combine
 #'   with fields when type is "combine".
+#' @param .name_repair One of "unique" (default), "universal", "check_unique",
+#'   "unique_quiet", or "universal_quiet" passed to [vctrs::vec_cbind()]. See
+#'   [vctrs:vec_as_names] for the meaning of these options.
+#' @param ... Additional parameters passed to [vctrs::vec_cbind()]. Not used.
 #' @keywords internal
 #' @importFrom httr2 resp_body_json
 #' @importFrom cli cli_warn
@@ -488,6 +500,7 @@ resp_body_records <- function(resp,
                               type = "combine",
                               airtable_id_col = NULL,
                               metadata = c("id", "createdTime", "commentCount"),
+                              .name_repair = "unique",
                               ...,
                               call = caller_env()) {
   body <- httr2::resp_body_json(resp, simplifyVector = simplifyVector)
@@ -537,6 +550,7 @@ resp_body_records <- function(resp,
       set_names(records, record_nm),
       as.data.frame(fields),
       ...,
+      .name_repair = .name_repair,
       .error_call = call
     )
   )

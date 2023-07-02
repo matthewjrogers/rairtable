@@ -13,6 +13,7 @@ read_airtable(
   airtable_id_col = NULL,
   max_rows = deprecated(),
   model = NULL,
+  .name_repair = "unique",
   token = NULL,
   ...
 )
@@ -33,6 +34,7 @@ list_records(
   metadata = c("id", "createdTime"),
   offset = NULL,
   model = NULL,
+  .name_repair = "unique",
   token = NULL,
   ...
 )
@@ -45,6 +47,7 @@ get_record(
   tz = NULL,
   locale = NULL,
   metadata = c("id", "createdTime"),
+  .name_repair = "unique",
   token = NULL,
   ...
 )
@@ -73,6 +76,10 @@ rownames if id_to_col is \code{FALSE}.}
 
 \item{model}{A table model from \code{\link[=get_table_model]{get_table_model()}}. Optionally used to
 validate fields and sort parameters.}
+
+\item{.name_repair}{One of "unique" (default), "universal", "check_unique",
+"unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. See
+\link{vctrs:vec_as_names} for the meaning of these options.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
