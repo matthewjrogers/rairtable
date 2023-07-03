@@ -39,7 +39,11 @@ model is ignored. model is ignored if table is supplied.}
   Arguments passed on to \code{\link[=get_table_model]{get_table_model}}
   \describe{
     \item{\code{schema}}{A base schema list from \code{\link[=get_base_schema]{get_base_schema()}} using
-\code{simplifyVector = FALSE}. Optional if base is supplied.}
+\code{simplifyVector = FALSE}. Optional if base is supplied (or if airtable or url
+are supplied with additional parameters).}
+    \item{\code{i}}{Index value for the table to return passed to \code{\link[vctrs:vec_slice]{vctrs::vec_slice()}}.
+Defaults to 1 which returns the first table from the tables listed in the
+base schema.}
     \item{\code{simplifyVector}}{Should JSON arrays containing only primitives (i.e.
 booleans, numbers, and strings) be caused to atomic vectors?}
   }}
@@ -48,9 +52,6 @@ booleans, numbers, and strings) be caused to atomic vectors?}
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
-
-\item{table}{A base schema or, if schema is provided, a string with a table
-name or ID.}
 }
 \description{
 Note that copying a config from a table model requires modifying or ignoring

@@ -85,7 +85,6 @@ copy_table_config <- function(table = NULL,
   )
 }
 
-
 #' Check table model
 #'
 #' @keywords internal
@@ -133,37 +132,4 @@ check_table_config <- function(config,
       )
     }
   )
-}
-
-#' Get a table schema from a base schema or table name
-#'
-#' An internal function used by [copy_table_config()].
-#'
-#' @param table A base schema or, if schema is provided, a string with a table
-#'   name or ID.
-#' @inheritParams get_table_models
-#' @param ... Additional parameters passed to [get_table_models()].
-#' @keywords internal
-get_table_model <- function(table = NULL,
-                            schema = NULL,
-                            simplifyVector = FALSE,
-                            ...,
-                            call = caller_env()) {
-  if (has_name(table, "tables")) {
-    # FIXME: Add additional checks to avoid this allowing this:
-    # get_table_model(list("tables" = list(1)))
-    check_list(table[["tables"]], max_length = 1, call = call)
-  } else {
-    table <- get_table_models(
-      schema = schema,
-      simplifyVector = simplifyVector,
-      ...,
-      tables = table,
-      call = call
-    )
-
-    check_list(table, max_length = 1, call = call)
-  }
-
-  table[[1]]
 }

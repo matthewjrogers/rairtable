@@ -1,7 +1,8 @@
-#' Get metadata for an Airtable base
+#' Get metadata for an Airtable base or table
 #'
 #' Get an "airtable_base_schema" object, a base schema, or a list of table
-#' models from a base schema.
+#' models from a base schema. [get_table_model()] primarily exists as a helper
+#' function for [copy_table_config()].
 #'
 #' @param base An Airtable base ID, an airtable object containing a base ID, or
 #'   a URL that can be parsed for a base ID. Optional if url or airtable are
@@ -9,10 +10,11 @@
 #' @inheritParams req_airtable
 #' @param ... Additional parameters:
 #' - For [airtable_base()] and [get_base_schema()], additional parameters
-#' may include airtable or url. One of the three is required if base is `NULL`.
+#' may include airtable or url (one of which required if base is `NULL`).
 #' - For [get_table_models()], additional parameters are passed to
 #' [get_base_schema()] so may include simplifyVector.
-#'
+#'- For [get_table_model()], additional parameters can include airtable or url
+#'(one of which is required if table is `NULL`).
 #' @returns
 #'  - [airtable_base()] returns an `airtable_base_schema` object.
 #'  - [get_base_schema()] returns the response from the Airtable get base schema
@@ -109,13 +111,16 @@ get_base_schema <- function(base = NULL,
 
 #' @rdname airtable_base
 #' @name get_table_models
-#' @param tables Optional character vector of table names or IDs to include in
-#'   the returned data frame or list.
+#' @param tables,table Optional character vector of table names or IDs to
+#'   include in the returned data frame or list. For [get_table_model()], table
+#'   can be a schema but is typically expected to be a table name or ID.
 #' @param schema A base schema list from [get_base_schema()] using
-#'   `simplifyVector = FALSE`. Optional if base is supplied.
+#'   `simplifyVector = FALSE`. Optional if base is supplied (or if airtable or url
+#'   are supplied with additional parameters).
 #' @aliases list_base_tables
 #' @export
 #' @importFrom tibble as_tibble
+#' @importFrom vctrs obj_check_list
 get_table_models <- function(base = NULL,
                              tables = NULL,
                              schema = NULL,
@@ -130,12 +135,10 @@ get_table_models <- function(base = NULL,
       call = call
     )
 
-  if (!is_list(schema)) {
-    cli_abort(
-      "{.arg schema} must be a list, not {.obj_simple_type {schema}}.",
-      call = call
-    )
-  }
+  vctrs::obj_check_list(
+    schema,
+    call = call
+  )
 
   table_models <- schema[["tables"]]
 
@@ -148,6 +151,49 @@ get_table_models <- function(base = NULL,
   }
 
   filter_with_values(table_models, values = tables, call = call)
+}
+
+#' @rdname airtable_base
+#' @name get_table_model
+#' @param i Index value for the table to return passed to [vctrs::vec_slice()].
+#'   Defaults to 1 which returns the first table from the tables listed in the
+#'   base schema.
+#' @export
+#' @importFrom vctrs vec_slice
+get_table_model <- function(table = NULL,
+                            schema = NULL,
+                            simplifyVector = FALSE,
+                            i = 1,
+                            ...,
+                            call = caller_env()) {
+  # If a schema is supplied to table
+  if (is.list(table) && has_name(table, "tables")) {
+    # expect error if more than nth tables are include in schema
+    table <- table[["tables"]]
+  }
+
+  # table can be based on a url or airtable parameter
+  table <- table %||% get_table_id(table = table, ..., call = call)
+
+  # If table is a table name or table ID
+  if (is_string(table)) {
+    table <- get_table_models(
+      schema = schema,
+      simplifyVector = simplifyVector,
+      ...,
+      tables = table,
+      call = call
+    )
+  }
+
+  table <- vctrs::vec_slice(table, i, error_call = call)
+
+  if (is_list(table)) {
+    # return first element from list
+    return(table[[1]])
+  }
+
+  table
 }
 
 #' Is x have an airtable_base_schema class?

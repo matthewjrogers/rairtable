@@ -5,7 +5,8 @@
 \alias{get_base_schema}
 \alias{get_table_models}
 \alias{list_base_tables}
-\title{Get metadata for an Airtable base}
+\alias{get_table_model}
+\title{Get metadata for an Airtable base or table}
 \usage{
 airtable_base(base = NULL, token = NULL, ...)
 
@@ -25,6 +26,15 @@ get_table_models(
   ...,
   call = caller_env()
 )
+
+get_table_model(
+  table = NULL,
+  schema = NULL,
+  simplifyVector = FALSE,
+  i = 1,
+  ...,
+  call = caller_env()
+)
 }
 \arguments{
 \item{base}{An Airtable base ID, an airtable object containing a base ID, or
@@ -38,9 +48,11 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 \item{...}{Additional parameters:
 \itemize{
 \item For \code{\link[=airtable_base]{airtable_base()}} and \code{\link[=get_base_schema]{get_base_schema()}}, additional parameters
-may include airtable or url. One of the three is required if base is \code{NULL}.
+may include airtable or url (one of which required if base is \code{NULL}).
 \item For \code{\link[=get_table_models]{get_table_models()}}, additional parameters are passed to
 \code{\link[=get_base_schema]{get_base_schema()}} so may include simplifyVector.
+\item For \code{\link[=get_table_model]{get_table_model()}}, additional parameters can include airtable or url
+(one of which is required if table is \code{NULL}).
 }}
 
 \item{simplifyVector}{Should JSON arrays containing only primitives (i.e.
@@ -51,11 +63,17 @@ running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 
-\item{tables}{Optional character vector of table names or IDs to include in
-the returned data frame or list.}
+\item{tables, table}{Optional character vector of table names or IDs to
+include in the returned data frame or list. For \code{\link[=get_table_model]{get_table_model()}}, table
+can be a schema but is typically expected to be a table name or ID.}
 
 \item{schema}{A base schema list from \code{\link[=get_base_schema]{get_base_schema()}} using
-\code{simplifyVector = FALSE}. Optional if base is supplied.}
+\code{simplifyVector = FALSE}. Optional if base is supplied (or if airtable or url
+are supplied with additional parameters).}
+
+\item{i}{Index value for the table to return passed to \code{\link[vctrs:vec_slice]{vctrs::vec_slice()}}.
+Defaults to 1 which returns the first table from the tables listed in the
+base schema.}
 }
 \value{
 \itemize{
@@ -68,7 +86,8 @@ from the schema response or a list.
 }
 \description{
 Get an "airtable_base_schema" object, a base schema, or a list of table
-models from a base schema.
+models from a base schema. \code{\link[=get_table_model]{get_table_model()}} primarily exists as a helper
+function for \code{\link[=copy_table_config]{copy_table_config()}}.
 }
 \examples{
 \dontrun{

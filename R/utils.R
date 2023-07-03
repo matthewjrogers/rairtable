@@ -155,8 +155,8 @@ return_data_resp <- function(data = NULL, resp = NULL, return_data = TRUE) {
 #' Check if object is a list
 #'
 #' @noRd
+#' @importFrom vctrs obj_check_list
 check_list <- function(x,
-                       max_length = NULL,
                        allow_na = FALSE,
                        allow_empty = FALSE,
                        allow_null = FALSE,
@@ -170,20 +170,13 @@ check_list <- function(x,
     return(invisible(NULL))
   }
 
-  if (allow_empty && is_empty(x)) {
-    return(invisible(NULL))
-  }
-
   if (is_empty(x)) {
+    if (allow_empty) {
+      return(invisible(NULL))
+    }
+
     cli_abort(
       "{.arg {arg}} can't be empty.",
-      call = call
-    )
-  }
-
-  if (!is_null(max_length) && length(x) > max_length) {
-    cli_abort(
-      "{.arg {arg}} must be length {max_length} or less, not length {length(x)}.",
       call = call
     )
   }
@@ -192,12 +185,10 @@ check_list <- function(x,
     return(invisible(NULL))
   }
 
-  stop_input_type(
-    x,
-    what = "a list",
-    allow_na = allow_na,
-    allow_null = allow_null,
-    arg = arg, call = call
+  vctrs::obj_check_list(
+    x = x,
+    arg = arg,
+    call = call
   )
 }
 
@@ -229,8 +220,6 @@ safety_check <- function(safely = NULL,
   if (all(tolower(answer) %in% tolower(yes))) {
     return(invisible(NULL))
   }
-
-  check_character(message, call = call)
 
   cli_abort(
     message = message,

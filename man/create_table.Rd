@@ -41,7 +41,15 @@ model is ignored. model is ignored if table is supplied.}
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{Additional parameters passed to \code{\link[=get_table_models]{get_table_models()}}.}
+\item{...}{Additional parameters:
+\itemize{
+\item For \code{\link[=airtable_base]{airtable_base()}} and \code{\link[=get_base_schema]{get_base_schema()}}, additional parameters
+may include airtable or url (one of which required if base is \code{NULL}).
+\item For \code{\link[=get_table_models]{get_table_models()}}, additional parameters are passed to
+\code{\link[=get_base_schema]{get_base_schema()}} so may include simplifyVector.
+\item For \code{\link[=get_table_model]{get_table_model()}}, additional parameters can include airtable or url
+(one of which is required if table is \code{NULL}).
+}}
 }
 \value{
 Invisibly returns a list with the table ID, name, description,
