@@ -74,8 +74,9 @@ rownames if id_to_col is \code{FALSE}.}
 
 \item{max_rows}{Deprecated. Maximum number of rows to read.}
 
-\item{model}{A table model from \code{\link[=get_table_model]{get_table_model()}}. Optionally used to
-validate fields and sort parameters.}
+\item{model}{Optional. A table model from \code{\link[=get_table_model]{get_table_model()}}. If supplied,
+model is used to validate fields and sort parameters and to arrange columns
+to match the order of the table model.}
 
 \item{.name_repair}{One of "unique" (default), "universal", "check_unique",
 "unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. See

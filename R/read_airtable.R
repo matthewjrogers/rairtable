@@ -24,8 +24,9 @@
 #'   and [get_record()], airtable_id_col is not used if metadata is `NULL` or
 #'   does not include "id". The record ID column is dropped and converted to
 #'   rownames if id_to_col is `FALSE`.
-#' @param model A table model from [get_table_model()]. Optionally used to
-#'   validate fields and sort parameters.
+#' @param model Optional. A table model from [get_table_model()]. If supplied,
+#'   model is used to validate fields and sort parameters and to arrange columns
+#'   to match the order of the table model.
 #' @param max_rows Deprecated. Maximum number of rows to read.
 #' @param ... For [read_airtable()], additional query parameters, such as url,
 #'   can be passed to [req_airtable()]. For [list_records()] and [get_record()],
@@ -83,12 +84,17 @@ read_airtable <- function(airtable = NULL,
 
   check_bool(id_to_col)
 
+
+  if (!is_null(model)) {
+    # Reorder columns to match order in model if supplied
+    data <- arrange_record_cols(data, metadata = "id", model)
+  }
+
   if (id_to_col) {
     return(data)
   }
 
-  airtable_id_col <- airtable_id_col %||%
-    getOption("rairtable.id_col", "airtable_record_id")
+  airtable_id_col <- airtable_id_col %||% names(data)[[1]]
 
   # set ids to rownames if not instructed to do otherwise
   tibble::column_to_rownames(
@@ -140,12 +146,39 @@ list_records <- function(airtable = NULL,
     token = token
   )
 
-  req_perform_offset(
+  records <- req_perform_offset(
     req = req,
     airtable_id_col = airtable_id_col,
     metadata = metadata,
     .name_repair = .name_repair,
     offset = offset
+  )
+
+  if (!is_null(model)) {
+    # Reorder columns to match order in model if supplied
+    records <- arrange_record_cols(records, metadata, model)
+  }
+
+  records
+}
+
+#' Arrange columns in record data frame to match model
+#'
+#' @noRd
+#' @importFrom tidyselect any_of
+arrange_record_cols <- function(records, metadata, model = NULL, call = caller_env()) {
+  metadata_nm <- names(records)[seq_along(metadata)]
+
+  if (is.data.frame(model)) {
+    model_nm <- model[["fields"]][[1]][["name"]]
+  } else {
+    model_nm <- names_at(model[["fields"]])
+  }
+
+  select_cols(
+    tidyselect::any_of(c(metadata_nm, model_nm)),
+    .data = records,
+    call = call
   )
 }
 
@@ -348,7 +381,7 @@ req_records_sort <- function(req,
 
   sort <- set_names(sort, glue("sort[{seq_along(sort) - 1}][field]"))
 
-  req <- rlang::exec(httr2::req_url_query, req, !!!sort)
+  req <- exec(httr2::req_url_query, req, !!!sort)
 
   direction <- arg_match(
     direction,
@@ -369,7 +402,7 @@ req_records_sort <- function(req,
     glue("sort[{seq_along(sort) - 1}][direction]")
   )
 
-  rlang::exec(httr2::req_url_query, req, !!!direction)
+  exec(httr2::req_url_query, req, !!!direction)
 }
 
 #' Add commentCount to request if required by metadata values
@@ -505,8 +538,9 @@ resp_body_records <- function(resp,
                               call = caller_env()) {
   body <- httr2::resp_body_json(resp, simplifyVector = simplifyVector)
 
-  type <-
-    arg_match0(type, c("records", "fields", "combine"), error_call = call)
+  type <- arg_match0(
+    type, c("records", "fields", "combine"), error_call = call
+    )
 
   if (has_name(body, "records")) {
     # Used by read_airtable and list_records
@@ -531,7 +565,12 @@ resp_body_records <- function(resp,
 
   # If metadata is not NULL
   if (!is_null(metadata)) {
-    records <- select_cols(.data = records, tidyselect::any_of(metadata))
+    records <- select_cols(
+      .data = records,
+      tidyselect::any_of(metadata),
+      call = call
+      )
+
     record_nm <- names(records)
 
     if ("id" %in% record_nm) {

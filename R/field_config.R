@@ -131,7 +131,8 @@ make_list_of_lists <- function(data,
   if (!is_null(cols)) {
     data <- select_cols(
       tidyselect::any_of(cols),
-      .data = data
+      .data = data,
+      call = call
     )
   }
 

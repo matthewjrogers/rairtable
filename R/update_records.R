@@ -227,7 +227,7 @@ get_record_id_col <- function(data,
       )
     }
 
-    data <- select_cols(tidyselect::all_of(id_col), .data = data)
+    data <- select_cols(tidyselect::all_of(id_col), .data = data, call = call)
     n_cols <- ncol(data)
 
     if (n_cols != 1) {
@@ -267,17 +267,17 @@ get_data_columns <- function(data,
 
   if (!is_null(id_col)) {
     check_name(id_col, call = call)
-    data <- data[, names(data) != id_col]
+    data <- data[, names(data) != id_col, drop = FALSE]
   }
 
-  select_cols(columns, .data = data)
+  select_cols(columns, .data = data, call = call)
 }
 
 #' Get names of selected columns
 #'
 #' @noRd
-get_data_colnames <- function(..., .data) {
-  names(select_cols(..., .data = .data))
+get_data_colnames <- function(..., .data, .drop = FALSE, call = caller_env()) {
+  names(select_cols(..., .data = .data, .drop = .drop, call = call))
 }
 
 #' Use tidyselect to pull a column from a data frame
@@ -285,6 +285,6 @@ get_data_colnames <- function(..., .data) {
 #' @noRd
 #' @importFrom tidyselect eval_select
 #' @importFrom rlang expr
-select_cols <- function(..., .data, .drop = FALSE) {
-  .data[, tidyselect::eval_select(expr(c(...)), data = .data), drop = .drop]
+select_cols <- function(..., .data, .drop = FALSE, call = caller_env()) {
+  .data[, tidyselect::eval_select(expr(c(...)), data = .data, error_call = call), drop = .drop]
 }
