@@ -47,6 +47,7 @@ get_record(
   tz = NULL,
   locale = NULL,
   metadata = c("id", "createdTime"),
+  model = NULL,
   .name_repair = "unique",
   token = NULL,
   ...

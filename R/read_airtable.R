@@ -84,7 +84,6 @@ read_airtable <- function(airtable = NULL,
 
   check_bool(id_to_col)
 
-
   if (!is_null(model)) {
     # Reorder columns to match order in model if supplied
     data <- arrange_record_cols(data, metadata = "id", model)
@@ -162,26 +161,6 @@ list_records <- function(airtable = NULL,
   records
 }
 
-#' Arrange columns in record data frame to match model
-#'
-#' @noRd
-#' @importFrom tidyselect any_of
-arrange_record_cols <- function(records, metadata, model = NULL, call = caller_env()) {
-  metadata_nm <- names(records)[seq_along(metadata)]
-
-  if (is.data.frame(model)) {
-    model_nm <- model[["fields"]][[1]][["name"]]
-  } else {
-    model_nm <- names_at(model[["fields"]])
-  }
-
-  select_cols(
-    tidyselect::any_of(c(metadata_nm, model_nm)),
-    .data = records,
-    call = call
-  )
-}
-
 #' @rdname read_airtable
 #' @name get_record
 #' @param record Record ID (a string starting with "rec"). Required for
@@ -195,6 +174,7 @@ get_record <- function(airtable = NULL,
                        tz = NULL,
                        locale = NULL,
                        metadata = c("id", "createdTime"),
+                       model = NULL,
                        .name_repair = "unique",
                        token = NULL,
                        ...) {
@@ -220,12 +200,19 @@ get_record <- function(airtable = NULL,
     metadata <- record_metadata_match(metadata, values = c("id", "createdTime"))
   }
 
-  resp_body_records(
+  record <- resp_body_records(
     resp,
     airtable_id_col = airtable_id_col,
     metadata = metadata,
     .name_repair = .name_repair
   )
+
+  if (!is_null(model)) {
+    # Reorder columns to match order in model if supplied
+    record <- arrange_record_cols(record, metadata = metadata, model)
+  }
+
+  record
 }
 
 #' Build a request for the Airtable list records API method
@@ -606,5 +593,25 @@ record_metadata_match <- function(metadata,
     values = values,
     multiple = TRUE,
     error_call = call
+  )
+}
+
+#' Arrange columns in record data frame to match model
+#'
+#' @noRd
+#' @importFrom tidyselect any_of
+arrange_record_cols <- function(records, metadata, model = NULL, call = caller_env()) {
+  metadata_nm <- names(records)[seq_along(metadata)]
+
+  if (is.data.frame(model)) {
+    model_nm <- model[["fields"]][[1]][["name"]]
+  } else {
+    model_nm <- names_at(model[["fields"]])
+  }
+
+  select_cols(
+    tidyselect::any_of(c(metadata_nm, model_nm)),
+    .data = records,
+    call = call
   )
 }
