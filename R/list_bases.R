@@ -47,7 +47,6 @@ list_bases <- function(bases = NULL,
 filter_with_values <- function(x,
                                values = NULL,
                                arg = caller_arg(values),
-                               ...,
                                call = caller_env()) {
   check_character(values, arg = arg, call = call)
   if (is_list_of_lists(x)) {
