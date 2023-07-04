@@ -19,6 +19,7 @@ copy_table_config(
   model = NULL,
   name = NULL,
   description = NULL,
+  airtable = NULL,
   ...,
   call = caller_env()
 )

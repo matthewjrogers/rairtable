@@ -10,6 +10,7 @@ req_update_records(
   ...,
   records,
   data,
+  fields_by_id = FALSE,
   typecast = FALSE,
   method = NULL,
   token = NULL,
@@ -21,14 +22,15 @@ req_update_record(
   ...,
   record,
   data,
-  typecast = FALSE,
+  typecast = TRUE,
   method = NULL,
+  token = NULL,
   call = caller_env()
 )
 }
 \arguments{
 \item{req}{A HTTP response created by \code{\link[=req_airtable]{req_airtable()}}. Optional if
-airttable, url, \emph{or} base and table are passed to \code{\link[=request_airtable]{request_airtable()}}.}
+airtable, url, \emph{or} base and table are passed to \code{\link[=request_airtable]{request_airtable()}}.}
 
 \item{...}{
   Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
@@ -59,8 +61,7 @@ string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the API request URL.}
   }}
 
-\item{records, record}{Record ID or IDs to update as a character vector.
-Required.}
+\item{records, record}{Record ID or IDs to update as a character vector.}
 
 \item{data}{Data to include in body.}
 
@@ -74,6 +75,10 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+
+\item{field_by_id}{If \code{TRUE}, the response to the API request is keyed by
+field IDs instead of field names. The response is only returned if
+\code{return_data = FALSE}.}
 }
 \description{
 Update one or more records in an Airtable base

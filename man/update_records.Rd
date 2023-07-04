@@ -10,15 +10,21 @@ update_records(
   airtable_id_col = NULL,
   columns = tidyselect::everything(),
   records = NULL,
-  safely = TRUE,
+  model = NULL,
+  fields_by_id = FALSE,
+  typecast = FALSE,
   return_data = TRUE,
+  safely = TRUE,
+  token = NULL,
   ...
 )
 }
 \arguments{
 \item{data}{A data frame containing the fields to update. If records is
 \code{NULL}, data must include a column of record IDs (named by airtable_id_col)
-or rownames with record IDs.}
+or rownames with record IDs. If the data frame is originally created using
+\code{list_records()}, make sure to drop the "createdTime" and/or "commentCount"
+columns.}
 
 \item{airtable}{An \code{airtable} object. Optional if url or base and table are
 provided with additional parameters passed to \code{\link[=request_airtable]{request_airtable()}}.}
@@ -33,16 +39,16 @@ to \code{\link[tidyselect:everything]{tidyselect::everything()}}. See
 for documentation on helpers.}
 
 \item{records}{A character vector of record IDs indicating which Airtable
-records to replace with the updated values from data. Optional if data has
-a record ID column (named by airtable_id_col) or rownames with record IDs.
-Defaults to \code{NULL}.}
-
-\item{safely}{If \code{TRUE}, confirm number and names of columns to update and
-number of rows before executing update.}
+records to replace with the updated values from data. A vector of record or
+cell URLs is also supported. Optional if data has a record ID column (named
+by airtable_id_col) or rownames with record IDs. Defaults to \code{NULL}.}
 
 \item{return_data}{If \code{FALSE}, return JSON response from the Airtable web API
 as a list. If \code{TRUE} (default) and data is not \code{NULL}, return input data
 frame or list.}
+
+\item{safely}{If \code{TRUE}, confirm number and names of columns to update and
+number of rows before executing update.}
 
 \item{...}{
   Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
@@ -79,7 +85,5 @@ Update one or more fields in an Airtable table based on a data frame. Set
 \code{safely = FALSE} to delete records outside of an interactive session.
 }
 \details{
-Find more information on the Airtable API methods for updating a record
-\url{https://airtable.com/developers/web/api/update-record} or multiple records
-\url{https://airtable.com/developers/web/api/update-multiple-records}.
+Find more information on the Airtable API methods for \href{https://airtable.com/developers/web/api/update-record}{updating a single record} or \href{https://airtable.com/developers/web/api/update-multiple-records}{multiple records}.
 }

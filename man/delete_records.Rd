@@ -29,8 +29,8 @@ containing Airtable record IDs. Optional if records is supplied or if
 record IDs are stored in row names (default option for \code{\link[=read_airtable]{read_airtable()}}).
 Defaults to \code{NULL} which is set to \code{getOption("rairtable.id_col", "airtable_record_id")}.}
 
-\item{records}{Character vector with record IDs. Optional if data is
-provided.}
+\item{records}{Character vector with record IDs. A vector of record or cell
+URLs is also supported. Optional if data is provided.}
 
 \item{safely}{If \code{TRUE}, ask for confirmation before deleting Airtable
 records and abort if confirmation is not provided.}

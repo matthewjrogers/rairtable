@@ -8,6 +8,7 @@ req_create_records(
   req = NULL,
   ...,
   data,
+  fields_by_id = FALSE,
   typecast = TRUE,
   token = NULL,
   call = caller_env()
@@ -64,6 +65,10 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+
+\item{field_by_id}{If \code{TRUE}, the response to the API request is keyed by
+field IDs instead of field names. This response is only returned if
+\code{return_data = FALSE}.}
 }
 \value{
 Invisibly return response from API call.
