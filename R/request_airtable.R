@@ -125,6 +125,8 @@ request_airtable_url <- function(url = NULL,
                                  require_view = FALSE,
                                  ...,
                                  call = caller_env()) {
+  check_url(url, call = call)
+
   if (is_airtable_api_url(url)) {
     check_airtable_api_url(
       url,
@@ -161,8 +163,6 @@ request_airtable_url <- function(url = NULL,
 
     return(req)
   }
-
-  check_url(url, call = call)
 
   api_url <- api_url %||%
     getOption("rairtable.api_url", "https://api.airtable.com/v0")

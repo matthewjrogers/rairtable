@@ -90,6 +90,8 @@ new_airtable_obj <- function(base,
     table <- table[["id"]]
   }
 
+  check_string(table, call = call)
+
   if (is_airtable_url(table)) {
     ids <- parse_airtable_url(
       table,
@@ -104,7 +106,6 @@ new_airtable_obj <- function(base,
   }
 
   check_string(base, call = call)
-  check_string(table, call = call)
   check_character(view, allow_null = TRUE, call = call)
 
   req <- request_airtable_api_url(

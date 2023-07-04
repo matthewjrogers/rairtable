@@ -31,8 +31,8 @@ NULL
 #'   "https://airtable.com/shr".
 #' @export
 is_airtable_url <- function(url, base_url = NULL, allow_shared = FALSE) {
-  if (!is_string(url)) {
-    return(FALSE)
+  if (!all(is_character(url))) {
+    url <- as.character(url)
   }
 
   base_url <- base_url %||%
@@ -70,8 +70,8 @@ is_url <- function(x) {
 #' @keywords internal
 is_airtable_api_url <- function(url,
                                 api_url = NULL) {
-  if (!is_string(url)) {
-    return(FALSE)
+  if (!all(is_character(url))) {
+    url <- as.character(url)
   }
 
   api_url <- api_url %||%
@@ -99,6 +99,8 @@ parse_airtable_url <- function(url,
                                require_view = FALSE,
                                require_field = FALSE,
                                call = caller_env()) {
+  check_url(url, call = call)
+
   ids <-
     vctrs::list_drop_empty(
       list(
@@ -136,7 +138,6 @@ parse_url_base_id <- function(url,
 
   if (is_airtable_api_url(url, api_url)) {
     # FIXME: api_url is not required if base ID matches pattern
-
     base_pattern <- glue(
       "((?<=/){base_name}(?=/))|((?<=/){base_name}$)|((?<=/){base_name}(?=\\?))"
     )
@@ -227,6 +228,18 @@ parse_url_workspace_id <- function(url) {
 #' @inheritParams base::regexpr
 #' @noRd
 string_extract <- function(string, pattern, perl = TRUE) {
+  if (length(string) > 1) {
+    match <- vapply(
+      string,
+      string_extract,
+      FUN.VALUE = NA_character_,
+      pattern = pattern,
+      perl = perl
+    )
+
+    return(match)
+  }
+
   if (is.na(string)) {
     return(NA_character_)
   }

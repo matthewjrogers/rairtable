@@ -14,8 +14,8 @@
 #'   record IDs are stored in row names (default option for [read_airtable()]).
 #'   Defaults to `NULL` which is set to `getOption("rairtable.id_col",
 #'   "airtable_record_id")`.
-#' @param records Character vector with record IDs. Optional if data is
-#'   provided.
+#' @param records Character vector with record IDs. A vector of record or cell
+#'   URLs is also supported. Optional if data is provided.
 #' @param safely If `TRUE`, ask for confirmation before deleting Airtable
 #'   records and abort if confirmation is not provided.
 #' @param batch_size Deprecated. Number of records to delete in a single batch.
@@ -43,10 +43,10 @@ delete_records <- function(data = NULL,
     )
   }
 
-  airtable_id_col <- airtable_id_col %||%
-    getOption("rairtable.id_col", "airtable_record_id")
-
   if (!is_null(data)) {
+    airtable_id_col <- airtable_id_col %||%
+      getOption("rairtable.id_col", "airtable_record_id")
+
     if (!is_null(records)) {
       cli::cli_alert_warning(
         "{.arg records} is ignored when {.arg data} is supplied."
@@ -62,6 +62,8 @@ delete_records <- function(data = NULL,
         or a data frame with rownames."
       )
     }
+  } else if (all(is_url(records))) {
+    records <- parse_url_record_id(records)
   }
 
   check_character(records)
