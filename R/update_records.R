@@ -3,13 +3,15 @@
 #' Update one or more fields in an Airtable table based on a data frame. Set
 #' `safely = FALSE` to delete records outside of an interactive session.
 #'
-#' Find more information on the Airtable API methods for updating a record
-#' <https://airtable.com/developers/web/api/update-record> or multiple records
-#' <https://airtable.com/developers/web/api/update-multiple-records>.
+#' Find more information on the Airtable API methods for [updating a single
+#' record](https://airtable.com/developers/web/api/update-record) or [multiple
+#' records](https://airtable.com/developers/web/api/update-multiple-records).
 #'
 #' @param data A data frame containing the fields to update. If records is
 #'   `NULL`, data must include a column of record IDs (named by airtable_id_col)
-#'   or rownames with record IDs.
+#'   or rownames with record IDs. If the data frame is originally created using
+#'   `list_records()`, make sure to drop the "createdTime" and/or "commentCount"
+#'   columns.
 #' @param airtable An `airtable` object. Optional if url or base and table are
 #'   provided with additional parameters passed to [request_airtable()].
 #' @param airtable_id_col Column containing Airtable record IDs. Not required if
@@ -20,9 +22,9 @@
 #'   <https://tidyselect.r-lib.org/reference/index.html#language-and-helpers>
 #'   for documentation on helpers.
 #' @param records A character vector of record IDs indicating which Airtable
-#'   records to replace with the updated values from data. Optional if data has
-#'   a record ID column (named by airtable_id_col) or rownames with record IDs.
-#'   Defaults to `NULL`.
+#'   records to replace with the updated values from data. A vector of record or
+#'   cell URLs is also supported. Optional if data has a record ID column (named
+#'   by airtable_id_col) or rownames with record IDs. Defaults to `NULL`.
 #' @param safely If `TRUE`, confirm number and names of columns to update and
 #'   number of rows before executing update.
 #' @inheritParams return_data_resp
@@ -37,13 +39,19 @@ update_records <- function(data,
                            airtable_id_col = NULL,
                            columns = tidyselect::everything(),
                            records = NULL,
-                           safely = TRUE,
+                           model = NULL,
+                           fields_by_id = FALSE,
+                           typecast = FALSE,
                            return_data = TRUE,
+                           safely = TRUE,
+                           token = NULL,
                            ...) {
   if (is_null(records)) {
     airtable_id_col <- airtable_id_col %||%
       getOption("rairtable.id_col", "airtable_record_id")
     records <- get_record_id_col(data = data, id_col = airtable_id_col)
+  } else if (all(is_url(records))) {
+    records <- parse_url_record_id(records)
   }
 
   check_character(records)
@@ -55,12 +63,29 @@ update_records <- function(data,
     id_col = airtable_id_col
   )
 
-  update_col_names <- get_data_colnames(columns, data = update_data)
+  update_fields <- get_data_colnames(columns, .data = update_data)
+
+  if (!is_null(model)) {
+    update_fields <- try_fetch(
+      field_name_match(
+        update_fields,
+        model = model,
+        error_arg = "fields"
+      ),
+      error = function(cnd) {
+        cli_abort(
+          c("{.arg data} has column names that can't be found
+            in the fields of the supplied {.arg model}"),
+          parent = cnd
+        )
+      }
+    )
+  }
 
   safety_check(
     safely = safely,
     c(
-      ">" = "Updating values for the {.field {update_col_names}} field{?s} in
+      ">" = "Updating values for the {.field {update_fields}} field{?s} in
       {n_records} record{?s}."
     ),
     message = "Record update cancelled."
@@ -70,7 +95,10 @@ update_records <- function(data,
     airtable = airtable,
     ...,
     records = records,
-    data = update_data
+    data = update_data,
+    fields_by_id = fields_by_id,
+    typecast = typecast,
+    token = token
   )
 
   cli::cli_progress_step(
@@ -84,17 +112,20 @@ update_records <- function(data,
 #' Update one or more records in an Airtable base
 #'
 #' @param req A HTTP response created by [req_airtable()]. Optional if
-#'   airttable, url, *or* base and table are passed to [request_airtable()].
+#'   airtable, url, *or* base and table are passed to [request_airtable()].
 #' @inheritDotParams request_airtable -api_url
+#' @param field_by_id If `TRUE`, the response to the API request is keyed by
+#'   field IDs instead of field names. The response is only returned if
+#'   `return_data = FALSE`.
 #' @inheritParams req_airtable
 #' @param records,record Record ID or IDs to update as a character vector.
-#'   Required.
 #' @keywords internal
 #' @importFrom httr2 req_body_json req_perform
 req_update_records <- function(req = NULL,
                                ...,
                                records,
                                data,
+                               fields_by_id = FALSE,
                                typecast = FALSE,
                                method = NULL,
                                token = NULL,
@@ -142,6 +173,7 @@ req_update_records <- function(req = NULL,
             req = req,
             records = batched_records[[i]],
             data = batched_data[[i]],
+            fields_by_id = fields_by_id,
             typecast = typecast,
             call = call
           )
@@ -156,6 +188,7 @@ req_update_records <- function(req = NULL,
     req,
     data = list(
       "fields" = make_list_of_lists(data, 1, call = call),
+      "returnFieldsByFieldId" = fields_by_id,
       "typecast" = typecast
     )
   )
@@ -171,8 +204,9 @@ req_update_record <- function(req = NULL,
                               ...,
                               record,
                               data,
-                              typecast = FALSE,
+                              typecast = TRUE,
                               method = NULL,
+                              token = NULL,
                               call = caller_env()) {
   method <- match.arg(method, c("PATCH", "PUT"))
 
@@ -183,7 +217,8 @@ req_update_record <- function(req = NULL,
       data,
       max_rows = 1,
       call = call
-    )[[1]]
+    )[[1]],
+    "typecast" = typecast
   )
 
   req <- req_airtable(
@@ -192,6 +227,7 @@ req_update_record <- function(req = NULL,
     record = record,
     method = method,
     data = data,
+    token = token,
     call = call
   )
 

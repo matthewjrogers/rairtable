@@ -6,6 +6,9 @@
 #' @param data A data frame or list of records to create in Airtable. Column
 #'   names or the names of list values must match the field names used in the
 #'   Airtable base. Required.
+#' @param field_by_id If `TRUE`, the response to the API request is keyed by
+#'   field IDs instead of field names. This response is only returned if
+#'   `return_data = FALSE`.
 #' @param typecast If `TRUE` (default), values will be converted to match the
 #'   base if possible. typecase must be set to `TRUE` to add new values to a
 #'   multiselect field type.
@@ -19,6 +22,7 @@
 req_create_records <- function(req = NULL,
                                ...,
                                data,
+                               fields_by_id = FALSE,
                                typecast = TRUE,
                                token = NULL,
                                call = caller_env()) {
@@ -57,7 +61,11 @@ req_create_records <- function(req = NULL,
 
   req <- httr2::req_body_json(
     req,
-    data = list("records" = split_list(data, 1), "typecast" = typecast)
+    data = list(
+      "records" = split_list(data, 1),
+      "returnFieldsByFieldId" = field_by_id,
+      "typecast" = typecast
+      )
   )
 
   httr2::req_perform(req, error_call = call)

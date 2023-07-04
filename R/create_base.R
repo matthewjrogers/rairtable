@@ -40,10 +40,10 @@ create_base <- function(name,
 
   check_list(tables)
 
-  # TODO: Consider swapping this for a check_table_config
   if (!all(vapply(
     tables,
     function(x) {
+      # TODO: Consider swapping this for check_table_config
       all(has_name(x, c("name", "fields")))
     },
     TRUE
@@ -59,7 +59,7 @@ create_base <- function(name,
     ...
   )
 
-  check_string(workspace)
+  check_string(workspace, allow_empty = FALSE)
 
   resp <- request_airtable_meta(
     meta = "create_base",
