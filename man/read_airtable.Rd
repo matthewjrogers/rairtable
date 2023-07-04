@@ -25,6 +25,7 @@ list_records(
   fields = NULL,
   sort = NULL,
   direction = "asc",
+  filter = NULL,
   fields_by_id = FALSE,
   cell_format = NULL,
   tz = NULL,
@@ -95,13 +96,21 @@ include base and table.}
 \item{view}{Airtable view ID. View ID values starts with "viw". Optional if
 require_view is \code{FALSE}.}
 
-\item{sort}{Field to sort by, Default: \code{NULL}}
+\item{sort}{Field names to sort by. Defaults to \code{NULL}.}
 
 \item{direction}{A string ("asc" for ascending (default) or "desc" for
 descending) or character vector matching length of sort parameter. Ignored
 if sort is \code{NULL}.}
 
-\item{fields_by_id}{If \code{TRUE}, return fields by id, Default: \code{FALSE}}
+\item{filter}{A formula using field names or IDs used to filter records where
+records that evaluate to to 0, false, "", NaN, \verb{[]}, or #Error! are excluded
+from the results. Testing your formula using the Airtable Formula field
+user interface is recommended. If view is supplied, only records in the
+view are included. Learn more in the Airtable API documentation \href{https://support.airtable.com/docs/airtable-web-api-using-filterbyformula-or-sort-parameters}{on the filterByFormula parameter}
+or the \href{https://support.airtable.com/docs/formula-field-reference}{formula field reference}.}
+
+\item{fields_by_id}{If \code{TRUE}, use fields IDs for column names in returned
+records. If \code{FALSE} (default), use field names.}
 
 \item{cell_format}{Cell format for "Link to another record" fields. Defaults
 to "json" which returns a unique record ID. A "string" cell_format returns
@@ -111,10 +120,9 @@ the displayed character string.}
 "string", tz defaults to \code{Sys.timezone()} and locale defaults to
 \code{Sys.getlocale("LC_TIME")}.}
 
-\item{max_records}{Maximum number of records to return, Default: \code{NULL}. Must
-be 100 or less.}
+\item{max_records}{Maximum number of records to return. Must be 100 or less.}
 
-\item{page_size}{Max records to return per page, Default: \code{NULL}}
+\item{page_size}{Maximum number of records to return per page.}
 
 \item{metadata}{Record metadata columns to include with returned data frame.
 Options including "id", "createdTime", and "commentCount". Defaults to
@@ -122,10 +130,8 @@ Options including "id", "createdTime", and "commentCount". Defaults to
 added to the returned data frame.}
 
 \item{offset}{Offset value to passed to \code{\link[httr2:req_url]{httr2::req_url_query()}} as part of
-the API call. See
-\url{https://airtable.com/developers/web/api/list-records#response-offset} for
-more information on how the offset value is used by the Airtable API.
-Primarily intended for developer use only.}
+the API call. Intended for developer use only. See the \href{https://airtable.com/developers/web/api/list-records#response-offset}{Airtable API documentation on the offset value}
+is used by the Airtable API.}
 
 \item{record}{Record ID (a string starting with "rec"). Required for
 \code{\link[=get_record]{get_record()}}.}
@@ -136,12 +142,14 @@ provided by the airtable parameter.
 }
 \description{
 Read records from a table in an Airtable base. \code{\link[=read_airtable]{read_airtable()}} supports
-basic access to data based on an airtable object. \code{\link[=list_records]{list_records()}}
-and \code{\link[=get_record]{get_record()}} allows you to pass url or base and table directly
-and supports more options from the Airtable API.
+basic access to data based on an airtable object. \code{\link[=list_records]{list_records()}} and
+\code{\link[=get_record]{get_record()}} allows you to pass url or base and table directly and supports
+more options from the Airtable API. Note that returned records do not include
+any fields with empty values, e.g. "". If a column in an Airtable table is
+blank, the column is not included in the data frame returned by any of these
+functions.
 }
 \details{
-Find more information on the list records API method:
-\url{https://airtable.com/developers/web/api/list-records} or get record API
-method: \url{https://airtable.com/developers/web/api/get-record}
+Read the Airtable API documentation for on the \href{https://airtable.com/developers/web/api/list-records}{list records API method} or \href{https://airtable.com/developers/web/api/get-record}{get record API method} for more
+information.
 }

@@ -1,13 +1,17 @@
 #' Read records from an Airtable table
 #'
 #' Read records from a table in an Airtable base. [read_airtable()] supports
-#' basic access to data based on an airtable object. [list_records()]
-#' and [get_record()] allows you to pass url or base and table directly
-#' and supports more options from the Airtable API.
+#' basic access to data based on an airtable object. [list_records()] and
+#' [get_record()] allows you to pass url or base and table directly and supports
+#' more options from the Airtable API. Note that returned records do not include
+#' any fields with empty values, e.g. "". If a column in an Airtable table is
+#' blank, the column is not included in the data frame returned by any of these
+#' functions.
 #'
-#' Find more information on the list records API method:
-#' <https://airtable.com/developers/web/api/list-records> or get record API
-#' method: <https://airtable.com/developers/web/api/get-record>
+#' Read the Airtable API documentation for on the [list records API
+#' method](https://airtable.com/developers/web/api/list-records) or [get record
+#' API method](https://airtable.com/developers/web/api/get-record) for more
+#' information.
 #'
 #' @param airtable An `airtable` class object. Optional for [read_airtable()] if
 #'   url is supplied. For [list_records()] and
@@ -115,6 +119,7 @@ list_records <- function(airtable = NULL,
                          fields = NULL,
                          sort = NULL,
                          direction = "asc",
+                         filter = NULL,
                          fields_by_id = FALSE,
                          cell_format = NULL,
                          tz = NULL,
@@ -134,6 +139,7 @@ list_records <- function(airtable = NULL,
     fields = fields,
     sort = sort,
     direction = direction,
+    filter = filter,
     fields_by_id = fields_by_id,
     cell_format = cell_format,
     tz = tz,
@@ -221,25 +227,34 @@ get_record <- function(airtable = NULL,
 #' @param view Airtable view ID or name, Default: `NULL`. If the supplied url or
 #'   airtable object includes a view, the view provided to this parameter is
 #'   ignored.
-#' @param fields Fields to return from Airtable base, Default: `NULL`
-#' @param sort Field to sort by, Default: `NULL`
+#' @param fields Fields names or IDs to return from Airtable base.
+#' @param sort Field names to sort by. Defaults to `NULL`.
 #' @param direction A string ("asc" for ascending (default) or "desc" for
 #'   descending) or character vector matching length of sort parameter. Ignored
 #'   if sort is `NULL`.
-#' @param max_records Maximum number of records to return, Default: `NULL`. Must
-#'   be 100 or less.
-#' @param page_size Max records to return per page, Default: `NULL`
+#' @param filter A formula using field names or IDs used to filter records where
+#'   records that evaluate to to 0, false, "", NaN, `[]`, or #Error! are excluded
+#'   from the results. Testing your formula using the Airtable Formula field
+#'   user interface is recommended. If view is supplied, only records in the
+#'   view are included. Learn more in the Airtable API documentation [on the
+#'   filterByFormula
+#'   parameter](https://support.airtable.com/docs/airtable-web-api-using-filterbyformula-or-sort-parameters)
+#'   or the [formula field
+#'   reference](https://support.airtable.com/docs/formula-field-reference).
+#' @param fields_by_id If `TRUE`, use fields IDs for column names in returned
+#'   records. If `FALSE` (default), use field names.
 #' @param cell_format Cell format for "Link to another record" fields. Defaults
 #'   to "json" which returns a unique record ID. A "string" cell_format returns
 #'   the displayed character string.
 #' @param tz,locale Time zone and locale, Defaults to `NULL`. If cell_format is
 #'   "string", tz defaults to `Sys.timezone()` and locale defaults to
 #'   `Sys.getlocale("LC_TIME")`.
-#' @param fields_by_id If `TRUE`, return fields by id, Default: `FALSE`
 #' @param metadata Record metadata columns to include with returned data frame.
 #'   Options including "id", "createdTime", and "commentCount". Defaults to
 #'   `c("id", "createdTime")`. If metadata is `NULL`, no additional fields are
 #'   added to the returned data frame.
+#' @param max_records Maximum number of records to return. Must be 100 or less.
+#' @param page_size Maximum number of records to return per page.
 #' @keywords internal
 #' @importFrom httr2 req_url_query
 #' @importFrom rlang exec
@@ -437,10 +452,10 @@ req_record_cell_format <- function(req,
 #' @param req A modified HTTP request from [request_airtable()] or a httr2
 #'   function.
 #' @param offset Offset value to passed to [httr2::req_url_query()] as part of
-#'   the API call. See
-#'   <https://airtable.com/developers/web/api/list-records#response-offset> for
-#'   more information on how the offset value is used by the Airtable API.
-#'   Primarily intended for developer use only.
+#'   the API call. Intended for developer use only. See the [Airtable API
+#'   documentation on the offset
+#'   value](https://airtable.com/developers/web/api/list-records#response-offset)
+#'   is used by the Airtable API.
 #' @keywords internal
 #' @importFrom httr2 req_url_query req_perform resp_body_json
 #' @importFrom tibble as_tibble

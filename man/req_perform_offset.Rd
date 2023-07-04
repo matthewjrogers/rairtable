@@ -32,10 +32,8 @@ resp_body_records(
 function.}
 
 \item{offset}{Offset value to passed to \code{\link[httr2:req_url]{httr2::req_url_query()}} as part of
-the API call. See
-\url{https://airtable.com/developers/web/api/list-records#response-offset} for
-more information on how the offset value is used by the Airtable API.
-Primarily intended for developer use only.}
+the API call. Intended for developer use only. See the \href{https://airtable.com/developers/web/api/list-records#response-offset}{Airtable API documentation on the offset value}
+is used by the Airtable API.}
 
 \item{type}{"combine" (default) combines the data frames with fields and
 records from the API response. Additional supported options are "records"

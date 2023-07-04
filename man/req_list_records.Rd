@@ -30,15 +30,23 @@ req_list_records(
 airtable object includes a view, the view provided to this parameter is
 ignored.}
 
-\item{fields}{Fields to return from Airtable base, Default: \code{NULL}}
+\item{fields}{Fields names or IDs to return from Airtable base.}
 
-\item{sort}{Field to sort by, Default: \code{NULL}}
+\item{sort}{Field names to sort by. Defaults to \code{NULL}.}
 
 \item{direction}{A string ("asc" for ascending (default) or "desc" for
 descending) or character vector matching length of sort parameter. Ignored
 if sort is \code{NULL}.}
 
-\item{fields_by_id}{If \code{TRUE}, return fields by id, Default: \code{FALSE}}
+\item{filter}{A formula using field names or IDs used to filter records where
+records that evaluate to to 0, false, "", NaN, \verb{[]}, or #Error! are excluded
+from the results. Testing your formula using the Airtable Formula field
+user interface is recommended. If view is supplied, only records in the
+view are included. Learn more in the Airtable API documentation \href{https://support.airtable.com/docs/airtable-web-api-using-filterbyformula-or-sort-parameters}{on the filterByFormula parameter}
+or the \href{https://support.airtable.com/docs/formula-field-reference}{formula field reference}.}
+
+\item{fields_by_id}{If \code{TRUE}, use fields IDs for column names in returned
+records. If \code{FALSE} (default), use field names.}
 
 \item{cell_format}{Cell format for "Link to another record" fields. Defaults
 to "json" which returns a unique record ID. A "string" cell_format returns
@@ -53,10 +61,9 @@ Options including "id", "createdTime", and "commentCount". Defaults to
 \code{c("id", "createdTime")}. If metadata is \code{NULL}, no additional fields are
 added to the returned data frame.}
 
-\item{max_records}{Maximum number of records to return, Default: \code{NULL}. Must
-be 100 or less.}
+\item{max_records}{Maximum number of records to return. Must be 100 or less.}
 
-\item{page_size}{Max records to return per page, Default: \code{NULL}}
+\item{page_size}{Maximum number of records to return per page.}
 }
 \description{
 Build a request for the Airtable list records API method
