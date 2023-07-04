@@ -65,6 +65,7 @@ copy_table_config <- function(table = NULL,
                               model = NULL,
                               name = NULL,
                               description = NULL,
+                              airtable = NULL,
                               ...,
                               call = caller_env()) {
   if (!all(has_name(model, c("name", "fields")))) {
@@ -72,6 +73,9 @@ copy_table_config <- function(table = NULL,
 
     model <- get_table_model(
       table = table,
+      # TODO: Double-check when/if the airtable parameter (or a url parameter)
+      # is required here
+      airtable = airtable,
       ...,
       call = call
     )
@@ -80,6 +84,7 @@ copy_table_config <- function(table = NULL,
   make_table_config(
     name = name %||% model[["name"]],
     description = description %||% model[["description"]],
+    # TODO: combine model field config  with a new fields arg using modifyList
     fields = get_field_config(model[["fields"]], call = call),
     call = call
   )
