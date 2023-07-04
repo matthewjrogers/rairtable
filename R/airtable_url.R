@@ -207,6 +207,20 @@ parse_url_record_id <- function(url) {
   string_extract(url, record_pattern)
 }
 
+#' Parse workspace ID from URL
+#'
+#' @noRd
+parse_url_workspace_id <- function(url) {
+  workspace_name <- "wsp[[:alnum:]]+"
+
+  workspace_pattern <-
+    glue(
+      "((?<=/){workspace_name}(?=/|\\?))|((?<=/){workspace_name}$)"
+    )
+
+  string_extract(url, workspace_pattern)
+}
+
 #' Extract pattern from a length 1 string
 #'
 #' @param string Passed to x parameter of [regmatches()]
