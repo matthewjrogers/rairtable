@@ -1,0 +1,162 @@
+---
+title: "Using the Airtable Metadata API"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{metadata}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+Airtable's REST API allows users to list, update, create, and delete both records on records. In November 2022, Airtable launched a public version of the Metadata API to allow users to read and edit the structure of an Airtable base. This vignette shows the functions 
+
+- `list_bases()`
+- `airtable_base()` or `get_base_schema()` (and the related helper functions `get_table_models()` and `get_table_model()`)
+- `create_base()`
+- `create_table()` and `update_table()`
+- `create_field()` and `update_field()`
+
+Note that the Airtable metadata API does *not* work with an Airtable API key.
+
+```{r setup}
+library(rairtable)
+```
+
+## Basic functions
+
+### List bases
+
+`list_bases()` lists all of the bases associated with a personal access token.
+
+```{r}
+# list_bases()
+```
+
+### Get base schema or table models
+
+`airtable_base()` provides a bare list with a base ID string, an
+`airtable_schema` object, and a list of `airtable_table_schema` objects. The table schema objects are similar to the table model objects created or used by other metadata access functions in this package but do not include the full fields metadata used by the other outputs.
+
+```{r}
+atbl <- airtable(
+  table = "https://airtable.com/appns7sldmZsLzhyh/tblM3C3UG8AgfFw9L/viw6JYs9BoW9Q3ndI?blocks=hide"
+)
+
+atbl_base <- airtable_base(atbl)
+
+str(atbl_base)
+```
+
+Using the lower level `get_base_schema()` function allows you to get a data frame or a list by using the simplifyVector parameter:
+
+```{r}
+schema_df <- get_base_schema(atbl)
+
+str(schema_df)
+```
+
+A schema is either a data frame or a list of tables with each element having a name, table ID, and field array:
+
+```{r}
+schema <- get_base_schema(atbl, simplifyVector = FALSE)
+
+str(schema)
+```
+
+A list of table models can be pulled from a schema:
+
+```{r}
+model <- get_table_models(schema = schema)[[1]]
+# get_table_model(table = 1, schema = schema)
+
+recs <- list_records(
+  airtable = atbl
+)
+
+recs
+```
+
+## Using metadata objects in other rairtable functions
+
+### Using table models for validation
+
+Then this model can be used to validate column names when using the fields or sort parameter of `list_records()` or validate column names when updating records with `update_records()`
+
+```{r}
+recs <- list_records(
+  airtable = atbl,
+  fields = "Assignee",
+  model = model
+)
+ 
+# This call will error
+# recs <- list_records(
+#   airtable = atbl,
+#   fields = "Assignee2",
+#   model = model
+# )
+```
+
+A table model can also be converted into a table config which is similar to a model but drops the table ID and field IDs.
+
+```{r}
+tbl_config <- copy_table_config(
+  model = model
+)
+
+str(tbl_config)
+```
+
+Fields from a table config from an existing table can be used to create a new table.
+
+```{r}
+new_table <- create_table(
+  base = atbl$base,
+  name = "New table",
+  fields = tbl_config[["fields"]]
+)
+```
+
+Note that there is currently no API method for deleting tables or fields.
+
+A field config is just a list of fields element of a table config.
+
+```{r}
+fld_config <- get_field_config(model = model)
+
+identical(fld_config, tbl_config[["fields"]])
+```
+
+A field config can be used to create a new field.
+
+```{r}
+create_field(
+  base = atbl$base,
+  table = new_table$id,
+  name = "New field",
+  config = fld_config[[1]]
+)
+```
+
+Note that create field requires a table ID, it does not work with a table name at this time.
+
+### Creating a new base from a schema
+
+In combination, these functions support the option to duplicate much of the content from an existing base to create a new one with matching tables and fields.
+
+```{r}
+create_base(
+  name = "Airtable base created with schema",
+  workspace = "https://airtable.com/workspaces/wspimIukKye9X23Lx?",
+  schema = schema
+)
+```
+
