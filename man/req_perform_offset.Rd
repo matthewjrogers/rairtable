@@ -13,6 +13,7 @@ req_perform_offset(
   metadata = c("id", "createdTime", "commentCount"),
   max_rows = NULL,
   .name_repair = "unique",
+  simplifyVector = TRUE,
   call = caller_env()
 )
 

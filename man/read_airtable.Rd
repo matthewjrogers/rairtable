@@ -36,13 +36,14 @@ list_records(
   offset = NULL,
   model = NULL,
   .name_repair = "unique",
+  simplifyVector = TRUE,
   token = NULL,
   ...
 )
 
 get_record(
   airtable = NULL,
-  record,
+  record = NULL,
   airtable_id_col = NULL,
   cell_format = NULL,
   tz = NULL,
@@ -50,6 +51,7 @@ get_record(
   metadata = c("id", "createdTime"),
   model = NULL,
   .name_repair = "unique",
+  simplifyVector = TRUE,
   token = NULL,
   ...
 )
@@ -133,12 +135,18 @@ added to the returned data frame.}
 the API call. Intended for developer use only. See the \href{https://airtable.com/developers/web/api/list-records#response-offset}{Airtable API documentation on the offset value}
 is used by the Airtable API.}
 
+\item{simplifyVector}{Passed to \code{\link[httr2:req_body]{httr2::req_body_json()}}. If \code{FALSE},
+\code{\link[=get_record]{get_record()}} and \code{\link[=list_records]{list_records()}} both return named lists of records.}
+
 \item{record}{Record ID (a string starting with "rec"). Required for
-\code{\link[=get_record]{get_record()}}.}
+\code{\link[=get_record]{get_record()}} unless a field or cell URL is provided.}
 }
 \value{
 A data frame with the records from the Airtable base and table
-provided by the airtable parameter.
+provided by the airtable parameter. If simplifyVector is \code{FALSE}, a list is
+returned with each element containing nested elements that match the
+metadata values and an element "fields" that contains a named list of
+fields from the Airtable.
 }
 \description{
 Read records from a table in an Airtable base. \code{\link[=read_airtable]{read_airtable()}} supports

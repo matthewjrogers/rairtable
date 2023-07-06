@@ -32,6 +32,8 @@
 #'   model is used to validate fields and sort parameters and to arrange columns
 #'   to match the order of the table model.
 #' @param max_rows Deprecated. Maximum number of rows to read.
+#' @param simplifyVector Passed to [httr2::req_body_json()]. If `FALSE`,
+#'   [get_record()] and [list_records()] both return named lists of records.
 #' @param ... For [read_airtable()], additional query parameters, such as url,
 #'   can be passed to [req_airtable()]. For [list_records()] and [get_record()],
 #'   additional parameters are passed to [request_airtable()] and can also
@@ -39,7 +41,10 @@
 #' @inheritParams rlang::args_error_context
 #'
 #' @return A data frame with the records from the Airtable base and table
-#'   provided by the airtable parameter.
+#'   provided by the airtable parameter. If simplifyVector is `FALSE`, a list is
+#'   returned with each element containing nested elements that match the
+#'   metadata values and an element "fields" that contains a named list of
+#'   fields from the Airtable.
 #'
 #' @export
 #'
@@ -130,6 +135,7 @@ list_records <- function(airtable = NULL,
                          offset = NULL,
                          model = NULL,
                          .name_repair = "unique",
+                         simplifyVector = TRUE,
                          token = NULL,
                          ...) {
   req <- req_list_records(
@@ -156,10 +162,11 @@ list_records <- function(airtable = NULL,
     airtable_id_col = airtable_id_col,
     metadata = metadata,
     .name_repair = .name_repair,
+    simplifyVector = simplifyVector,
     offset = offset
   )
 
-  if (!is_null(model)) {
+  if (!is_null(model) && simplifyVector) {
     # Reorder columns to match order in model if supplied
     records <- arrange_record_cols(records, metadata, model)
   }
@@ -170,11 +177,11 @@ list_records <- function(airtable = NULL,
 #' @rdname read_airtable
 #' @name get_record
 #' @param record Record ID (a string starting with "rec"). Required for
-#'   [get_record()].
+#'   [get_record()] unless a field or cell URL is provided.
 #' @export
 #' @importFrom httr2 req_perform
 get_record <- function(airtable = NULL,
-                       record,
+                       record = NULL,
                        airtable_id_col = NULL,
                        cell_format = NULL,
                        tz = NULL,
@@ -182,10 +189,16 @@ get_record <- function(airtable = NULL,
                        metadata = c("id", "createdTime"),
                        model = NULL,
                        .name_repair = "unique",
+                       simplifyVector = TRUE,
                        token = NULL,
                        ...) {
   req <- request_airtable(
     airtable = airtable,
+    ...
+  )
+
+  record <- get_record_id(
+    record = record,
     ...
   )
 
@@ -210,10 +223,11 @@ get_record <- function(airtable = NULL,
     resp,
     airtable_id_col = airtable_id_col,
     metadata = metadata,
-    .name_repair = .name_repair
+    .name_repair = .name_repair,
+    simplifyVector = simplifyVector
   )
 
-  if (!is_null(model)) {
+  if (!is_null(model) && simplifyVector) {
     # Reorder columns to match order in model if supplied
     record <- arrange_record_cols(record, metadata = metadata, model)
   }
@@ -467,6 +481,7 @@ req_perform_offset <- function(req,
                                metadata = c("id", "createdTime", "commentCount"),
                                max_rows = NULL,
                                .name_repair = "unique",
+                               simplifyVector = TRUE,
                                call = caller_env()) {
   max_rows <- max_rows %||% 50000
   check_number_whole(max_rows, max = 50000, call = call)
@@ -493,6 +508,7 @@ req_perform_offset <- function(req,
         type = type,
         airtable_id_col = airtable_id_col,
         metadata = metadata,
+        simplifyVector = simplifyVector,
         .name_repair = .name_repair,
         call = call
       )
@@ -503,6 +519,10 @@ req_perform_offset <- function(req,
       # End loop if no offset returned
       break
     }
+  }
+
+  if (!simplifyVector) {
+    return(vctrs::list_drop_empty(c(body_list)))
   }
 
   tibble::as_tibble(
@@ -540,9 +560,14 @@ resp_body_records <- function(resp,
                               call = caller_env()) {
   body <- httr2::resp_body_json(resp, simplifyVector = simplifyVector)
 
+  if (!simplifyVector) {
+    return(body)
+  }
+
   type <- arg_match0(
-    type, c("records", "fields", "combine"), error_call = call
-    )
+    type, c("records", "fields", "combine"),
+    error_call = call
+  )
 
   if (has_name(body, "records")) {
     # Used by read_airtable and list_records
@@ -571,7 +596,7 @@ resp_body_records <- function(resp,
       .data = records,
       tidyselect::any_of(metadata),
       call = call
-      )
+    )
 
     record_nm <- names(records)
 
