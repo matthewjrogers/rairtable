@@ -83,6 +83,7 @@ is_workspace_id <- function(x) {
 get_base_id <- function(base = NULL,
                         airtable = NULL,
                         url = NULL,
+                        ...,
                         call = caller_env()) {
   base <- base %||% airtable %||% url
 
@@ -115,6 +116,7 @@ get_table_id <- function(table = NULL,
                          airtable = NULL,
                          url = NULL,
                          table_name = NULL,
+                         ...,
                          call = caller_env()) {
   table <- table %||% airtable %||% url
 
@@ -144,6 +146,7 @@ get_table_id <- function(table = NULL,
 #' @noRd
 get_field_id <- function(column = NULL,
                          url = NULL,
+                         ...,
                          call = caller_env()) {
   column <- column %||% url
 
@@ -169,6 +172,7 @@ get_field_id <- function(column = NULL,
 #' @noRd
 get_record_id <- function(record = NULL,
                           url = NULL,
+                          ...,
                           call = caller_env()) {
   record <- record %||% url
 
@@ -193,8 +197,9 @@ get_record_id <- function(record = NULL,
 #'
 #' @noRd
 get_workspace_id <- function(workspace = NULL,
-                          url = NULL,
-                          call = caller_env()) {
+                             url = NULL,
+                             ...,
+                             call = caller_env()) {
   workspace <- workspace %||% url
 
   if (is_workspace_id(workspace)) {
