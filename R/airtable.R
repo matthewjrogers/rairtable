@@ -207,11 +207,10 @@ print.airtable <- function(x, ...) {
       list("vec-trunc" = getOption("rairtable.fields-trunc", 6))
     )
 
-    text <-
-      c(
-        text,
-        "*" = "{length(x$fields)} field{?s} including {.field {fields}}."
-      )
+    text <- c(
+      text,
+      "*" = "{length(x$fields)} field{?s} including {.field {fields}}."
+    )
   }
 
   cli::cli_bullets(text)

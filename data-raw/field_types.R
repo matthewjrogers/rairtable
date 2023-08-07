@@ -15,8 +15,7 @@
 #     "createdBy", "lastModifiedBy", "externalSyncSource"
 #   )
 
-field_types <-
-  tibble::tribble(
+field_types <- tibble::tribble(
                       ~type,                    ~name,                                                                             ~url,      ~class, ~read_only, ~options,
                "autoNumber",            "Auto number",               "https://airtable.com//developers/web/api/field-model#auto-number", "character",       TRUE,     TRUE,
                   "barcode",                "Barcode",                   "https://airtable.com//developers/web/api/field-model#barcode", "character",       TRUE,     TRUE,

@@ -49,7 +49,7 @@ is_airtable_url <- function(url, base_url = NULL, allow_shared = FALSE) {
 #'
 #' @noRd
 is_url <- function(x) {
-  if (is_null(x)) {
+  if (!is_vector(x) || is_empty(x)) {
     return(FALSE)
   }
 
@@ -101,15 +101,14 @@ parse_airtable_url <- function(url,
                                call = caller_env()) {
   check_url(url, call = call)
 
-  ids <-
-    vctrs::list_drop_empty(
-      list(
-        "base" = parse_url_base_id(url, base_url, api_url, call),
-        "table" = parse_url_table_id(url, table_name, call),
-        "view" = parse_url_view_id(url, view_name, call),
-        "field" = parse_url_field_id(url)
-      )
+  ids <- vctrs::list_drop_empty(
+    list(
+      "base" = parse_url_base_id(url, base_url, api_url, call),
+      "table" = parse_url_table_id(url, table_name, call),
+      "view" = parse_url_view_id(url, view_name, call),
+      "field" = parse_url_field_id(url)
     )
+  )
 
   check_parsed_airtable_url(
     ids,
@@ -159,10 +158,9 @@ parse_url_base_id <- function(url,
 parse_url_table_id <- function(url, table_name = NULL, call = caller_env()) {
   table_name <- table_name %||% "tbl[[:alnum:]]+"
   check_string(table_name, call = call)
-  table_pattern <-
-    glue(
-      "((?<=/){table_name}(?=/))|((?<=/){table_name}$)|((?<=/){table_name}(?=\\?))"
-    )
+  table_pattern <- glue(
+    "((?<=/){table_name}(?=/))|((?<=/){table_name}$)|((?<=/){table_name}(?=\\?))"
+  )
 
   string_extract(url, table_pattern)
 }
@@ -173,10 +171,9 @@ parse_url_table_id <- function(url, table_name = NULL, call = caller_env()) {
 parse_url_view_id <- function(url, view_name = NULL, call = caller_env()) {
   view_name <- view_name %||% "viw[[:alnum:]]+"
   check_string(view_name, call = call)
-  view_pattern <-
-    glue(
-      "((?<=/){view_name}(?=/|\\?))|((?<=/){view_name}$)|((?<=view\\=){view_name})"
-    )
+  view_pattern <- glue(
+    "((?<=/){view_name}(?=/|\\?))|((?<=/){view_name}$)|((?<=view\\=){view_name})"
+  )
 
   string_extract(url, view_pattern)
 }
@@ -186,10 +183,9 @@ parse_url_view_id <- function(url, view_name = NULL, call = caller_env()) {
 #' @noRd
 parse_url_field_id <- function(url) {
   field_name <- "fld[[:alnum:]]+"
-  field_pattern <-
-    glue(
-      "((?<=/){field_name}(?=/|\\?))|((?<=/){field_name}$)"
-    )
+  field_pattern <- glue(
+    "((?<=/){field_name}(?=/|\\?))|((?<=/){field_name}$)"
+  )
 
   string_extract(url, field_pattern)
 }
@@ -200,10 +196,9 @@ parse_url_field_id <- function(url) {
 parse_url_record_id <- function(url) {
   record_name <- "rec[[:alnum:]]+"
 
-  record_pattern <-
-    glue(
-      "((?<=/){record_name}(?=/|\\?))|((?<=/){record_name}$)|((?<=view\\=){record_name})"
-    )
+  record_pattern <- glue(
+    "((?<=/){record_name}(?=/|\\?))|((?<=/){record_name}$)|((?<=view\\=){record_name})"
+  )
 
   string_extract(url, record_pattern)
 }
@@ -214,10 +209,9 @@ parse_url_record_id <- function(url) {
 parse_url_workspace_id <- function(url) {
   workspace_name <- "wsp[[:alnum:]]+"
 
-  workspace_pattern <-
-    glue(
-      "((?<=/){workspace_name}(?=/|\\?))|((?<=/){workspace_name}$)"
-    )
+  workspace_pattern <- glue(
+    "((?<=/){workspace_name}(?=/|\\?))|((?<=/){workspace_name}$)"
+  )
 
   string_extract(url, workspace_pattern)
 }
@@ -228,31 +222,18 @@ parse_url_workspace_id <- function(url) {
 #' @inheritParams base::regexpr
 #' @noRd
 string_extract <- function(string, pattern, perl = TRUE) {
-  if (length(string) > 1) {
-    match <- vapply(
-      string,
-      string_extract,
-      FUN.VALUE = NA_character_,
-      pattern = pattern,
-      perl = perl
-    )
-
-    return(match)
-  }
-
   if (is.na(string)) {
     return(NA_character_)
   }
 
-  match <-
-    regmatches(
-      x = string,
-      m = regexpr(
-        pattern = pattern,
-        text = string,
-        perl = perl
-      )
+  match <- regmatches(
+    x = string,
+    m = regexpr(
+      pattern = pattern,
+      text = string,
+      perl = perl
     )
+  )
 
   if (is_empty(match)) {
     return(NULL)

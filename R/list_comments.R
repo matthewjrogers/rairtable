@@ -20,13 +20,12 @@
 list_comments <- function(airtable = NULL,
                           record = NULL,
                           ...) {
-  req <-
-    req_comments(
-      airtable = airtable,
-      record = record,
-      ...,
-      template = "{base}/{table}/{record}/comments"
-    )
+  req <- req_comments(
+    airtable = airtable,
+    record = record,
+    ...,
+    template = "{base}/{table}/{record}/comments"
+  )
 
   resp <- httr2::req_perform(req)
   body <- httr2::resp_body_json(resp)
@@ -35,11 +34,10 @@ list_comments <- function(airtable = NULL,
 
   # pre-allocate space for data
   while (!is_null(body[["offset"]])) {
-    req <-
-      httr2::req_url_query(
-        .req = req,
-        offset = offset
-      )
+    req <- httr2::req_url_query(
+      .req = req,
+      offset = offset
+    )
 
     resp <- httr2::req_perform(req)
     body <- httr2::resp_body_json(resp)
@@ -132,12 +130,11 @@ req_comments <- function(airtable = NULL,
     call = call
   )
 
-  record <-
-    get_record_id(
-      record = record,
-      ...,
-      call = call
-    )
+  record <- get_record_id(
+    record = record,
+    ...,
+    call = call
+  )
 
   if (require_record && !is_record_id(record)) {
     cli_abort(

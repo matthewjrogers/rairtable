@@ -32,15 +32,14 @@ request_airtable_meta <- function(url = NULL,
                                   token = NULL,
                                   call = caller_env()) {
   if (is_null(template)) {
-    meta <-
-      arg_match(meta,
-        c(
-          "create_base", "list_base", "schema_base",
-          "create_table", "update_table",
-          "create_field", "update_field"
-        ),
-        error_call = call
-      )
+    meta <- arg_match(meta,
+      c(
+        "create_base", "list_base", "schema_base",
+        "create_table", "update_table",
+        "create_field", "update_field"
+      ),
+      error_call = call
+    )
 
     base_required <- !(meta %in% c("create_base", "list_base"))
     table_required <- meta %in% c("update_table", "update_field", "create_field")
@@ -94,20 +93,19 @@ request_airtable_meta <- function(url = NULL,
     data <- vctrs::list_drop_empty(data)
   }
 
-  req <-
-    req_airtable(
-      base = base,
-      table = table,
-      column = column,
-      template = template,
-      ...,
-      data = data,
-      token = token,
-      call = call,
-      require_base = FALSE,
-      require_table = FALSE,
-      allow_key = FALSE
-    )
+  req <- req_airtable(
+    base = base,
+    table = table,
+    column = column,
+    template = template,
+    ...,
+    data = data,
+    token = token,
+    call = call,
+    require_base = FALSE,
+    require_table = FALSE,
+    allow_key = FALSE
+  )
 
   httr2::req_perform(req, error_call = call)
 }

@@ -39,18 +39,17 @@ req_create_records <- function(req = NULL,
   if (n_records > batch_size) {
     batched_data <- split_list(data, batch_size, call = call)
 
-    resp <-
-      map_along(
-        batched_data,
-        function(i) {
-          req_create_records(
-            req = req,
-            data = batched_data[[i]],
-            call = call
-          )
-        },
-        action = "Creating records"
-      )
+    resp <- map_along(
+      batched_data,
+      function(i) {
+        req_create_records(
+          req = req,
+          data = batched_data[[i]],
+          call = call
+        )
+      },
+      action = "Creating records"
+    )
 
     return(resp)
   }
@@ -65,7 +64,7 @@ req_create_records <- function(req = NULL,
       "records" = split_list(data, 1),
       "returnFieldsByFieldId" = field_by_id,
       "typecast" = typecast
-      )
+    )
   )
 
   httr2::req_perform(req, error_call = call)

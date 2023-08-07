@@ -13,8 +13,8 @@
 #' may include airtable or url (one of which required if base is `NULL`).
 #' - For [get_table_models()], additional parameters are passed to
 #' [get_base_schema()] so may include simplifyVector.
-#'- For [get_table_model()], additional parameters can include airtable or url
-#'(one of which is required if table is `NULL`).
+#' - For [get_table_model()], additional parameters can include airtable or url
+#' (one of which is required if table is `NULL`).
 #' @returns
 #'  - [airtable_base()] returns an `airtable_base_schema` object.
 #'  - [get_base_schema()] returns the response from the Airtable get base schema
@@ -42,12 +42,11 @@ airtable_base <- function(base = NULL,
     ...,
   )
 
-  base_schema <-
-    get_base_schema(
-      base = base,
-      token = token,
-      simplifyVector = FALSE
-    )
+  base_schema <- get_base_schema(
+    base = base,
+    token = token,
+    simplifyVector = FALSE
+  )
 
   base_schema <- base_schema[["tables"]]
 
@@ -57,17 +56,15 @@ airtable_base <- function(base = NULL,
   )
 
   for (tbl in seq_along(base_schema)) {
-    base_schema[[tbl]] <-
-      vctrs::new_vctr(
-        .data = base_schema[[tbl]],
-        class = "airtable_table_schema"
-      )
+    base_schema[[tbl]] <- vctrs::new_vctr(
+      .data = base_schema[[tbl]],
+      class = "airtable_table_schema"
+    )
 
-    base_schema[[tbl]][["fields"]] <-
-      vctrs::new_vctr(
-        .data = set_list_names(base_schema[[tbl]][["fields"]], at = "name"),
-        class = "airtable_fields_schema"
-      )
+    base_schema[[tbl]][["fields"]] <- vctrs::new_vctr(
+      .data = set_list_names(base_schema[[tbl]][["fields"]], at = "name"),
+      class = "airtable_fields_schema"
+    )
   }
 
   list(

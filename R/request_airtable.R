@@ -86,16 +86,15 @@ request_airtable <- function(airtable = NULL,
   }
 
   if (!is_null(url)) {
-    req <-
-      request_airtable_url(
-        url,
-        ...,
-        api_url = api_url,
-        require_base = require_base,
-        require_table = require_table,
-        require_view = require_view,
-        call = call
-      )
+    req <- request_airtable_url(
+      url,
+      ...,
+      api_url = api_url,
+      require_base = require_base,
+      require_table = require_table,
+      require_view = require_view,
+      call = call
+    )
 
     return(req)
   }
@@ -150,24 +149,22 @@ request_airtable_url <- function(url = NULL,
       call = call
     )
 
-    req <-
-      request_airtable_api_url(
-        base = ids[["base"]],
-        table = ids[["table"]],
-        view = ids[["view"]],
-        api_url = api_url,
-        require_table = require_table,
-        require_view = require_view,
-        call = call
-      )
+    req <- request_airtable_api_url(
+      base = ids[["base"]],
+      table = ids[["table"]],
+      view = ids[["view"]],
+      api_url = api_url,
+      require_table = require_table,
+      require_view = require_view,
+      call = call
+    )
 
     return(req)
   }
 
   api_url <- api_url %||%
     getOption("rairtable.api_url", "https://api.airtable.com/v0")
-  base_url <-
-    getOption("rairtable.base_url", "https://airtable.com")
+  base_url <- getOption("rairtable.base_url", "https://airtable.com")
 
   cli_abort(
     "{.arg url} must be a valid url starting with
@@ -244,15 +241,14 @@ req_airtable <- function(.req = NULL,
                          require_table = FALSE,
                          remove_view = TRUE,
                          call = caller_env()) {
-  .req <-
-    .req %||% request_airtable(
-      airtable = airtable,
-      url = url,
-      api_url = api_url,
-      require_base = require_base,
-      require_table = require_table,
-      call = call
-    )
+  .req <- .req %||% request_airtable(
+    airtable = airtable,
+    url = url,
+    api_url = api_url,
+    require_base = require_base,
+    require_table = require_table,
+    call = call
+  )
 
   if (!is_httr2_req(.req)) {
     cli_abort(
@@ -321,24 +317,21 @@ req_auth_airtable <- function(req,
     token <- token %||% get_airtable_pat(token, default = default)
   }
 
-  req <-
-    httr2::req_auth_bearer_token(
-      req = req,
-      token = token
-    )
+  req <- httr2::req_auth_bearer_token(
+    req = req,
+    token = token
+  )
 
-  string <-
-    string %||%
+  string <- string %||%
     getOption(
       "rairtable.useragent",
       default = "rairtable (https://github.com/matthewjrogers/rairtable)"
     )
 
-  req <-
-    httr2::req_user_agent(
-      req = req,
-      string = string
-    )
+  req <- httr2::req_user_agent(
+    req = req,
+    string = string
+  )
 
   req <- httr2::req_error(req, body = airtable_error_body)
 
@@ -357,13 +350,13 @@ airtable_error_body <- function(resp) {
   error <- httr2::resp_body_json(resp)[["error"]]
 
   if (!is_null(status)) {
-    err_url <-
-      paste0("https://airtable.com/developers/web/api/errors#anchor-", status)
+    err_url <- paste0(
+      "https://airtable.com/developers/web/api/errors#anchor-", status
+    )
 
-    message <-
-      cli::cli_fmt(
-        cli::cli_bullets(c("i" = "More information: {.url {err_url}}"))
-      )
+    message <- cli::cli_fmt(
+      cli::cli_bullets(c("i" = "More information: {.url {err_url}}"))
+    )
   }
 
   if (has_name(error, "message")) {

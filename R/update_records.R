@@ -165,21 +165,20 @@ req_update_records <- function(req = NULL,
 
     batched_data <- split_list(data, batch_size, call = call)
 
-    resp <-
-      map_along(
-        batched_records,
-        function(i) {
-          req_update_records(
-            req = req,
-            records = batched_records[[i]],
-            data = batched_data[[i]],
-            fields_by_id = fields_by_id,
-            typecast = typecast,
-            call = call
-          )
-        },
-        action = "Updating records"
-      )
+    resp <- map_along(
+      batched_records,
+      function(i) {
+        req_update_records(
+          req = req,
+          records = batched_records[[i]],
+          data = batched_data[[i]],
+          fields_by_id = fields_by_id,
+          typecast = typecast,
+          call = call
+        )
+      },
+      action = "Updating records"
+    )
 
     return(resp)
   }
@@ -276,7 +275,7 @@ get_record_id_col <- function(data,
 
     if (!is_character(data[[1]])) {
       cli_abort(
-          "Records in {.val {id_col}} column must be a character vector,
+        "Records in {.val {id_col}} column must be a character vector,
           not {.obj_simple_type {data[[1]]}}.",
         call = call
       )
@@ -322,5 +321,12 @@ get_data_colnames <- function(..., .data, .drop = FALSE, call = caller_env()) {
 #' @importFrom tidyselect eval_select
 #' @importFrom rlang expr
 select_cols <- function(..., .data, .drop = FALSE, call = caller_env()) {
-  .data[, tidyselect::eval_select(expr(c(...)), data = .data, error_call = call), drop = .drop]
+  .data[,
+    tidyselect::eval_select(
+      expr(c(...)),
+      data = .data,
+      error_call = call
+    ),
+    drop = .drop
+  ]
 }

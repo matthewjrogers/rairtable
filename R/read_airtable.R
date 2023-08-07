@@ -73,13 +73,12 @@ read_airtable <- function(airtable = NULL,
     req <- req_records_fields(req, fields = fields, model = model)
   }
 
-  data <-
-    req_perform_offset(
-      req = req,
-      airtable_id_col = airtable_id_col,
-      metadata = "id",
-      .name_repair = .name_repair
-    )
+  data <- req_perform_offset(
+    req = req,
+    airtable_id_col = airtable_id_col,
+    metadata = "id",
+    .name_repair = .name_repair
+  )
 
   if ("data.frame" %in% lapply(data, class)) {
     cli::cli_bullets(
@@ -247,10 +246,10 @@ get_record <- function(airtable = NULL,
 #'   descending) or character vector matching length of sort parameter. Ignored
 #'   if sort is `NULL`.
 #' @param filter A formula using field names or IDs used to filter records where
-#'   records that evaluate to to 0, false, "", NaN, `[]`, or #Error! are excluded
-#'   from the results. Testing your formula using the Airtable Formula field
-#'   user interface is recommended. If view is supplied, only records in the
-#'   view are included. Learn more in the Airtable API documentation [on the
+#'   records that evaluate to to 0, false, "", NaN, `[]`, or #Error! are
+#'   excluded from the results. Testing your formula using the Airtable Formula
+#'   field user interface is recommended. If view is supplied, only records in
+#'   the view are included. Learn more in the Airtable API documentation [on the
 #'   filterByFormula
 #'   parameter](https://support.airtable.com/docs/airtable-web-api-using-filterbyformula-or-sort-parameters)
 #'   or the [formula field
@@ -494,24 +493,22 @@ req_perform_offset <- function(req,
 
   # pre-allocate space for data
   for (i in seq_along(body_list)) {
-    req <-
-      httr2::req_url_query(
-        .req = req,
-        offset = offset
-      )
+    req <- httr2::req_url_query(
+      .req = req,
+      offset = offset
+    )
 
     resp <- httr2::req_perform(req, error_call = call)
 
-    body_list[[i]] <-
-      resp_body_records(
-        resp,
-        type = type,
-        airtable_id_col = airtable_id_col,
-        metadata = metadata,
-        simplifyVector = simplifyVector,
-        .name_repair = .name_repair,
-        call = call
-      )
+    body_list[[i]] <- resp_body_records(
+      resp,
+      type = type,
+      airtable_id_col = airtable_id_col,
+      metadata = metadata,
+      simplifyVector = simplifyVector,
+      .name_repair = .name_repair,
+      call = call
+    )
 
     offset <- httr2::resp_body_json(resp)[["offset"]]
 
@@ -593,8 +590,8 @@ resp_body_records <- function(resp,
   # If metadata is not NULL
   if (!is_null(metadata)) {
     records <- select_cols(
-      .data = records,
       tidyselect::any_of(metadata),
+      .data = records,
       call = call
     )
 
@@ -640,7 +637,10 @@ record_metadata_match <- function(metadata,
 #'
 #' @noRd
 #' @importFrom tidyselect any_of
-arrange_record_cols <- function(records, metadata, model = NULL, call = caller_env()) {
+arrange_record_cols <- function(records,
+                                metadata,
+                                model = NULL,
+                                call = caller_env()) {
   metadata_nm <- names(records)[seq_along(metadata)]
 
   if (is.data.frame(model)) {

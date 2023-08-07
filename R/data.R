@@ -12,5 +12,5 @@
 #'   \item{`class`}{Correponding class}
 #'   \item{`read_only`}{Flag for read-only field types}
 #'   \item{`options`}{Flag for field types with options}
-#'}
+#' }
 "field_types"

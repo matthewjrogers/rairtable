@@ -149,18 +149,17 @@ req_delete_records <- function(req = NULL,
   if (n_records > batch_size) {
     batched_records <- split_list(records, batch_size, call = call)
 
-    resp <-
-      map_along(
-        batched_records,
-        function(i) {
-          req_delete_records(
-            records = batched_records[[i]],
-            req = req,
-            call = call
-          )
-        },
-        action = "Deleting records"
-      )
+    resp <- map_along(
+      batched_records,
+      function(i) {
+        req_delete_records(
+          records = batched_records[[i]],
+          req = req,
+          call = call
+        )
+      },
+      action = "Deleting records"
+    )
 
     return(resp)
   }
