@@ -52,6 +52,10 @@ for a view being present in the API request URL.}
 names or the names of list values must match the field names used in the
 Airtable base. Required.}
 
+\item{fields_by_id}{If \code{TRUE}, the response to the API request is keyed by
+field IDs instead of field names. This response is only returned if
+\code{return_data = FALSE}.}
+
 \item{typecast}{If \code{TRUE} (default), values will be converted to match the
 base if possible. typecase must be set to \code{TRUE} to add new values to a
 multiselect field type.
@@ -65,10 +69,6 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
-
-\item{field_by_id}{If \code{TRUE}, the response to the API request is keyed by
-field IDs instead of field names. This response is only returned if
-\code{return_data = FALSE}.}
 }
 \value{
 Invisibly return response from API call.

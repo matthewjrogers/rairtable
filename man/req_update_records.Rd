@@ -65,6 +65,10 @@ for a view being present in the API request URL.}
 
 \item{data}{Data to include in body.}
 
+\item{fields_by_id}{If \code{TRUE}, the response to the API request is keyed by
+field IDs instead of field names. The response is only returned if
+\code{return_data = FALSE}.}
+
 \item{method}{Custom HTTP method}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
@@ -75,10 +79,6 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
-
-\item{field_by_id}{If \code{TRUE}, the response to the API request is keyed by
-field IDs instead of field names. The response is only returned if
-\code{return_data = FALSE}.}
 }
 \description{
 Update one or more records in an Airtable base

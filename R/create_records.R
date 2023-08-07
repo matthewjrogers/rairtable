@@ -6,7 +6,7 @@
 #' @param data A data frame or list of records to create in Airtable. Column
 #'   names or the names of list values must match the field names used in the
 #'   Airtable base. Required.
-#' @param field_by_id If `TRUE`, the response to the API request is keyed by
+#' @param fields_by_id If `TRUE`, the response to the API request is keyed by
 #'   field IDs instead of field names. This response is only returned if
 #'   `return_data = FALSE`.
 #' @param typecast If `TRUE` (default), values will be converted to match the
@@ -62,7 +62,7 @@ req_create_records <- function(req = NULL,
     req,
     data = list(
       "records" = split_list(data, 1),
-      "returnFieldsByFieldId" = field_by_id,
+      "returnFieldsByFieldId" = fields_by_id,
       "typecast" = typecast
     )
   )
