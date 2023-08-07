@@ -39,10 +39,10 @@ descending) or character vector matching length of sort parameter. Ignored
 if sort is \code{NULL}.}
 
 \item{filter}{A formula using field names or IDs used to filter records where
-records that evaluate to to 0, false, "", NaN, \verb{[]}, or #Error! are excluded
-from the results. Testing your formula using the Airtable Formula field
-user interface is recommended. If view is supplied, only records in the
-view are included. Learn more in the Airtable API documentation \href{https://support.airtable.com/docs/airtable-web-api-using-filterbyformula-or-sort-parameters}{on the filterByFormula parameter}
+records that evaluate to to 0, false, "", NaN, \verb{[]}, or #Error! are
+excluded from the results. Testing your formula using the Airtable Formula
+field user interface is recommended. If view is supplied, only records in
+the view are included. Learn more in the Airtable API documentation \href{https://support.airtable.com/docs/airtable-web-api-using-filterbyformula-or-sort-parameters}{on the filterByFormula parameter}
 or the \href{https://support.airtable.com/docs/formula-field-reference}{formula field reference}.}
 
 \item{fields_by_id}{If \code{TRUE}, use fields IDs for column names in returned

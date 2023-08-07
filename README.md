@@ -21,6 +21,16 @@ simplify the integration of Airtable into data science workflows. Using
   tidyverse-friendly functions
 - Get filtered data from Airtable views
 
+At present, `rairtable` does not support any API endpoints that are
+restricted to “Enterprise” accounts (for views, permissions, and org
+management) or any of the endpoints for the [webhooks
+API](https://airtable.com/developers/web/api/webhooks-overview).
+However, the `request_airtable()` and `req_airtable()` functions should
+make it straightforward for others to extend this package and expand
+coverage of the API. See the [Airtable Web API
+changelog](https://airtable.com/developers/web/api/changelog) for any
+recent updates to the API.
+
 ## Installation
 
 For the stable CRAN release, you can install rairtable with:
@@ -95,7 +105,7 @@ can see in that view can be listed if you pass the airtable object to
 
 ``` r
 atbl <- airtable(
-  table = "https://airtable.com/app8uSq5M3ia6FZUR/tblvGyhX2yg0d22gz/viw4HALSnD2HQMOHs"
+  table = "https://airtable.com/app8uSq5M3ia6FZUR/tblvGyhX2yg0d22gz"
 )
 ```
 
@@ -105,20 +115,20 @@ You can read records to a data frame using `read_airtable()`:
 records <- read_airtable(airtable = atbl)
 
 records
-#> # A tibble: 1,160 × 5
-#>    airtable_record_id Description       Emoji Type             Name             
-#>    <chr>              <chr>             <chr> <chr>            <chr>            
-#>  1 recquG0MvrVdIVYqs  Zzz               💤    Symbols          💤 Zzz           
-#>  2 recAM3FvVWbi7a4pC  Zombie            🧟    Smileys & People 🧟 Zombie        
-#>  3 recCGegvKOI4aoNrO  Zipper-Mouth Face 🤐    Smileys & People 🤐 Zipper-Mouth …
-#>  4 rec0SP7HBGjfYE25v  Zebra             🦓    Animals & Nature 🦓 Zebra         
-#>  5 recpL1l6rxtI5bb1L  Zany Face         🤪    Smileys & People 🤪 Zany Face     
-#>  6 recKoXUv3RKKSSqSI  Yen Banknote      💴    Travel & Places  💴 Yen Banknote  
-#>  7 recAyqvduNIUxgc9w  Yen Banknote      💴    Objects          💴 Yen Banknote  
-#>  8 rec9oHV0vSvzCsFEd  Yellow Heart      💛    Symbols          💛 Yellow Heart  
-#>  9 reczIIl1w5TRYVvj1  Yarn              🧶    Smileys & People 🧶 Yarn          
-#> 10 recZa04sGTylDE2yI  Yarn              🧶    Activity         🧶 Yarn          
-#> # ℹ 1,150 more rows
+#> # A tibble: 1,165 × 5
+#>    airtable_record_id Description               Emoji Type             Name     
+#>    <chr>              <chr>                     <chr> <chr>            <chr>    
+#>  1 rec06W7BBIWlQOHuu  Wedding                   💒    Travel & Places  💒 Weddi…
+#>  2 rec08do2AoZYmCjFu  Stop Sign                 🛑    Symbols          🛑 Stop …
+#>  3 rec0BjxZID8hwEoTR  Hand With Fingers Splayed 🖐     Smileys & People 🖐 Hand W…
+#>  4 rec0EWZon2777A7qO  Family: Woman, Boy        👩‍👦    Smileys & People 👩‍👦 Famil…
+#>  5 rec0EzAj9ZN7NDRBt  Game Die                  🎲    Activity         🎲 Game …
+#>  6 rec0GH7OYgPEjRaSb  Family: Woman, Boy, Boy   👩‍👦‍👦    Smileys & People 👩‍👦‍👦 Famil…
+#>  7 rec0JiPbOdtdc0kFe  Woman Factory Worker      👩‍🏭    Smileys & People 👩‍🏭 Woman…
+#>  8 rec0KMMjZcvjC52cU  Delivery Truck            🚚    Travel & Places  🚚 Deliv…
+#>  9 rec0LrntBIo1dC945  Woman Wearing Turban      👳‍♀️    Smileys & People 👳‍♀️ Woman…
+#> 10 rec0OurcoK4dQG4DD  Outbox Tray               📤    Objects          📤 Outbo…
+#> # ℹ 1,155 more rows
 ```
 
 By default, `read_airtable()` will read all rows in the chosen table and
@@ -153,12 +163,24 @@ data <- tibble::tibble(
   "Description" = "README robot"
 )
 
-insert_records(
+resp <- insert_records(
   airtable = atbl,
-  data = data
+  data = data,
+  return_data = FALSE
 )
 #> ℹ 1 record created.
-#> ✔ 1 record created. [12ms]
+#> ✔ 1 record created. [6ms]
+#> 
+
+get_record(airtable = atbl, record = resp$records[[1]]$id)
+#>   airtable_record_id              createdTime Emoji  Description
+#> 1  recc7OPbDzh7vUib0 2023-08-07T02:08:02.000Z    🤖 README robot
+#>              Name
+#> 1 🤖 README robot
+
+delete_records(airtable = atbl, records = resp$records[[1]]$id, safely = FALSE)
+#> ℹ 1 record deleted.
+#> ✔ 1 record deleted. [7ms]
 #> 
 ```
 
@@ -181,26 +203,90 @@ airtable_base(atbl)
 #> $schema
 #> <airtable_base_schema/vctrs_vctr/list>
 #> ─ 1 table:
-#> • Emojis - tblvGyhX2yg0d22gz
+#> • Emojis2 - tblvGyhX2yg0d22gz
 #> 
 #> $tables
 #> $tables[[1]]
 #> <airtable/vctrs_vctr/list>
 #> ── Emojis ──────────────────────────────────────────────────────────────────────
 #> • Base: app8uSq5M3ia6FZUR
-#> • Table: "Emojis" - tblvGyhX2yg0d22gz
+#> • Table: "Emojis2" - tblvGyhX2yg0d22gz
 #> • 4 fields including Name, Type, Emoji, and Description.
 #> ── <https://airtable.com/app8uSq5M3ia6FZUR/tblvGyhX2yg0d22gz> ──────────────────
 ```
 
-`list_base_tables()` is more basic alternative by simply returning a
+`get_table_models()` is more basic alternative by simply returning a
 tibble of tables with list columns for views and fields associated with
 each table.
 
 ``` r
-list_base_tables(atbl)
+models <- get_table_models(atbl)
+
+models
 #> # A tibble: 1 × 5
-#>   id                name   primaryFieldId    fields       views       
-#>   <chr>             <chr>  <chr>             <list>       <list>      
-#> 1 tblvGyhX2yg0d22gz Emojis fld72YY9UFba12LeK <df [4 × 4]> <df [4 × 3]>
+#>   id                name    primaryFieldId    fields       views       
+#>   <chr>             <chr>   <chr>             <list>       <list>      
+#> 1 tblvGyhX2yg0d22gz Emojis2 fld72YY9UFba12LeK <df [4 × 4]> <df [4 × 3]>
 ```
+
+A table model can be converted into a table configuration object which
+is similar but has none of the field IDs that are unique to the source
+Airtable:
+
+``` r
+config <- copy_table_config(table = models$name, base = atbl$base)
+
+str(config)
+#> List of 2
+#>  $ name  : chr "Emojis2"
+#>  $ fields:List of 4
+#>   ..$ :List of 3
+#>   .. ..$ name   : chr "Name"
+#>   .. ..$ type   : chr "formula"
+#>   .. ..$ options:List of 3
+#>   .. .. ..$ isValid           : logi TRUE
+#>   .. .. ..$ referencedFieldIds:List of 2
+#>   .. .. .. ..$ : chr "fldiYDAKVUmtm2csm"
+#>   .. .. .. ..$ : chr "fldCunC28DcGDI6vO"
+#>   .. .. ..$ result            :List of 1
+#>   .. .. .. ..$ type: chr "singleLineText"
+#>   ..$ :List of 3
+#>   .. ..$ name   : chr "Type"
+#>   .. ..$ type   : chr "singleSelect"
+#>   .. ..$ options:List of 1
+#>   .. .. ..$ choices:List of 8
+#>   .. .. .. ..$ :List of 2
+#>   .. .. .. .. ..$ name : chr "Smileys & People"
+#>   .. .. .. .. ..$ color: chr "blueLight2"
+#>   .. .. .. ..$ :List of 2
+#>   .. .. .. .. ..$ name : chr "Animals & Nature"
+#>   .. .. .. .. ..$ color: chr "cyanLight2"
+#>   .. .. .. ..$ :List of 2
+#>   .. .. .. .. ..$ name : chr "Food & Drink"
+#>   .. .. .. .. ..$ color: chr "tealLight2"
+#>   .. .. .. ..$ :List of 2
+#>   .. .. .. .. ..$ name : chr "Activity"
+#>   .. .. .. .. ..$ color: chr "greenLight2"
+#>   .. .. .. ..$ :List of 2
+#>   .. .. .. .. ..$ name : chr "Travel & Places"
+#>   .. .. .. .. ..$ color: chr "yellowLight2"
+#>   .. .. .. ..$ :List of 2
+#>   .. .. .. .. ..$ name : chr "Objects"
+#>   .. .. .. .. ..$ color: chr "orangeLight2"
+#>   .. .. .. ..$ :List of 2
+#>   .. .. .. .. ..$ name : chr "Symbols"
+#>   .. .. .. .. ..$ color: chr "redLight2"
+#>   .. .. .. ..$ :List of 2
+#>   .. .. .. .. ..$ name : chr "Flags"
+#>   .. .. .. .. ..$ color: chr "pinkLight2"
+#>   ..$ :List of 2
+#>   .. ..$ name: chr "Emoji"
+#>   .. ..$ type: chr "singleLineText"
+#>   ..$ :List of 2
+#>   .. ..$ name: chr "Description"
+#>   .. ..$ type: chr "singleLineText"
+```
+
+This table configuration can be used by `create_table()` or
+`create_base()` to create a new Airtable base by using the schema of an
+existing base.

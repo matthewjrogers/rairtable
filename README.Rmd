@@ -28,6 +28,8 @@ knitr::opts_chunk$set(
 - Use Airtable as an endpoint for `dplyr` pipelines with tidyverse-friendly functions
 - Get filtered data from Airtable views
 
+At present, `rairtable` does not support any API endpoints that are restricted to "Enterprise" accounts (for views, permissions, and org management) or any of the endpoints for the [webhooks API](https://airtable.com/developers/web/api/webhooks-overview). However, the `request_airtable()` and `req_airtable()` functions should make it straightforward for others to extend this package and expand coverage of the API. See the [Airtable Web API changelog](https://airtable.com/developers/web/api/changelog) for any recent updates to the API.
+
 ## Installation
 
 For the stable CRAN release, you can install rairtable with:
@@ -84,7 +86,7 @@ You can also use the URL for your base to create an airtable object. Note, that 
 
 ```{r}
 atbl <- airtable(
-  table = "https://airtable.com/app8uSq5M3ia6FZUR/tblvGyhX2yg0d22gz/viw4HALSnD2HQMOHs"
+  table = "https://airtable.com/app8uSq5M3ia6FZUR/tblvGyhX2yg0d22gz"
 )
 ```
 
@@ -116,10 +118,15 @@ data <- tibble::tibble(
   "Description" = "README robot"
 )
 
-insert_records(
+resp <- insert_records(
   airtable = atbl,
-  data = data
+  data = data,
+  return_data = FALSE
 )
+
+get_record(airtable = atbl, record = resp$records[[1]]$id)
+
+delete_records(airtable = atbl, records = resp$records[[1]]$id, safely = FALSE)
 ```
 
 The functions do not currently validate data so the column names and types must match the names and types in the Airtable where the records will be created. You can also delete records using `delete_records()`.
@@ -132,9 +139,20 @@ The Airtable Metadata API requires a personal access token and will not work wit
 airtable_base(atbl)
 ```
 
-`list_base_tables()` is more basic alternative by simply returning a tibble of tables with list columns for views and fields associated with each table.
+`get_table_models()` is more basic alternative by simply returning a tibble of tables with list columns for views and fields associated with each table.
 
 ```{r}
-list_base_tables(atbl)
+models <- get_table_models(atbl)
+
+models
 ```
 
+A table model can be converted into a table configuration object which is similar but has none of the field IDs that are unique to the source Airtable:
+
+```{r}
+config <- copy_table_config(table = models$name, base = atbl$base)
+
+str(config)
+```
+
+This table configuration can be used by `create_table()` or `create_base()` to create a new Airtable base by using the schema of an existing base.
