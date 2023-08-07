@@ -179,7 +179,7 @@ make_field_array <- function(fields,
   )
 
   if (is_string(table)) {
-    tables <- get_table_models(..., tables = table, token = token, call = call)
+    table <- get_table_models(..., tables = table, token = token, call = call)
   }
 
   if (has_name(table, "fields")) {
