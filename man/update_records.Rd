@@ -14,7 +14,7 @@ update_records(
   fields_by_id = FALSE,
   typecast = FALSE,
   return_data = TRUE,
-  safely = TRUE,
+  safely = NULL,
   token = NULL,
   ...
 )
@@ -48,7 +48,8 @@ as a list. If \code{TRUE} (default) and data is not \code{NULL}, return input da
 frame or list.}
 
 \item{safely}{If \code{TRUE}, confirm number and names of columns to update and
-number of rows before executing update.}
+number of rows before executing update. Defaults to \code{NULL} which sets
+safely based on the \code{rairtable.safely} option (which defaults to \code{TRUE}).}
 
 \item{...}{
   Arguments passed on to \code{\link[=request_airtable]{request_airtable}}

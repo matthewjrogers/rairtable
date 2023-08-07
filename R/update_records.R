@@ -26,7 +26,8 @@
 #'   cell URLs is also supported. Optional if data has a record ID column (named
 #'   by airtable_id_col) or rownames with record IDs. Defaults to `NULL`.
 #' @param safely If `TRUE`, confirm number and names of columns to update and
-#'   number of rows before executing update.
+#'   number of rows before executing update. Defaults to `NULL` which sets
+#'   safely based on the `rairtable.safely` option (which defaults to `TRUE`).
 #' @inheritParams return_data_resp
 #' @inheritDotParams request_airtable -api_url -call
 #' @return A data frame of the input data, to be stored as an object or piped
@@ -43,7 +44,7 @@ update_records <- function(data,
                            fields_by_id = FALSE,
                            typecast = FALSE,
                            return_data = TRUE,
-                           safely = TRUE,
+                           safely = NULL,
                            token = NULL,
                            ...) {
   if (is_null(records)) {
@@ -114,7 +115,7 @@ update_records <- function(data,
 #' @param req A HTTP response created by [req_airtable()]. Optional if
 #'   airtable, url, *or* base and table are passed to [request_airtable()].
 #' @inheritDotParams request_airtable -api_url
-#' @param field_by_id If `TRUE`, the response to the API request is keyed by
+#' @param fields_by_id If `TRUE`, the response to the API request is keyed by
 #'   field IDs instead of field names. The response is only returned if
 #'   `return_data = FALSE`.
 #' @inheritParams req_airtable
