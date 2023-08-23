@@ -48,7 +48,7 @@ with fields when type is "combine".}
 
 \item{.name_repair}{One of "unique" (default), "universal", "check_unique",
 "unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. See
-\link{vctrs:vec_as_names} for the meaning of these options.}
+\link[vctrs:vec_as_names]{vctrs::vec_as_names} for the meaning of these options.}
 
 \item{...}{Additional parameters passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. Not used.}
 }
