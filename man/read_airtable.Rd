@@ -84,7 +84,7 @@ to match the order of the table model.}
 
 \item{.name_repair}{One of "unique" (default), "universal", "check_unique",
 "unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. See
-\code{\link[=vctrs:vec_as_names]{vctrs:vec_as_names()}} for the meaning of these options.}
+\link[vctrs:vec_as_names]{vctrs::vec_as_names} for the meaning of these options.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or

@@ -540,7 +540,7 @@ req_perform_offset <- function(req,
 #'   with fields when type is "combine".
 #' @param .name_repair One of "unique" (default), "universal", "check_unique",
 #'   "unique_quiet", or "universal_quiet" passed to [vctrs::vec_cbind()]. See
-#'   [vctrs:vec_as_names()] for the meaning of these options.
+#'   [vctrs::vec_as_names] for the meaning of these options.
 #' @param ... Additional parameters passed to [vctrs::vec_cbind()]. Not used.
 #' @keywords internal
 #' @importFrom httr2 resp_body_json
