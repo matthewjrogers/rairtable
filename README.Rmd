@@ -30,6 +30,8 @@ knitr::opts_chunk$set(
 
 At present, `rairtable` does not support any API endpoints that are restricted to "Enterprise" accounts (for views, permissions, and org management) or any of the endpoints for the [webhooks API](https://airtable.com/developers/web/api/webhooks-overview). However, the `request_airtable()` and `req_airtable()` functions should make it straightforward for others to extend this package and expand coverage of the API. See the [Airtable Web API changelog](https://airtable.com/developers/web/api/changelog) for any recent updates to the API.
 
+As of September 2023, Airtable has adjusted their API pricing. Accounts using the **Free plan** are limited to *1,000 API calls per month*. Accounts using the paid **Team plan** (previously known as Pro) are limited to *100,000 API calls per month*. Use caution in deleting, updating, and adding records to avoid exceeding the API limit associated with your account.
+
 ## Installation
 
 For the stable CRAN release, you can install rairtable with:

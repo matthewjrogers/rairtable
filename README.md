@@ -31,6 +31,13 @@ coverage of the API. See the [Airtable Web API
 changelog](https://airtable.com/developers/web/api/changelog) for any
 recent updates to the API.
 
+As of September 2023, Airtable has adjusted their API pricing. Accounts
+using the **Free plan** are limited to *1,000 API calls per month*.
+Accounts using the paid **Team plan** (previously known as Pro) are
+limited to *100,000 API calls per month*. Use caution in deleting,
+updating, and adding records to avoid exceeding the API limit associated
+with your account.
+
 ## Installation
 
 For the stable CRAN release, you can install rairtable with:
@@ -169,18 +176,18 @@ resp <- insert_records(
   return_data = FALSE
 )
 #> ℹ 1 record created.
-#> ✔ 1 record created. [6ms]
+#> ✔ 1 record created. [9ms]
 #> 
 
 get_record(airtable = atbl, record = resp$records[[1]]$id)
 #>   airtable_record_id              createdTime Emoji  Description
-#> 1  recc7OPbDzh7vUib0 2023-08-07T02:08:02.000Z    🤖 README robot
+#> 1  recS5bRjOUQfzbBSz 2023-09-01T18:17:36.000Z    🤖 README robot
 #>              Name
 #> 1 🤖 README robot
 
 delete_records(airtable = atbl, records = resp$records[[1]]$id, safely = FALSE)
 #> ℹ 1 record deleted.
-#> ✔ 1 record deleted. [7ms]
+#> ✔ 1 record deleted. [11ms]
 #> 
 ```
 
@@ -243,8 +250,9 @@ str(config)
 #>   ..$ :List of 3
 #>   .. ..$ name   : chr "Name"
 #>   .. ..$ type   : chr "formula"
-#>   .. ..$ options:List of 3
+#>   .. ..$ options:List of 4
 #>   .. .. ..$ isValid           : logi TRUE
+#>   .. .. ..$ formula           : chr "{fldiYDAKVUmtm2csm} & \" \" & {fldCunC28DcGDI6vO}"
 #>   .. .. ..$ referencedFieldIds:List of 2
 #>   .. .. .. ..$ : chr "fldiYDAKVUmtm2csm"
 #>   .. .. .. ..$ : chr "fldCunC28DcGDI6vO"
