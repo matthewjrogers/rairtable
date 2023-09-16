@@ -5,32 +5,66 @@
 \title{Create a new airtable object}
 \usage{
 airtable(
-  table,
-  base,
+  table = NULL,
+  base = NULL,
   view = NULL,
   fields = list(),
-  api_url = "https://api.airtable.com",
-  api_version = 0
+  name = NULL,
+  description = NULL,
+  api_url = NULL,
+  api_version = deprecated(),
+  token = NULL,
+  require_table = TRUE,
+  ...
 )
 }
 \arguments{
-\item{table}{Table name in Airtable}
+\item{table}{Airtable table ID or name. Table ID values start with "tbl". If
+table is an Airtable URL matching the pattern
+"https://airtable.com/{baseID}/{tableIdOrName}/{viewId}" the URL is parsed
+to supply the values for base and table. If table is a named list with the
+names "id", "name", and "description", the value for id is used as the
+value of table and name and description are passed to the respective
+parameters.}
 
-\item{base}{Airtable base containing table. A base functions like a schema in a traditional database. You can retrieve the base ID from the API documentation.}
+\item{base}{Airtable base ID. Base ID values start with "app". Optional if
+table is a URL containing a base ID or required otherwise.}
 
-\item{view}{Optional view of data to read}
+\item{view}{Optional Airtable view ID. View ID values starts with "viw".}
 
-\item{fields}{An optional `airtable_fields_schema` object. Automatically populated in tables created by `airtable_base()`}
+\item{fields}{An optional \code{airtable_fields_schema} object. Automatically
+populated in tables created by \code{airtable_base()}.}
 
-\item{api_url}{API endpoint to connect to. Can be changed for API integrations that require custom endpoint}
+\item{name, description}{Airtable table name and base name/description.
+Optional. Base name is set by \code{\link[=list_bases]{list_bases()}} but name remains
+blank if not supplied. These parameters are only used when printing
+airtable objects.}
 
-\item{api_version}{Version of API to use. Defaults to 0 (the current version as of Fall 2021)}
+\item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
+\code{getOption("rairtable.api_url", "https://api.airtable.com/v0")}.}
+
+\item{api_version}{Deprecated. Airtable API version. Version is now part of
+default api_url.}
+
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{require_table}{If \code{TRUE}, the string "tbl" must be included in the
+supplied url. If require_table is a string, it is treated as the required
+table name which must be part of url. If \code{FALSE} (default), there is no
+check for a table being present in the API request URL.}
+
+\item{...}{Additional parameters passed to \code{\link[=check_airtable_obj]{check_airtable_obj()}}. Primarily
+intended for internal use.}
 }
 \value{
-An airtable object
+An \code{airtable} class list of table and fields stored as values of the
+list and the base, view, and request_url stored as attributes.
 }
 \description{
-Creates an S3 airtable object, which serves as a pointer for rairtable functions
+Creates an S3 airtable object, which serves as a pointer for rairtable
+functions.
 }
 \examples{
 \dontrun{

@@ -2,22 +2,162 @@
 % Please edit documentation in R/read_airtable.R
 \name{read_airtable}
 \alias{read_airtable}
-\title{Read table from Airtable}
+\alias{list_records}
+\alias{get_record}
+\title{Read records from an Airtable table}
 \usage{
-read_airtable(airtable, fields = NULL, id_to_col = TRUE, max_rows = 50000)
+read_airtable(
+  airtable = NULL,
+  fields = NULL,
+  id_to_col = TRUE,
+  airtable_id_col = NULL,
+  max_rows = deprecated(),
+  model = NULL,
+  .name_repair = "unique",
+  token = NULL,
+  ...
+)
+
+list_records(
+  airtable = NULL,
+  view = NULL,
+  airtable_id_col = NULL,
+  fields = NULL,
+  sort = NULL,
+  direction = "asc",
+  filter = NULL,
+  fields_by_id = FALSE,
+  cell_format = NULL,
+  tz = NULL,
+  locale = NULL,
+  max_records = NULL,
+  page_size = NULL,
+  metadata = c("id", "createdTime"),
+  offset = NULL,
+  model = NULL,
+  .name_repair = "unique",
+  simplifyVector = TRUE,
+  token = NULL,
+  ...
+)
+
+get_record(
+  airtable = NULL,
+  record = NULL,
+  airtable_id_col = NULL,
+  cell_format = NULL,
+  tz = NULL,
+  locale = NULL,
+  metadata = c("id", "createdTime"),
+  model = NULL,
+  .name_repair = "unique",
+  simplifyVector = TRUE,
+  token = NULL,
+  ...
+)
 }
 \arguments{
-\item{airtable}{An airtable object}
+\item{airtable}{An \code{airtable} class object. Optional for \code{\link[=read_airtable]{read_airtable()}} if
+url is supplied. For \code{\link[=list_records]{list_records()}} and
+\code{\link[=get_record]{get_record()}}, support the airtable, url, or a base \emph{and} table
+parameter.}
 
-\item{fields}{An optional list of fields to select.}
+\item{fields}{Character vector with field names or field IDs to return.
+Optional.}
 
-\item{id_to_col}{If TRUE, store airtable ID as a column rather than as row names}
+\item{id_to_col}{If \code{TRUE} (default), the airtable record IDs will be added
+to the returned data frame as a new column. If \code{FALSE}, the airtable record
+IDs are used as row names.}
 
-\item{max_rows}{Optional maximum number of rows to read}
+\item{airtable_id_col}{Airtable record ID column name assigned to returned
+data frame. Defaults to \code{NULL} which is sets record ID column name to
+\code{getOption("rairtable.id_col", "airtable_record_id")}. For \code{\link[=list_records]{list_records()}}
+and \code{\link[=get_record]{get_record()}}, airtable_id_col is not used if metadata is \code{NULL} or
+does not include "id". The record ID column is dropped and converted to
+rownames if id_to_col is \code{FALSE}.}
+
+\item{max_rows}{Deprecated. Maximum number of rows to read.}
+
+\item{model}{Optional. A table model from \code{\link[=get_table_model]{get_table_model()}}. If supplied,
+model is used to validate fields and sort parameters and to arrange columns
+to match the order of the table model.}
+
+\item{.name_repair}{One of "unique" (default), "universal", "check_unique",
+"unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. See
+\link[vctrs:vec_as_names]{vctrs::vec_as_names} for the meaning of these options.}
+
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{...}{For \code{\link[=read_airtable]{read_airtable()}}, additional query parameters, such as url,
+can be passed to \code{\link[=req_airtable]{req_airtable()}}. For \code{\link[=list_records]{list_records()}} and \code{\link[=get_record]{get_record()}},
+additional parameters are passed to \code{\link[=request_airtable]{request_airtable()}} and can also
+include base and table.}
+
+\item{view}{Airtable view ID. View ID values starts with "viw". Optional if
+require_view is \code{FALSE}.}
+
+\item{sort}{Field names to sort by. Defaults to \code{NULL}.}
+
+\item{direction}{A string ("asc" for ascending (default) or "desc" for
+descending) or character vector matching length of sort parameter. Ignored
+if sort is \code{NULL}.}
+
+\item{filter}{A formula using field names or IDs used to filter records where
+records that evaluate to to 0, false, "", NaN, \verb{[]}, or #Error! are
+excluded from the results. Testing your formula using the Airtable Formula
+field user interface is recommended. If view is supplied, only records in
+the view are included. Learn more in the Airtable API documentation \href{https://support.airtable.com/docs/airtable-web-api-using-filterbyformula-or-sort-parameters}{on the filterByFormula parameter}
+or the \href{https://support.airtable.com/docs/formula-field-reference}{formula field reference}.}
+
+\item{fields_by_id}{If \code{TRUE}, use fields IDs for column names in returned
+records. If \code{FALSE} (default), use field names.}
+
+\item{cell_format}{Cell format for "Link to another record" fields. Defaults
+to "json" which returns a unique record ID. A "string" cell_format returns
+the displayed character string.}
+
+\item{tz, locale}{Time zone and locale, Defaults to \code{NULL}. If cell_format is
+"string", tz defaults to \code{Sys.timezone()} and locale defaults to
+\code{Sys.getlocale("LC_TIME")}.}
+
+\item{max_records}{Maximum number of records to return. Must be 100 or less.}
+
+\item{page_size}{Maximum number of records to return per page.}
+
+\item{metadata}{Record metadata columns to include with returned data frame.
+Options including "id", "createdTime", and "commentCount". Defaults to
+\code{c("id", "createdTime")}. If metadata is \code{NULL}, no additional fields are
+added to the returned data frame.}
+
+\item{offset}{Offset value to passed to \code{\link[httr2:req_url]{httr2::req_url_query()}} as part of
+the API call. Intended for developer use only. See the \href{https://airtable.com/developers/web/api/list-records#response-offset}{Airtable API documentation on the offset value}
+is used by the Airtable API.}
+
+\item{simplifyVector}{Passed to \code{\link[httr2:req_body]{httr2::req_body_json()}}. If \code{FALSE},
+\code{\link[=get_record]{get_record()}} and \code{\link[=list_records]{list_records()}} both return named lists of records.}
+
+\item{record}{Record ID (a string starting with "rec"). Required for
+\code{\link[=get_record]{get_record()}} unless a field or cell URL is provided.}
 }
 \value{
-A dataframe containing the data read from the specified 'Airtable' table
+A data frame with the records from the Airtable base and table
+provided by the airtable parameter. If simplifyVector is \code{FALSE}, a list is
+returned with each element containing nested elements that match the
+metadata values and an element "fields" that contains a named list of
+fields from the Airtable.
 }
 \description{
-Connect to and read values from an Airtable table.
+Read records from a table in an Airtable base. \code{\link[=read_airtable]{read_airtable()}} supports
+basic access to data based on an airtable object. \code{\link[=list_records]{list_records()}} and
+\code{\link[=get_record]{get_record()}} allows you to pass url or base and table directly and supports
+more options from the Airtable API. Note that returned records do not include
+any fields with empty values, e.g. "". If a column in an Airtable table is
+blank, the column is not included in the data frame returned by any of these
+functions.
+}
+\details{
+Read the Airtable API documentation for on the \href{https://airtable.com/developers/web/api/list-records}{list records API method} or \href{https://airtable.com/developers/web/api/get-record}{get record API method} for more
+information.
 }

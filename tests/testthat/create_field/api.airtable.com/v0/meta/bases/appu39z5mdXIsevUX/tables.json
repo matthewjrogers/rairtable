@@ -1,0 +1,62 @@
+{
+    "tables": [
+        {
+            "id": "tbl0MzEDRrELyD57V",
+            "name": "Table 1",
+            "primaryFieldId": "fldBRpOBgwjvowBEc",
+            "fields": [
+                {
+                    "type": "singleLineText",
+                    "id": "fldBRpOBgwjvowBEc",
+                    "name": "Name"
+                },
+                {
+                    "type": "multilineText",
+                    "id": "fldiB2eTUKn083Udf",
+                    "name": "Notes"
+                },
+                {
+                    "type": "singleCollaborator",
+                    "id": "fldmFXiFBBV148o7W",
+                    "name": "Assignee"
+                },
+                {
+                    "type": "singleSelect",
+                    "options": {
+                        "choices": [
+                            {
+                                "id": "selsSLTmGKdwQDRjN",
+                                "name": "Todo",
+                                "color": "redLight2"
+                            },
+                            {
+                                "id": "selqO1q4mJu3ppXMR",
+                                "name": "In progress",
+                                "color": "yellowLight2"
+                            },
+                            {
+                                "id": "selsMlaECbeRpcEoQ",
+                                "name": "Done",
+                                "color": "greenLight2"
+                            }
+                        ]
+                    },
+                    "id": "fldYKTuRcSH12fZ5L",
+                    "name": "Status"
+                },
+                {
+                    "type": "singleLineText",
+                    "id": "fldnqFWwxh9fj4TFh",
+                    "name": "Test_create_field"
+                }
+            ],
+            "views": [
+                {
+                    "id": "viwtQYeduYs7pvuwF",
+                    "name": "Grid view",
+                    "type": "grid"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,47 @@
+---
+title: "Configuration"
+vignette: >
+  %\VignetteIndexEntry{configuration}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+These are environment variables and options that users may set, to modify the behavior of rairtable.
+
+## User facing environment variables
+
+### `rairtable.pat_default` and `rairtable.key_default`
+
+The default value used for the Airtable Personal Access Token and API Key variables that are set with [set_airtable_token()] or [set_airtable_api_key()] and retrieved using [get_airtable_pat()] or [get_airtable_api_key()].
+
+### `rairtable.id_col`
+
+A number of functions use the `airtable_id_col` parameter to set the name of the column holding record id values. The default value "airtable_id_col" can be modified using the `rairtable.id_col` option. This option is used by [read_airtable()], [update_records()], [delete_records()], and other functions.
+
+### `rairtable.user_agent`
+
+The rairtable package uses [httr2::req_user_agent()] to pass a User-Agent header with each API call. The default value "rairtable (https://github.com/matthewjrogers/rairtable)" can be modified using the  `rairtable.user_agent` option.
+
+### `rairtable.safely`
+
+The default value for `rairtable.safely` (`TRUE`) requires user confirmation every time the user deletes, modifies, or creates records for Airtable. This can be modified using the `rairtable.safely` option.
+
+### `rairtable.fields-trunc`
+
+This option is passed to the style parameter of [cli::cli_vec()] to determine the number of fields printed for `airtable` and `airtable_table_schema` objects. Option defaults to 6.
+
+## API-specific environment variables
+
+The API environment variables should remain the same unless the Airtable API changes.
+
+### `rairtable.batch_size`
+
+Airtable limits the number of records that can be deleted, updated, or created in a single API call to 10. This default value can be modified using the `rairtable.batch_size` option.
+
+### `rairtable.api_url`
+
+The base URL for the Airtable API is "https://api.airtable.com/v0". This default value can be modified using the `rairtable.api_url` option. This option is used by internal functions for checking Airtable API urls and, optionally, [request_airtable()].
+
+### `rairtable.base_url`
+
+The Airtable view base URL is "http://airtable.com". This default value can be modified using the `rairtable.base_url` option. This option is used by [is_airtable_url()] and [check_airtable_url()].

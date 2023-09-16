@@ -2,36 +2,89 @@
 % Please edit documentation in R/update_records.R
 \name{update_records}
 \alias{update_records}
-\title{Update Airtable records}
+\title{Update records in an Airtable table}
 \usage{
 update_records(
   data,
-  airtable,
-  columns = dplyr::everything(),
-  airtable_id_col = "airtable_record_id",
-  safely = TRUE,
-  parallel = FALSE,
-  batch_size = 10
+  airtable = NULL,
+  airtable_id_col = NULL,
+  columns = tidyselect::everything(),
+  records = NULL,
+  model = NULL,
+  fields_by_id = FALSE,
+  typecast = FALSE,
+  return_data = TRUE,
+  safely = NULL,
+  token = NULL,
+  ...
 )
 }
 \arguments{
-\item{data}{A dataframe containing the records and fields to update}
+\item{data}{A data frame containing the fields to update. If records is
+\code{NULL}, data must include a column of record IDs (named by airtable_id_col)
+or rownames with record IDs. If the data frame is originally created using
+\code{list_records()}, make sure to drop the "createdTime" and/or "commentCount"
+columns.}
 
-\item{airtable}{An airtable object}
+\item{airtable}{An \code{airtable} object. Optional if url or base and table are
+provided with additional parameters passed to \code{\link[=request_airtable]{request_airtable()}}.}
 
-\item{columns}{Columns in the data to update on Airtable. Can be a vector of character strings, unquoted column names, or a \code{dplyr} tidyselect helper like \code{starts_with()}, \code{ends_with()} or \code{everything()}. Defaults to \code{dplyr::everything()}}
+\item{airtable_id_col}{Column containing Airtable record IDs. Not required if
+record IDs are stored in row names as returned from \code{\link[=read_airtable]{read_airtable()}}}
 
-\item{airtable_id_col}{Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from \code{read_airtable}}
+\item{columns}{Columns in the data to update on Airtable. Can be a vector of
+character strings, unquoted column names, or a tidyselect helper. Defaults
+to \code{\link[tidyselect:everything]{tidyselect::everything()}}. See
+\url{https://tidyselect.r-lib.org/reference/index.html#language-and-helpers}
+for documentation on helpers.}
 
-\item{safely}{If \code{TRUE}, confirm number and names of columns to update and number of rows before executing update.}
+\item{records}{A character vector of record IDs indicating which Airtable
+records to replace with the updated values from data. A vector of record or
+cell URLs is also supported. Optional if data has a record ID column (named
+by airtable_id_col) or rownames with record IDs. Defaults to \code{NULL}.}
 
-\item{parallel}{If \code{TRUE} use parallel processing for encoding large tables}
+\item{return_data}{If \code{FALSE}, return JSON response from the Airtable web API
+as a list. If \code{TRUE} (default) and data is not \code{NULL}, return input data
+frame or list.}
 
-\item{batch_size}{Number of records to update per request. Maximum of 10}
+\item{safely}{If \code{TRUE}, confirm number and names of columns to update and
+number of rows before executing update. Defaults to \code{NULL} which sets
+safely based on the \code{rairtable.safely} option (which defaults to \code{TRUE}).}
+
+\item{...}{
+  Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
+  \describe{
+    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
+is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
+is optional if airtable \emph{or} base and table are supplied. If url is an
+Airtable view, any additional base or table values provided are ignored. If
+airtable is provided, any supplied url is ignored.}
+    \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
+airtable are supplied or if require_base is \code{FALSE}. base and table are
+both required if url and airtable are \code{NULL} and require_base is \code{TRUE}.}
+    \item{\code{table}}{Airtable table id or name. Table ID values are strings starting
+with "tbl". Optional if require_table is \code{FALSE}.}
+    \item{\code{view}}{Airtable view ID. View ID values starts with "viw". Optional if
+require_view is \code{FALSE}.}
+    \item{\code{require_base}}{If \code{TRUE} (default), the string "app" must be included in
+the supplied API request URL.}
+    \item{\code{require_table}}{If \code{TRUE}, the string "tbl" must be included in the
+supplied url. If require_table is a string, it is treated as the required
+table name which must be part of url. If \code{FALSE} (default), there is no
+check for a table being present in the API request URL.}
+    \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
+string supplied to url. If \code{FALSE} (default), there is no check
+for a view being present in the API request URL.}
+  }}
 }
 \value{
-A dataframe (invisibly) of the input data, to be stored as an object or piped into further `dplyr` functions
+A data frame of the input data, to be stored as an object or piped
+into further additional functions. The data frame is returned invisibly.
 }
 \description{
-Update one or more columns of data in an Airtable table. Supports batch updates and parallel JSON encoding (recommended for large tables).
+Update one or more fields in an Airtable table based on a data frame. Set
+\code{safely = FALSE} to delete records outside of an interactive session.
+}
+\details{
+Find more information on the Airtable API methods for \href{https://airtable.com/developers/web/api/update-record}{updating a single record} or \href{https://airtable.com/developers/web/api/update-multiple-records}{multiple records}.
 }

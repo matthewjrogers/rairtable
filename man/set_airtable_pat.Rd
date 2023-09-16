@@ -2,24 +2,52 @@
 % Please edit documentation in R/set_airtable_pat.R
 \name{set_airtable_pat}
 \alias{set_airtable_pat}
-\title{Set or install Airtable personal access token}
+\alias{get_airtable_pat}
+\title{Set or get an Airtable personal access token}
 \usage{
-set_airtable_pat(pat, install = FALSE)
+set_airtable_pat(
+  pat,
+  install = FALSE,
+  overwrite = FALSE,
+  default = "AIRTABLE_PAT",
+  call = caller_env()
+)
+
+get_airtable_pat(pat = NULL, default = "AIRTABLE_PAT", call = caller_env())
 }
 \arguments{
-\item{pat}{A valid Airtable personal access token}
+\item{pat}{A valid Airtable personal access token. Setup a token at
+\url{https://airtable.com/create/tokens}}
 
-\item{install}{Add your personal access token to your .Renviron for future sessions. Optionally overwrite an existing Airtable personal access token.}
+\item{install}{Add your personal access token to your \code{.Renviron} for future
+sessions.}
+
+\item{overwrite}{If \code{TRUE}, overwrite any existing Airtable personal access
+token.}
+
+\item{default}{Default name used for environmental variable where the
+personal access token is stored.}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
-No return value, called for side effects
+Invisibly return personal access token value
 }
 \description{
-Set Airtable personal access token as an environment variable, and optionally install the personal access token to your .Renviron file for future use.
+Set an Airtable personal access token as an environment variable, and
+optionally install the personal access token to your .Renviron file for
+future use.
 }
 \examples{
 \dontrun{
-set_airtable_pat("XXXXXXXXXX", install = TRUE)
-}
+set_airtable_pat("<personal access token>", install = TRUE)
 
+get_airtable_pat()
+}
+}
+\seealso{
+\code{\link[=set_airtable_api_key]{set_airtable_api_key()}}
 }

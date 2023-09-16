@@ -2,24 +2,50 @@
 % Please edit documentation in R/set_airtable_api_key.R
 \name{set_airtable_api_key}
 \alias{set_airtable_api_key}
-\title{Set or install Airtable API key}
+\alias{get_airtable_api_key}
+\title{Set or get an Airtable API key}
 \usage{
-set_airtable_api_key(key, install = FALSE)
+set_airtable_api_key(
+  key,
+  install = FALSE,
+  overwrite = FALSE,
+  default = "AIRTABLE_API_KEY",
+  call = caller_env()
+)
+
+get_airtable_api_key(
+  key = NULL,
+  default = "AIRTABLE_API_KEY",
+  call = caller_env()
+)
 }
 \arguments{
 \item{key}{A valid Airtable API key}
 
-\item{install}{Add your API key to .Renviron for future sessions. Optionally overwrite an existing Airtable API key.}
+\item{install}{Add your API key to .Renviron for future sessions.}
+
+\item{overwrite}{If \code{TRUE}, overwrite any existing Airtable API key.}
+
+\item{default}{Default name to use for environment variable.}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
-No return value, called for side effects
+Invisibly return API key value
 }
 \description{
-Set Airtable API key as an environment variable, and optionally install the API key to your .Renviron file for future use.
+Set Airtable API key as an environment variable, and optionally install the
+API key to your \code{.Renviron} file for future use.
 }
 \examples{
 \dontrun{
-airtable_api_key("XXXXXXXXXX", install = TRUE)
+set_airtable_api_key("XXXXXXXXXX", install = TRUE)
 }
 
+}
+\seealso{
+\code{\link[=set_airtable_pat]{set_airtable_pat()}}
 }

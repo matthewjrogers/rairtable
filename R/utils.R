@@ -1,243 +1,261 @@
-
-
-new_airtable <- function(table = character(), base = character(), view = character(), fields = list(), api_url = character(), api_version = integer()) {
-  
-  stopifnot(is.character(table))
-  stopifnot(is.character(base))
-  stopifnot(is.character(view) | is.null(view))
-  stopifnot(is.character(api_url))
-  stopifnot(is.integer(api_version))
-  stopifnot(length(api_version) == 1)
-  stopifnot(is.list(fields))
-
-  atbl <- new.env()
-  atbl$table <- table
-  atbl$fields <- fields
-  
-  class(atbl) <- "airtable"
-
-  attr(atbl, "base") <- base
-  attr(atbl, "view") <- view
-  attr(atbl, "request_url") <- paste(api_url, sprintf("v%s", api_version), base, utils::URLencode(table), sep = "/")
-
-  validate_airtable(atbl)
-
-  atbl
-
-}
-
-# validate a new airtable object
-
-validate_airtable <- function(airtable_obj){
-
-  table <- airtable_obj$table
-  base <- attr(airtable_obj, "base")
-  view <- attr(airtable_obj, "view")
-  request_url <- attr(airtable_obj, "request_url")
-  fields <- airtable_obj$fields
-  
-  
-  if (!is.list(fields)){
-    stop("The fields of the provided Airtable object is not a list")
-  }
-  
-  if (!inherits(fields, 'airtable_fields_schema')){
-    stop("The fields of the provided Airtable object must be of class `airtable_fields_schema`")
-  }
-  
-  if (!inherits(airtable_obj, 'airtable')){
-    stop("The provided airtable object is not of class `airtable`")
-  }
-
-  if (length(table) > 1){
-    stop("You can only connect to one Airtable table at a time. `table` should be a single character value", call. = FALSE)
-  }
-
-  if (length(table) < 1){
-    stop("You muist provide an Airtable table name. `table` should be a single character value", call. = FALSE)
-  }
-
-  if (length(base) > 1){
-    stop("Tables appear in a single Airtable base. `base` should be a single character value", call. = FALSE)
-  }
-
-  if (length(base) < 1){
-    stop("You must provide an Airtable base name. `base` should be a single character value", call. = FALSE)
-  }
-
-  if (length(view) > 1){
-    stop("You can only connect to one Airtable view at a time. `view` must be either NULL or a single character value", call. = FALSE)
-  }
-
-  if (length(view) < 1 & !is.null(view)){
-    stop("`view` must be either NULL or a single character value", call. = FALSE)
-  }
-
-  if (grepl("\\s", request_url)){
-    stop("`request_url` cannot contain any spaces", call. = FALSE)
-  }
-
-}
-
-#' @keywords internal
-#' @export
-#'
-
-print.airtable <- function(x, ...){
-
-  cat("Table: ", x$table, "\n", sep = "")
-  if (!is.null(attr(x, 'view'))){
-    cat("   View: ", attr(x, 'view'), "\n", sep = "")
-  }
-  cat("   Base: ", attr(x, 'base'), "\n", sep = "")
-}
-
-#' @keywords internal
-#' @export
-#'
-
-str.airtable = function(object, ...) {
-
-  view <- ifelse(is.null(attr(object, "view")), "", paste0('."', attr(object, "view"), '"'))
-  cat(" Airtable: ", object$table, view, " @ ", attr(object, "base"), "\n", sep = "")
-
-}
-
-# Retrieve API Key
-
-get_airtable_api_key <- function(){
-
-  key <- Sys.getenv("AIRTABLE_API_KEY")
-
-  if (key == ""){
-    stop("No Airtable personal access tokens or API keys set. API keys will be deprecated in 2024. Use `set_airtable_pat()` to set a personal access token")
-  }
-
-  key
-}
-
-get_airtable_pat <- function(){
-  
-  key <- Sys.getenv("AIRTABLE_PAT")
-  
-  if (key == ""){
-    stop("No Airtable personal access tokens set. Use `set_airtable_pat()` to set your personal access token.")
-  }
-  
-  key
-}
-
-# while both PATs and keys are supported, this function will let us get 
-get_airtable_pat_or_key <- function(){
-  tryCatch(
-    get_airtable_pat(),
-    error = function(e){
-      get_airtable_api_key()
-    }
+.onLoad <- function(lib, pkg) {
+  utils::data(
+    list = c("field_types"),
+    package = pkg,
+    envir = parent.env(environment())
   )
 }
-# Split a dataframe by row
 
-split_rows <- function(df, chunk_size){
-  n_rows <- nrow(df)
-  split_vec  <- rep(1:ceiling(n_rows / chunk_size), each = chunk_size)[1:n_rows]
-  res <- split(df, split_vec)
-
-  res
+# ---
+# repo: r-lib/rlang
+# file: standalone-purrr.R
+# last-updated: 2023-02-23
+# license: https://unlicense.org
+# imports: rlang
+# ---
+#' map and keep (from standalone-purrr.R)
+#'
+#' @noRd
+map <- function(.x, .f, ...) {
+  .f <- rlang::as_function(.f, env = rlang::global_env())
+  lapply(.x, .f, ...)
 }
 
+#' @noRd
+map_lgl <- function(.x, .f, ...) {
+  .rlang_purrr_map_mold(.x, .f, logical(1), ...)
+}
 
+#' @noRd
+.rlang_purrr_map_mold <- function(.x, .f, .mold, ...) {
+  .f <- as_function(.f, env = global_env())
+  out <- vapply(.x, .f, .mold, ..., USE.NAMES = FALSE)
+  names(out) <- names(.x)
+  out
+}
 
+#' @noRd
+keep <- function(.x, .f, ...) {
+  .x[.rlang_purrr_probe(.x, .f, ...)]
+}
 
-adorn_text <- function(text, mode = 'success'){
-  md <- match.arg(mode, c('success', 'failure'))
-
-  if (md == 'success'){
-    res <- paste(crayon::green(cli::symbol$tick), text, sep = " ")
+#' @noRd
+.rlang_purrr_probe <- function(.x, .p, ...) {
+  if (is_logical(.p)) {
+    stopifnot(length(.p) == length(.x))
+    .p
   } else {
-    res <- paste(crayon::red(cli::symbol$cross), text, sep = " ")
+    .p <- as_function(.p, env = global_env())
+    map_lgl(.x, .p, ...)
+  }
+}
+
+#' Wrapper for cli::cli_progress_along
+#'
+#' @param action String with the action to display in the progress message.
+#' @noRd
+#' @importFrom cli symbol pb_bar pb_percent cli_progress_along
+#' @importFrom rlang with_options
+map_along <- function(x,
+                      .f,
+                      ...,
+                      action = NULL,
+                      format = NULL) {
+  format <- format %||%
+    "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
+
+  rlang::with_options(
+    list("cli.progress_show_after" = 0.75),
+    map(
+      cli::cli_progress_along(x, format = format),
+      .f = .f,
+      ...
+    )
+  )
+}
+
+#' Is x a list of lists?
+#'
+#' @noRd
+is_list_of_lists <- function(x) {
+  if (!is_list(x)) {
+    return(FALSE)
   }
 
-  res
+  all(vapply(x, is_list, TRUE))
 }
 
+#' Split list or vector into equal size pieces
+#'
+#' @noRd
+split_list <- function(x,
+                       batch_size = NULL,
+                       arg = caller_arg(x),
+                       call = caller_env()) {
+  check_required(x, arg = arg, call = call)
 
-get_ids <- function(df, id_col){
-  if (is.null(id_col)){
+  batch_size <- batch_size %||%
+    as.integer(getOption("rairtable.batch_size", 10))
 
-    if (!tibble::has_rownames(df)){
-      stop("Data must either have Airtable IDs in row names or a provided ID column", call. = FALSE)
-    }
+  check_number_whole(batch_size, call = call)
 
-    ids <- row.names(df)
+  len <- length(x)
 
-  } else {
-
-    ids <- df %>% select(!!id_col) %>% dplyr::pull()
-
-  }
-
-  ids
-
-}
-
-# Split list or vector into equal size pieces
-
-split_list <- function(lst, chunk_size = 10){
   mapply(
-    function(a, b) (lst[a:b]),
-    seq.int(from = 1, to = length(lst), by = chunk_size),
-    pmin(seq.int(from = 1, to = length(lst), by = chunk_size) + (chunk_size - 1), length(lst)),
+    FUN = function(a, b) {
+      x[a:b]
+    },
+    seq.int(from = 1, to = len, by = batch_size),
+    pmin(
+      seq.int(from = 1, to = len, by = batch_size) + (batch_size - 1),
+      len
+    ),
     SIMPLIFY = FALSE
   )
 }
 
-stop_quietly <- function(...) {
-  opt <- options(show.error.messages = FALSE)
-  on.exit(options(opt))
-  message(paste(..., collapse = " "))
-  stop()
+#' Set list names optionally using an attribute from each item in the list
+#'
+#' @noRd
+set_list_names <- function(x, nm = NULL, at = "name") {
+  nm <- nm %||% names_at(x, at)
+  set_names(x, nm)
 }
 
-process_error <- function(response_status){
+#' @noRd
+names_at <- function(x, at = "name") {
+  vapply(x, function(x) {
+    x[[at]]
+  }, NA_character_)
+}
 
-  statuses <- data.frame(
-    code = c(400,  401, 403,  404, 408, 413, 422, 503),
-    description = c("The server could not understand the request due to invalid syntax",
-                    "Unauthorized: Invalid authentication",
-                    "Forbidden: Invalid authentication",
-                    "Resource not found",
-                    "Request timeout",
-                    "Payload too large",
-                    "Unprocessable entity. The request was well-formed but was unable to be followed due to semantic errors.\n\nEnsure that the column types in R are compatible with the column types of your Airtable table.",
-                    "The server is currently unable to handle the request due to temporary overloading or maintenance of the server."
+#' Return data, response body, or combined body from list of response objects
+#'
+#' An internal helper function to optionally return data, response body as a
+#' list, or combined list of httr2_res response objects.
+#'
+#' @param data Input data frame or list
+#' @param return_data If `FALSE`, return JSON response from the Airtable web API
+#'   as a list. If `TRUE` (default) and data is not `NULL`, return input data
+#'   frame or list.
+#' @inheritParams httr2::resp_body_json
+#' @keywords internal
+return_data_resp <- function(data = NULL, resp = NULL, return_data = TRUE) {
+  if (return_data && !is_null(data)) {
+    return(invisible(data))
+  }
 
+  if (!is_httr2_resp(resp)) {
+    return(c(lapply(resp, httr2::resp_body_json)))
+  }
+
+  httr2::resp_body_json(resp)
+}
+
+#' Check if object is a list
+#'
+#' @noRd
+#' @importFrom vctrs obj_check_list
+check_list <- function(x,
+                       allow_na = FALSE,
+                       allow_empty = FALSE,
+                       allow_null = FALSE,
+                       arg = caller_arg(x),
+                       call = caller_env()) {
+  if (allow_na && is.na(x)) {
+    return(invisible(NULL))
+  }
+
+  if (allow_null && is_null(x)) {
+    return(invisible(NULL))
+  }
+
+  if (is_empty(x)) {
+    if (allow_empty) {
+      return(invisible(NULL))
+    }
+
+    cli_abort(
+      "{.arg {arg}} can't be empty.",
+      call = call
     )
+  }
+
+  if (is_list(x)) {
+    return(invisible(NULL))
+  }
+
+  vctrs::obj_check_list(
+    x = x,
+    arg = arg,
+    call = call
+  )
+}
+
+#' Check if user, confirm action before proceeding
+#'
+#' @param yes Character vector of acceptable "yes" response options.
+#' @inheritParams cli_ask
+#' @noRd
+safety_check <- function(safely = NULL,
+                         ...,
+                         prompt = "Do you want to continue?",
+                         yes = c("", "Y", "Yes", "Yup", "Yep", "Yeah"),
+                         message = "Aborted. A yes is required to continue.",
+                         .envir = parent.frame(),
+                         call = rlang::caller_env()) {
+  safely <- safely %||% getOption("rairtable.safely", TRUE)
+  check_bool(safely, call = call)
+
+  if (is_false(safely)) {
+    return(invisible(NULL))
+  }
+
+  answer <- cli_ask(
+    ...,
+    prompt = paste0("?\u00a0", prompt, "\u00a0(Y/n)"),
+    .envir = .envir
   )
 
-  if (response_status %in% statuses$code){
-    return(sprintf("Error Code %s: %s", statuses[statuses$code == response_status, 'code'], statuses[statuses$code == response_status, 'description']))
+  if (all(tolower(answer) %in% tolower(yes))) {
+    return(invisible(NULL))
   }
 
-  sprintf("Error Code %s", response_status)
+  cli_abort(
+    message = message,
+    .envir = .envir,
+    call = call
+  )
 }
 
-
-# If the user chooses to execute safely, confirm action before proceeding
-
-safety_check <- function(safely, cancel_message, ...){
-
-  stopifnot(is.logical(safely))
-
-  if (safely){
-
-    ans <- menu(c(paste(crayon::green(cli::symbol$tick), 'Yes'),
-                  paste(crayon::red(cli::symbol$cross), 'No')),
-                title = paste0(..., collapse = ""))
-
-    if (ans != 1){
-      stop_quietly(crayon::red(cli::symbol$cross), cancel_message)
-    }
+#' Adapted from cliExtras::cli_ask()
+#'
+#' @noRd
+cli_ask <- function(prompt = "?",
+                    ...,
+                    .envir = rlang::caller_env(),
+                    call = .envir) {
+  if (!rlang::is_interactive()) {
+    cli_abort(
+      "User interaction is required.",
+      call = call
+    )
   }
 
+  if (!rlang::is_empty(rlang::list2(...))) {
+    cli::cli_bullets(..., .envir = .envir)
+  }
+  readline(paste0(prompt, "\u00a0"))
+}
+
+#' @noRd
+#' @importFrom rlang zap current_env
+#' @importFrom vctrs vec_rbind
+list_rbind <- function(x, names_to = zap(), ptype = NULL) {
+  vctrs::vec_rbind(
+    !!!x,
+    .names_to = names_to,
+    .ptype = ptype,
+    .error_call = current_env()
+  )
 }

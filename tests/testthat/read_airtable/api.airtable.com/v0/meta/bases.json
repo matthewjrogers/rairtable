@@ -1,0 +1,9 @@
+{
+    "bases": [
+        {
+            "id": "appu39z5mdXIsevUX",
+            "name": "rairtable Test",
+            "permissionLevel": "create"
+        }
+    ]
+}

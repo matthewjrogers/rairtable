@@ -2,23 +2,92 @@
 % Please edit documentation in R/airtable_base.R
 \name{airtable_base}
 \alias{airtable_base}
-\title{Title}
+\alias{get_base_schema}
+\alias{get_table_models}
+\alias{list_base_tables}
+\alias{get_table_model}
+\title{Get metadata for an Airtable base or table}
 \usage{
-airtable_base(
-  base_id,
-  metadata_api_url_pattern = "https://api.airtable.com/v0/meta/bases/\%s/tables"
+airtable_base(base = NULL, token = NULL, ...)
+
+get_base_schema(
+  base = NULL,
+  token = NULL,
+  simplifyVector = TRUE,
+  ...,
+  call = caller_env()
+)
+
+get_table_models(
+  base = NULL,
+  tables = NULL,
+  schema = NULL,
+  token = NULL,
+  ...,
+  call = caller_env()
+)
+
+get_table_model(
+  table = NULL,
+  schema = NULL,
+  simplifyVector = FALSE,
+  i = 1,
+  ...,
+  call = caller_env()
 )
 }
 \arguments{
-\item{base_id}{A valid Airtable base ID}
+\item{base}{An Airtable base ID, an airtable object containing a base ID, or
+a URL that can be parsed for a base ID. Optional if url or airtable are
+supplied to the additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}.}
 
-\item{metadata_api_url_pattern}{URL for GET request. By default 'https://api.airtable.com/v0/meta/bases/%s/tables'}
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{...}{Additional parameters:
+\itemize{
+\item For \code{\link[=airtable_base]{airtable_base()}} and \code{\link[=get_base_schema]{get_base_schema()}}, additional parameters
+may include airtable or url (one of which required if base is \code{NULL}).
+\item For \code{\link[=get_table_models]{get_table_models()}}, additional parameters are passed to
+\code{\link[=get_base_schema]{get_base_schema()}} so may include simplifyVector.
+\item For \code{\link[=get_table_model]{get_table_model()}}, additional parameters can include airtable or url
+(one of which is required if table is \code{NULL}).
+}}
+
+\item{simplifyVector}{Should JSON arrays containing only primitives (i.e.
+booleans, numbers, and strings) be caused to atomic vectors?}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+
+\item{tables, table}{Optional character vector of table names or IDs to
+include in the returned data frame or list. For \code{\link[=get_table_model]{get_table_model()}}, table
+can be a schema but is typically expected to be a table name or ID.}
+
+\item{schema}{A base schema list from \code{\link[=get_base_schema]{get_base_schema()}} using
+\code{simplifyVector = FALSE}. Optional if base is supplied (or if airtable or url
+are supplied with additional parameters).}
+
+\item{i}{Index value for the table to return passed to \code{\link[vctrs:vec_slice]{vctrs::vec_slice()}}.
+Defaults to 1 which returns the first table from the tables listed in the
+base schema.}
 }
 \value{
-an `airtable_base_schema` object
+\itemize{
+\item \code{\link[=airtable_base]{airtable_base()}} returns an \code{airtable_base_schema} object.
+\item \code{\link[=get_base_schema]{get_base_schema()}} returns the response from the Airtable get base schema
+API method
+\item \code{\link[=get_table_models]{get_table_models()}} returns a tibble with the list of tables
+from the schema response or a list.
+}
 }
 \description{
-Title
+Get an "airtable_base_schema" object, a base schema, or a list of table
+models from a base schema. \code{\link[=get_table_model]{get_table_model()}} primarily exists as a helper
+function for \code{\link[=copy_table_config]{copy_table_config()}}.
 }
 \examples{
 \dontrun{

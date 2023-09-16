@@ -2,30 +2,84 @@
 % Please edit documentation in R/delete_records.R
 \name{delete_records}
 \alias{delete_records}
-\title{Delete airtable records}
+\title{Delete records from an Airtable table}
 \usage{
 delete_records(
-  data,
-  airtable,
-  airtable_id_col = "airtable_record_id",
-  safely = TRUE,
-  batch_size = 10
+  data = NULL,
+  airtable = NULL,
+  airtable_id_col = NULL,
+  records = NULL,
+  safely = NULL,
+  batch_size = deprecated(),
+  return_records = TRUE,
+  token = NULL,
+  ...
 )
 }
 \arguments{
-\item{data}{A data frame containing records to delete}
+\item{data}{A data frame with a record ID column matching the value of
+airtable_id_col or rownames with record ID values.}
 
-\item{airtable}{An airtable object}
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
+must include a request_url attribute. url is ignored if airtable is
+provided. Optional if url or base \emph{and} table are supplied.}
 
-\item{airtable_id_col}{Column containing Airtable record IDs. Not required if record IDs are stored in row names as returned from \code{read_airtable}.}
+\item{airtable_id_col}{Column name or tidyselect function identifying column
+containing Airtable record IDs. Optional if records is supplied or if
+record IDs are stored in row names (default option for \code{\link[=read_airtable]{read_airtable()}}).
+Defaults to \code{NULL} which is set to \code{getOption("rairtable.id_col", "airtable_record_id")}.}
 
-\item{safely}{If \code{TRUE}, ask for confirmation before executing DELETE request}
+\item{records}{Character vector with record IDs. A vector of record or cell
+URLs is also supported. Optional if data is provided.}
 
-\item{batch_size}{Number of requests to send at a time. Maximum of 10.}
+\item{safely}{If \code{TRUE}, ask for confirmation before deleting Airtable
+records and abort if confirmation is not provided.}
+
+\item{batch_size}{Deprecated. Number of records to delete in a single batch.
+batch_size can now be set using the "rairtable.batch_size" option.}
+
+\item{return_records}{If \code{FALSE}, return the JSON response from the Airtable
+API. If \code{TRUE} (default), return a vector of deleted record IDs.}
+
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{...}{
+  Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
+  \describe{
+    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
+is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
+is optional if airtable \emph{or} base and table are supplied. If url is an
+Airtable view, any additional base or table values provided are ignored. If
+airtable is provided, any supplied url is ignored.}
+    \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
+airtable are supplied or if require_base is \code{FALSE}. base and table are
+both required if url and airtable are \code{NULL} and require_base is \code{TRUE}.}
+    \item{\code{table}}{Airtable table id or name. Table ID values are strings starting
+with "tbl". Optional if require_table is \code{FALSE}.}
+    \item{\code{view}}{Airtable view ID. View ID values starts with "viw". Optional if
+require_view is \code{FALSE}.}
+    \item{\code{require_base}}{If \code{TRUE} (default), the string "app" must be included in
+the supplied API request URL.}
+    \item{\code{require_table}}{If \code{TRUE}, the string "tbl" must be included in the
+supplied url. If require_table is a string, it is treated as the required
+table name which must be part of url. If \code{FALSE} (default), there is no
+check for a table being present in the API request URL.}
+    \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
+string supplied to url. If \code{FALSE} (default), there is no check
+for a view being present in the API request URL.}
+  }}
 }
 \value{
-A vector of IDs deleted
+A vector of deleted record IDs returned invisibly.
 }
 \description{
-Delete records in an Airtable table based on their Airtable record ID.
+Delete records in an Airtable table based on their Airtable record ID. Set
+\code{safely = FALSE} to delete records outside of an interactive session.
+}
+\details{
+Find more information on the Airtable API methods to delete a record
+\url{https://airtable.com/developers/web/api/delete-record} or multiple records
+\url{https://airtable.com/developers/web/api/delete-multiple-records}.
 }

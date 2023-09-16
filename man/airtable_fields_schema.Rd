@@ -2,16 +2,18 @@
 % Please edit documentation in R/airtable_fields_schema.R
 \name{airtable_fields_schema}
 \alias{airtable_fields_schema}
-\title{Create an `airtable_fields_schema` object that can be used for data validation}
+\title{Create an \code{airtable_fields_schema} object}
 \usage{
 airtable_fields_schema(field_schema)
 }
 \arguments{
-\item{field_schema}{A list of lists. Each child list should have a `name`, `type`, and `id` as well as an optional `options`}
+\item{field_schema}{A list of lists. Each child list should have a \code{name},
+\code{type}, and \code{id} as well as an optional \code{options}}
 }
 \value{
-An `airtable_fields_schema`object
+An \code{airtable_fields_schema} object
 }
 \description{
-Create an `airtable_fields_schema` object that can be used for data validation
+Create an \code{airtable_fields_schema} object from a list of lists to use for
+data validation.
 }
