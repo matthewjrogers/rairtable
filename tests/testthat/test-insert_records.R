@@ -1,15 +1,23 @@
-test_that("insert_records completes when records are sent in batches", {
+test_that("insert_records passes typecast to every batch", {
   withr::local_envvar(AIRTABLE_PAT = "test_pat")
   atbl <- airtable("tblabc123", "appxyz123", description = "Test base")
-  n_requests <- 0
+  captured <- new.env()
+  captured$requests <- list()
 
   httr2::with_mocked_responses(
     function(req) {
-      n_requests <<- n_requests + 1
+      captured$requests <- c(captured$requests, list(req$body$data))
       httr2::response_json(body = list(records = list()))
     },
-    expect_no_error(insert_records(data.frame(Name = letters[1:12]), atbl))
+    {
+      insert_records(data.frame(Name = letters[1:12]), atbl, typecast = FALSE)
+      insert_records(data.frame(Name = letters[1:12]), atbl, typecast = TRUE)
+    }
   )
 
-  expect_identical(n_requests, 2)
+  expect_length(captured$requests, 4)
+  expect_false(captured$requests[[1]]$typecast)
+  expect_false(captured$requests[[2]]$typecast)
+  expect_true(captured$requests[[3]]$typecast)
+  expect_true(captured$requests[[4]]$typecast)
 })

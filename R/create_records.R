@@ -45,6 +45,8 @@ req_create_records <- function(req = NULL,
         req_create_records(
           req = req,
           data = batched_data[[i]],
+          fields_by_id = fields_by_id,
+          typecast = typecast,
           call = call
         )
       },
