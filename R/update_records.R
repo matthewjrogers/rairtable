@@ -63,11 +63,18 @@ update_records <- function(data,
 
   update_data <- get_data_columns(
     data = data,
-    columns = columns,
+    columns = {{ columns }},
     id_col = airtable_id_col
   )
 
-  update_fields <- get_data_colnames(columns, .data = update_data)
+  if (nrow(update_data) != n_records) {
+    cli_abort(
+      "{.arg data} has {nrow(update_data)} row{?s} but
+      {n_records} record ID{?s} {?was/were} found."
+    )
+  }
+
+  update_fields <- names(update_data)
 
   if (!is_null(model)) {
     update_fields <- try_fetch(
@@ -310,16 +317,14 @@ get_data_columns <- function(data,
     data <- data[, names(data) != id_col, drop = FALSE]
   }
 
-  select_cols(columns, .data = data, error_call = call)
-}
+  pos <- tidyselect::eval_select(
+    enquo(columns),
+    data = data,
+    allow_rename = FALSE,
+    error_call = call
+  )
 
-#' Get names of selected columns
-#'
-#' @noRd
-get_data_colnames <- function(...,
-                              .data,
-                              call = caller_env()) {
-  names(select_cols(..., .data = .data, error_call = call))
+  data[pos]
 }
 
 #' Use tidyselect to pull a column from a data frame
