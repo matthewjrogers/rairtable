@@ -172,6 +172,14 @@ req_update_records <- function(req = NULL,
 
   data <- make_list_of_lists(data, call = call)
 
+  if (length(data) != n_records) {
+    cli_abort(
+      "{.arg data} must have one row for each of the {n_records} record ID{?s},
+      not {length(data)}.",
+      call = call
+    )
+  }
+
   if (n_records > batch_size) {
     batched_records <- split_list(records, batch_size, call = call)
 
@@ -198,7 +206,13 @@ req_update_records <- function(req = NULL,
   req <- httr2::req_body_json(
     req,
     data = list(
-      "fields" = make_list_of_lists(data, 1, call = call),
+      "records" = unname(
+        Map(
+          function(id, fields) list("id" = id, "fields" = fields),
+          records,
+          data
+        )
+      ),
       "returnFieldsByFieldId" = fields_by_id,
       "typecast" = typecast
     )
