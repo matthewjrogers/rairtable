@@ -57,12 +57,14 @@ create_table <- function(airtable = NULL,
                          model = NULL,
                          token = NULL,
                          ...) {
-  if (is_null(config)) {
-    config <- make_table_config(
-      name = name,
-      description = description,
-      fields = fields
-    )
+  if (!is_null(config)) {
+    if (!is_null(model)) {
+      cli_alert_warning(
+        "{.arg model} is ignored if {.arg config} is supplied."
+      )
+    }
+
+    check_table_config(config)
   } else if (!is_null(model)) {
     config <- copy_table_config(
       model = model,
@@ -70,7 +72,11 @@ create_table <- function(airtable = NULL,
       description = description
     )
   } else {
-    check_table_config(config)
+    config <- make_table_config(
+      name = name,
+      description = description,
+      fields = fields
+    )
   }
 
   base <- get_base_id(
